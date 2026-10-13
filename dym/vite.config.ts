@@ -29,7 +29,14 @@ export default defineConfig({
         }),
     ]),
     server: {
+        ...(process.env.LARAVEL_SAIL
+            ? {
+                  origin: 'http://localhost:5173',
+                  hmr: { host: 'localhost' },
+              }
+            : {}),
         watch: {
+            usePolling: Boolean(process.env.LARAVEL_SAIL),
             ignored: [
                 '**/.agents/**',
                 '**/.claude/**',
