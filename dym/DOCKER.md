@@ -32,9 +32,36 @@ docker compose up -d
 
 Application : http://localhost:8000. Vite : http://localhost:5173.
 Le service `queue` traite les tâches en base de données.
-Conserver `DB_CONNECTION=sqlite` et `APP_URL=http://localhost:8000` dans `.env`.
-Si `DB_DATABASE` est défini, son chemin doit être valide dans le conteneur
-(par exemple `/var/www/html/database/database.sqlite`).
+La base est MySQL 8.4 (service `mysql`, données dans le volume `mysql_data`).
+Dans `.env` :
+
+```dotenv
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=dym
+DB_USERNAME=sail
+DB_PASSWORD=password
+FORWARD_DB_PORT=3307
+```
+
+Depuis Windows (HeidiSQL, DBeaver…), MySQL est accessible sur `127.0.0.1:3307`.
+Les commandes `php artisan` doivent être lancées dans le conteneur
+(`docker compose exec laravel.test php artisan …`), car l'hôte `mysql`
+n'existe que sur le réseau Docker.
+
+### Performances (code monté depuis Windows)
+
+Le projet est monté depuis le disque Windows, où chaque accès fichier est lent.
+OPcache ne revérifie donc pas les fichiers PHP (`docker/php/99-dev.ini`).
+**Après modification d'un fichier PHP** (contrôleur, route, config…) :
+
+```powershell
+docker compose restart laravel.test
+```
+
+Les fichiers React/CSS ne sont pas concernés (Vite recharge à chaud).
+Pour revenir au comportement standard, plus lent : `PHP_OPCACHE_VALIDATE_TIMESTAMPS=1` dans `.env`.
 
 ## Commandes courantes
 
@@ -65,3 +92,47 @@ Après l'arrêt de Docker, avant de revenir à un serveur PHP local, supprimer
 Si le moteur Docker est inaccessible, ouvrir Docker Desktop, attendre son
 démarrage et vérifier `docker info`. Sous Windows, sélectionner les conteneurs
 Linux si Docker Desktop utilise actuellement les conteneurs Windows.
+
+## Production
+
+`Dockerfile` (multi-étapes) construit une image `serversideup/php` FPM + Nginx
+avec les dépendances Composer sans dev et les assets Vite compilés.
+`compose.prod.yaml` lance l'application (port 8080), un worker de queue et
+MySQL 8.4. Les données MySQL et `storage/app` sont dans des volumes nommés ;
+MySQL n'est pas exposé hors du réseau Docker.
+
+```powershell
+Copy-Item .env.example .env.production   # puis renseigner les valeurs ci-dessous
+docker compose --env-file .env.production -f compose.prod.yaml build
+docker compose --env-file .env.production -f compose.prod.yaml up -d
+```
+
+`--env-file .env.production` est obligatoire : il fournit aussi les identifiants
+au conteneur MySQL (sinon la commande échoue avec « DB_… manquant »).
+
+Dans `.env.production` :
+
+```dotenv
+APP_ENV=production
+APP_DEBUG=false
+APP_KEY=base64:...            # php artisan key:generate --show
+APP_URL=https://dym.ci
+
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=dym
+DB_USERNAME=dym
+DB_PASSWORD=<mot de passe fort>
+DB_ROOT_PASSWORD=<autre mot de passe fort>
+```
+
+Les migrations et la mise en cache s'exécutent au démarrage (`AUTORUN_*`),
+une fois MySQL prêt. Placer un reverse proxy TLS (Caddy, Traefik, Nginx)
+devant le port 8080. `.env.production` ne doit jamais être commité.
+
+Sauvegarde de la base :
+
+```powershell
+docker compose --env-file .env.production -f compose.prod.yaml exec mysql sh -c 'mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" dym' > dym.sql
+```

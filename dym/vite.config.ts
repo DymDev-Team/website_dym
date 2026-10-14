@@ -31,8 +31,12 @@ export default defineConfig({
     server: {
         ...(process.env.LARAVEL_SAIL
             ? {
-                  origin: 'http://localhost:5173',
-                  hmr: { host: 'localhost' },
+                  origin: `http://localhost:${process.env.VITE_PORT ?? 5173}`,
+                  cors: { origin: /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/ },
+                  hmr: {
+                      host: 'localhost',
+                      clientPort: Number(process.env.VITE_PORT ?? 5173),
+                  },
               }
             : {}),
         watch: {

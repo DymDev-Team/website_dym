@@ -1,0 +1,56 @@
+services:
+    app:
+        build:
+            context: .
+            target: production
+        image: dym/app:latest
+        restart: unless-stopped
+        ports:
+            - '${APP_PORT:-8080}:8080'
+        env_file: .env.production
+        volumes:
+            - storage:/var/www/html/storage/app
+        depends_on:
+            mysql:
+                condition: service_healthy
+        healthcheck:
+            test: ['CMD', 'curl', '-fsS', 'http://localhost:8080/up']
+            interval: 30s
+            timeout: 5s
+            retries: 3
+
+    queue:
+        image: dym/app:latest
+        restart: unless-stopped
+        command: ['php', 'artisan', 'queue:work', '--tries=3', '--timeout=90']
+        env_file: .env.production
+        environment:
+            AUTORUN_ENABLED: 'false'
+        volumes:
+            - storage:/var/www/html/storage/app
+        depends_on:
+            app:
+                condition: service_healthy
+
+    # Non exposé à l'extérieur : seuls app et queue y accèdent via le réseau Docker.
+    mysql:
+        image: 'mysql:8.4'
+        restart: unless-stopped
+        # Valeurs lues dans .env.production via « --env-file .env.production ».
+        environment:
+            MYSQL_DATABASE: '${DB_DATABASE:?DB_DATABASE manquant}'
+            MYSQL_USER: '${DB_USERNAME:?DB_USERNAME manquant}'
+            MYSQL_PASSWORD: '${DB_PASSWORD:?DB_PASSWORD manquant}'
+            MYSQL_ROOT_PASSWORD: '${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD manquant}'
+        volumes:
+            - mysql:/var/lib/mysql
+        healthcheck:
+            test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 -u root -p"$$MYSQL_ROOT_PASSWORD" --silent']
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 30s
+
+volumes:
+    mysql:
+    storage:

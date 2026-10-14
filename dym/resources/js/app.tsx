@@ -8,11 +8,23 @@ import SettingsLayout from '@/layouts/settings/layout';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+// Pages du site vitrine : elles ont leur propre en-tête/pied de page et ne
+// doivent pas hériter du layout (sidebar) de l'application.
+const publicPages = [
+    'welcome',
+    'activites',
+    'actualites',
+    'post',
+    'carriere',
+    'offre',
+    'legal',
+];
+
 void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
-            case name === 'welcome':
+            case publicPages.includes(name):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;

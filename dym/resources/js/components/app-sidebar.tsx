@@ -1,5 +1,21 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import {
+    BookOpen,
+    Briefcase,
+    Factory,
+    FolderGit2,
+    Gauge,
+    Hammer,
+    Handshake,
+    ImageIcon,
+    Inbox,
+    LayoutGrid,
+    MessageSquareQuote,
+    Newspaper,
+    Scale,
+    Settings,
+    Users,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -15,6 +31,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import admin from '@/routes/admin';
 import type { NavItem } from '@/types';
 
 export function AppSidebar() {
@@ -29,6 +46,66 @@ export function AppSidebar() {
             href: dashboardUrl,
             icon: LayoutGrid,
         },
+    ];
+
+    const adminNavItems: NavItem[] = [
+        { title: 'Vue d’ensemble', href: admin.dashboard(), icon: Gauge },
+        {
+            title: 'Actualités',
+            href: admin.posts.index(),
+            icon: Newspaper,
+            matchChildren: true,
+        },
+        {
+            title: 'Réalisations',
+            href: admin.projects.index(),
+            icon: ImageIcon,
+            matchChildren: true,
+        },
+        {
+            title: 'Activités',
+            href: admin.activities.index(),
+            icon: Hammer,
+            matchChildren: true,
+        },
+        {
+            title: 'Équipements',
+            href: admin.equipment.index(),
+            icon: Factory,
+            matchChildren: true,
+        },
+        {
+            title: 'Partenaires',
+            href: admin.partners.index(),
+            icon: Handshake,
+            matchChildren: true,
+        },
+        {
+            title: 'Témoignages',
+            href: admin.testimonials.index(),
+            icon: MessageSquareQuote,
+            matchChildren: true,
+        },
+        {
+            title: 'Offres d’emploi',
+            href: admin.jobOffers.index(),
+            icon: Briefcase,
+            matchChildren: true,
+        },
+        {
+            title: 'Candidatures',
+            href: admin.applications.index(),
+            icon: Inbox,
+            matchChildren: true,
+        },
+        {
+            title: 'Pages légales',
+            href: admin.legalPages.index(),
+            icon: Scale,
+            matchChildren: true,
+        },
+        { title: 'Paramètres', href: admin.settings.edit(), icon: Settings },
+        { title: 'Utilisateurs', href: admin.users.index(), icon: Users },
     ];
 
     const footerNavItems: NavItem[] = [
@@ -65,6 +142,9 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
+                {page.props.auth.user?.is_admin === true && (
+                    <NavMain items={adminNavItems} label="Administration" />
+                )}
             </SidebarContent>
 
             <SidebarFooter>

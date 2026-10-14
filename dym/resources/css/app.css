@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 
 @import 'tw-animate-css';
+@import './hero.css';
+@import './header.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -12,6 +14,24 @@
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
+
+    --font-display: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
+
+    --color-dym: #f15a22;
+    --color-dym-dark: #d94a14;
+    --color-ink: #141414;
+    --color-paper: #ffffff;
+
+    --animate-partners: partners-scroll 28s linear infinite;
+
+    @keyframes partners-scroll {
+        from {
+            transform: translateX(0);
+        }
+        to {
+            transform: translateX(-50%);
+        }
+    }
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
