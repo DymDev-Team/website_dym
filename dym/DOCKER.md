@@ -137,7 +137,7 @@ Prérequis : enregistrement DNS `A website → <IPv4 du VPS>` dans la zone LWS,
 ports 80/443 ouverts dans le pare-feu Contabo (s'il est activé).
 
 ```bash
-git clone https://github.com/DymDev-Team/website_dym.git && cd website_dym
+git clone https://github.com/DymDev-Team/website_dym.git && cd website_dym/dym
 sudo bash docker/deploy.sh
 docker compose --env-file .env.production -f compose.prod.yaml exec app php artisan app:make-admin vous@exemple.com
 ```
