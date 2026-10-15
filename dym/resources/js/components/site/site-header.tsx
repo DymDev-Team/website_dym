@@ -2,13 +2,17 @@ import { Link } from '@inertiajs/react';
 import { ArrowRight, Menu, X } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
+import { create as quoteCreate } from '@/routes/quotes';
+import { useTexts } from '@/components/site/use-texts';
 
 export const siteNav = [
-    { label: 'Accueil', href: '/' },
-    { label: 'Activités', href: '/activites' },
-    { label: 'Réalisations', href: '/#realisations' },
-    { label: 'Actualités', href: '/actualites' },
-    { label: 'Carrière', href: '/carriere' },
+    // `label` identifie l'entrée (prop `active` des pages) ; le texte affiché
+    // vient de t(`layout.header.nav_${key}`).
+    { key: 'home', label: 'Accueil', href: '/' },
+    { key: 'activities', label: 'Activités', href: '/activites' },
+    { key: 'projects', label: 'Réalisations', href: '/#realisations' },
+    { key: 'news', label: 'Actualités', href: '/actualites' },
+    { key: 'careers', label: 'Carrière', href: '/carriere' },
 ];
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
@@ -27,6 +31,7 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
     const [hovered, setHovered] = useState<number | null>(null);
     const [bar, setBar] = useState({ x: 0, w: 0 });
     const itemsRef = useRef<(HTMLAnchorElement | null)[]>([]);
+    const t = useTexts();
 
     const activeIndex = siteNav.findIndex((item) => item.label === active);
     const target = hovered ?? activeIndex;
@@ -83,7 +88,7 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
                                 i === target ? 'text-ink' : 'text-neutral-600 hover:text-ink'
                             }`}
                         >
-                            {item.label}
+                            {t(`layout.header.nav_${item.key}`)}
                         </a>
                     ))}
                     <span
@@ -97,13 +102,13 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
                 </nav>
 
                 <div className="hd-item flex items-center gap-3" style={delay(0.6)}>
-                    <a
-                        href="#contact"
+                    <Link
+                        href={quoteCreate()}
                         className="hd-cta relative hidden items-center gap-2 overflow-hidden bg-dym px-5 py-3 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark sm:inline-flex"
                     >
-                        Demander un devis
+                        {t('layout.header.cta')}
                         <ArrowRight className="hd-arrow size-3.5" />
-                    </a>
+                    </Link>
                     <button type="button" onClick={() => setOpen(!open)} className="hd-burger grid size-10 place-items-center border border-black/15 lg:hidden" aria-label="Menu" aria-expanded={open}>
                         {open ? <X className="size-5" /> : <Menu className="size-5" />}
                     </button>
@@ -120,17 +125,17 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
                             style={delay(0.05 + i * 0.05)}
                             className={`block border-b border-black/10 py-3 text-xs font-semibold tracking-[0.14em] uppercase ${item.label === active ? 'text-dym' : ''}`}
                         >
-                            {item.label}
+                            {t(`layout.header.nav_${item.key}`)}
                         </a>
                     ))}
-                    <a
-                        href="#contact"
+                    <Link
+                        href={quoteCreate()}
                         onClick={() => setOpen(false)}
                         style={delay(0.05 + siteNav.length * 0.05)}
                         className="hd-cta relative mt-5 inline-flex items-center gap-2 overflow-hidden bg-dym px-5 py-3 text-xs font-semibold tracking-[0.14em] text-white uppercase"
                     >
-                        Demander un devis <ArrowRight className="hd-arrow size-3.5" />
-                    </a>
+                        {t('layout.header.cta')} <ArrowRight className="hd-arrow size-3.5" />
+                    </Link>
                 </nav>
             )}
         </header>

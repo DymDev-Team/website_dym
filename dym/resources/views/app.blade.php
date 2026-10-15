@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
+@php($forceLight = str_starts_with($page['component'] ?? '', 'auth/'))
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ! $forceLight && ($appearance ?? 'system') == 'dark'])>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,7 +10,8 @@
             (function() {
                 const appearance = '{{ $appearance ?? "system" }}';
 
-                if (appearance === 'system') {
+                // Les pages de connexion restent en clair (charte du site).
+                if (appearance === 'system' && ! {{ $forceLight ? 'true' : 'false' }}) {
                     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
                     if (prefersDark) {
@@ -31,7 +33,8 @@
         </style>
 
         <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32">
+        <link rel="icon" href="/icon-512.png" type="image/png" sizes="512x512">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         @fonts

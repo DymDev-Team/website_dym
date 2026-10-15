@@ -38,14 +38,13 @@ test('admins can visit every admin page', function (string $route) {
     'admin.applications.index',
 ]);
 
-test('is_admin cannot be mass assigned at registration', function () {
-    $this->post(route('register.store'), [
+test('is_admin cannot be mass assigned', function () {
+    $user = User::query()->create([
         'name' => 'Intrus',
         'email' => 'intrus@example.com',
         'password' => 'password',
-        'password_confirmation' => 'password',
         'is_admin' => true,
     ]);
 
-    expect(User::query()->where('email', 'intrus@example.com')->first()?->is_admin)->toBeFalse();
+    expect($user->fresh()->is_admin)->toBeFalse();
 });

@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
 import type { Testimonial } from '@/types/admin';
+import { useTexts, withDot } from '@/components/site/use-texts';
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
@@ -17,6 +18,7 @@ const initials = (name: string) =>
 export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) {
     const [ref, inView] = useInView<HTMLElement>(0.2, false);
     const trackRef = useRef<HTMLDivElement>(null);
+    const t = useTexts();
 
     const scroll = (dir: 1 | -1) => {
         const track = trackRef.current;
@@ -41,14 +43,11 @@ export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) 
                 <div className="flex flex-wrap items-end justify-between gap-5">
                     <div>
                         <div className="hx-mono hx-fade mb-4 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
-                            <span className="inline-block size-[5px] bg-dym" /> TÉMOIGNAGES
+                            <span className="inline-block size-[5px] bg-dym" /> {t('home.testimonials.eyebrow')}
                         </div>
                         <h2 id="temoignages-title" className="font-display text-[clamp(34px,7vw,44px)] leading-[0.95] text-ink uppercase lg:text-[clamp(36px,2.8vw,50px)]">
                             <span className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
-                                <span style={delay(0.12)}>
-                                    Ils parlent de nous
-                                    <span className="text-dym">.</span>
-                                </span>
+                                <span style={delay(0.12)}>{withDot(t('home.testimonials.title'))}</span>
                             </span>
                         </h2>
                     </div>

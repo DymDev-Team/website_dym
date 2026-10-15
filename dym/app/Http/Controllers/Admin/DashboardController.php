@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\QuoteStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Equipment;
@@ -11,6 +12,7 @@ use App\Models\JobOffer;
 use App\Models\Partner;
 use App\Models\Post;
 use App\Models\Project;
+use App\Models\QuoteRequest;
 use App\Models\Testimonial;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -39,6 +41,10 @@ class DashboardController extends Controller
                     'total' => JobApplication::query()->count(),
                     'new' => JobApplication::query()->where('status', ApplicationStatus::New)->count(),
                     'openOffers' => JobOffer::query()->open()->count(),
+                ],
+                'quotes' => [
+                    'total' => QuoteRequest::query()->count(),
+                    'new' => QuoteRequest::query()->where('status', QuoteStatus::New)->count(),
                 ],
                 'users' => [
                     'total' => User::query()->count(),

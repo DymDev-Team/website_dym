@@ -18,6 +18,7 @@ const publicPages = [
     'carriere',
     'offre',
     'legal',
+    'devis',
 ];
 
 void createInertiaApp({

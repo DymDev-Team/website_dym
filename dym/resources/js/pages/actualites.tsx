@@ -6,6 +6,7 @@ import { SiteHeader } from '@/components/site/site-header';
 import { useInView } from '@/components/site/use-in-view';
 import { show } from '@/routes/posts';
 import type { Activity, Paginated, Post, SiteSettings } from '@/types/admin';
+import { useTexts, withDot } from '@/components/site/use-texts';
 
 type Props = {
     posts: Paginated<Post>;
@@ -45,7 +46,8 @@ function Underline({ children }: { children: string }) {
 }
 
 function PageLink({ url, dir }: { url: string | null; dir: 1 | -1 }) {
-    const label = dir < 0 ? 'Précédent' : 'Suivant';
+    const t = useTexts();
+    const label = t(dir < 0 ? 'news.list.previous' : 'news.list.next');
 
     if (!url) {
         return <span className="w-[104px]" aria-hidden />;
@@ -65,6 +67,7 @@ function PageLink({ url, dir }: { url: string | null; dir: 1 | -1 }) {
 
 export default function ActualitesPage({ posts, categories, category, activities, site }: Props) {
     const [ref, inView] = useInView<HTMLElement>(0.05, false);
+    const t = useTexts();
 
     // À la une : l'article le plus récent, en première page uniquement.
     const featured = posts.current_page === 1 ? posts.data[0] : undefined;
@@ -72,8 +75,8 @@ export default function ActualitesPage({ posts, categories, category, activities
 
     return (
         <>
-            <Head title="Actualités — DYM Manufacture">
-                <meta name="description" content="Projets livrés, nouveaux équipements et vie de l'atelier : toutes les actualités de DYM Manufacture." />
+            <Head title={t('news.meta.title')}>
+                <meta name="description" content={t('news.meta.description')} />
             </Head>
 
             <div className="bg-paper text-ink">
@@ -85,18 +88,18 @@ export default function ActualitesPage({ posts, categories, category, activities
                         <div className="flex flex-wrap items-end justify-between gap-6 lg:pl-[clamp(22px,3vw,52px)]">
                             <div>
                                 <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
-                                    <span className="inline-block size-[5px] bg-dym" /> NOS ACTUALITÉS
+                                    <span className="inline-block size-[5px] bg-dym" /> {t('news.header.eyebrow')}
                                 </div>
                                 <h1 id="actualites-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] text-ink uppercase lg:text-[clamp(44px,3.8vw,68px)]">
                                     <span className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
                                         <span style={delay(0.12)}>
-                                            Le métal en mouvement<span className="text-dym">.</span>
+                                            {withDot(t('news.header.title'))}
                                         </span>
                                     </span>
                                 </h1>
                             </div>
                             <p className="hx-fade max-w-[440px] text-[15px] leading-[1.7] text-neutral-600" style={delay(0.25)}>
-                                Projets livrés, nouveaux équipements, vie de l’atelier : suivez ce qui se fabrique chez DYM Manufacture.
+                                {t('news.header.text')}
                             </p>
                         </div>
 
@@ -113,13 +116,13 @@ export default function ActualitesPage({ posts, categories, category, activities
                                             c === category ? 'border-dym bg-dym text-white' : 'border-black/15 text-neutral-600 hover:border-ink hover:text-ink'
                                         }`}
                                     >
-                                        {c ?? 'Toutes'}
+                                        {c ?? t('news.list.all')}
                                     </Link>
                                 ))}
                             </nav>
                         )}
 
-                        {posts.data.length === 0 && <p className="mt-16 text-neutral-500 lg:pl-[clamp(22px,3vw,52px)]">Aucune actualité pour le moment.</p>}
+                        {posts.data.length === 0 && <p className="mt-16 text-neutral-500 lg:pl-[clamp(22px,3vw,52px)]">{t('news.list.empty')}</p>}
 
                         {/* À la une */}
                         {featured && (
@@ -129,7 +132,7 @@ export default function ActualitesPage({ posts, categories, category, activities
                                         <img src={featured.image_url ?? undefined} alt="" className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                                     </div>
                                     <div className="lg:pr-[clamp(22px,3vw,52px)]">
-                                        <span className="hx-mono text-[10px] text-dym">[ À LA UNE ]</span>
+                                        <span className="hx-mono text-[10px] text-dym">{t('news.list.featured')}</span>
                                         <div className="mt-4">
                                             <Meta post={featured} />
                                         </div>
@@ -138,7 +141,7 @@ export default function ActualitesPage({ posts, categories, category, activities
                                         </h2>
                                         {featured.excerpt && <p className="mt-5 line-clamp-4 text-[15px] leading-[1.7] text-neutral-600">{featured.excerpt}</p>}
                                         <span className="hx-mono mt-6 inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
-                                            Lire l’article
+                                            {t('news.list.read_article')}
                                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                                         </span>
                                     </div>
@@ -163,7 +166,7 @@ export default function ActualitesPage({ posts, categories, category, activities
                                             </h3>
                                             {p.excerpt && <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-neutral-600">{p.excerpt}</p>}
                                             <span className="hx-mono mt-4 inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
-                                                Lire la suite
+                                                {t('news.list.read_more')}
                                                 <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                                             </span>
                                         </Link>
@@ -177,7 +180,7 @@ export default function ActualitesPage({ posts, categories, category, activities
                             <nav aria-label="Pagination" className="hx-hair mt-16 flex items-center justify-between border-t pt-6">
                                 <PageLink url={posts.prev_page_url} dir={-1} />
                                 <span className="hx-mono text-[10px] tracking-[0.1em] text-neutral-500">
-                                    Page {posts.current_page} / {posts.last_page}
+                                    {t('news.list.page')} {posts.current_page} / {posts.last_page}
                                 </span>
                                 <PageLink url={posts.next_page_url} dir={1} />
                             </nav>

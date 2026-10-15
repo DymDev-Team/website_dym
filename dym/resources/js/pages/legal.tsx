@@ -4,6 +4,7 @@ import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import { show } from '@/routes/legal';
 import type { Activity, SiteSettings } from '@/types/admin';
+import { useTexts } from '@/components/site/use-texts';
 
 type Props = {
     page: { title: string; body: string; updated_at: string | null };
@@ -16,9 +17,11 @@ type Props = {
 const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' });
 
 export default function LegalPage({ page, legalPages, current, activities, site }: Props) {
+    const t = useTexts();
+
     return (
         <>
-            <Head title={`${page.title} — DYM Manufacture`} />
+            <Head title={t('legal.page.meta_title').replace('{titre}', page.title)} />
 
             <div className="bg-paper text-ink">
                 <SiteHeader active="" />
@@ -26,13 +29,13 @@ export default function LegalPage({ page, legalPages, current, activities, site 
                 <section className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto max-w-[1200px] pt-12 pb-10 lg:pt-16">
                         <div className="hx-mono mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500">
-                            <span className="inline-block size-[5px] bg-dym" /> INFORMATIONS LÉGALES
+                            <span className="inline-block size-[5px] bg-dym" /> {t('legal.page.eyebrow')}
                         </div>
                         <h1 className="font-display text-[clamp(38px,6vw,64px)] leading-[0.98] uppercase">
                             {page.title}
                             <span className="text-dym">.</span>
                         </h1>
-                        {page.updated_at && <p className="mt-4 text-sm text-neutral-500">Dernière mise à jour : {dateFormat.format(new Date(page.updated_at))}</p>}
+                        {page.updated_at && <p className="mt-4 text-sm text-neutral-500">{t('legal.page.updated').replace('{date}', dateFormat.format(new Date(page.updated_at)))}</p>}
                     </div>
                 </section>
 

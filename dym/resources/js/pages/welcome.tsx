@@ -4,6 +4,7 @@ import { Equipment } from '@/components/site/equipment';
 import { Hero } from '@/components/site/hero';
 import { Intro } from '@/components/site/intro';
 import { News } from '@/components/site/news';
+import { PageLoader } from '@/components/site/page-loader';
 import { Partners } from '@/components/site/partners';
 import { Process } from '@/components/site/process';
 import { Projects } from '@/components/site/projects';
@@ -19,6 +20,7 @@ import type {
     SiteSettings,
     Testimonial,
 } from '@/types/admin';
+import { useTexts } from '@/components/site/use-texts';
 
 type Props = {
     activities: Activity[];
@@ -39,11 +41,16 @@ export default function Welcome({
     posts,
     site,
 }: Props) {
+    const t = useTexts();
+
     return (
         <>
-            <Head title="DYM Manufacture — Le métal, de l'idée à la matière" />
+            <Head title={t('home.meta.title')}>
+                <meta name="description" content={t('home.meta.description')} />
+            </Head>
 
             <div className="bg-paper text-ink">
+                <PageLoader />
                 <SiteHeader />
                 <Hero />
 

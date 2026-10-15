@@ -1,9 +1,13 @@
-@import 'tailwindcss';
+/* Sources listées explicitement : la détection automatique parcourt tout le
+   projet (dont public/, 170 Mo d'images et vidéos), très lent sur le disque
+   Windows monté dans Docker. */
+@import 'tailwindcss' source(none);
 
 @import 'tw-animate-css';
 @import './hero.css';
 @import './header.css';
 
+@source '../js';
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
@@ -82,74 +86,75 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+    /* Charte DYM : papier, encre, orange. Barre latérale en encre. */
+    --background: #f4f1ea;
+    --foreground: #141414;
+    --card: #ffffff;
+    --card-foreground: #141414;
+    --popover: #ffffff;
+    --popover-foreground: #141414;
+    --primary: #f15a22;
+    --primary-foreground: #ffffff;
+    --secondary: #ebe7de;
+    --secondary-foreground: #141414;
+    --muted: #ebe7de;
+    --muted-foreground: #6b675f;
+    --accent: #ebe7de;
+    --accent-foreground: #141414;
     --destructive: oklch(0.577 0.245 27.325);
     --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
+    --border: rgb(20 20 20 / 0.1);
+    --input: rgb(20 20 20 / 0.18);
+    --ring: #f15a22;
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+    --radius: 0.125rem;
+    --sidebar: #141414;
+    --sidebar-foreground: #d9d5cc;
+    --sidebar-primary: #f15a22;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: rgb(255 255 255 / 0.07);
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: rgb(255 255 255 / 0.08);
+    --sidebar-ring: #f15a22;
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
+    --background: #121212;
+    --foreground: #f4f1ea;
+    --card: #1a1a1a;
+    --card-foreground: #f4f1ea;
+    --popover: #1a1a1a;
+    --popover-foreground: #f4f1ea;
+    --primary: #f15a22;
+    --primary-foreground: #ffffff;
+    --secondary: #242424;
+    --secondary-foreground: #f4f1ea;
+    --muted: #242424;
+    --muted-foreground: #a19d94;
+    --accent: #242424;
+    --accent-foreground: #f4f1ea;
     --destructive: oklch(0.396 0.141 25.723);
     --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
+    --border: rgb(255 255 255 / 0.09);
+    --input: rgb(255 255 255 / 0.14);
+    --ring: #f15a22;
     --chart-1: oklch(0.488 0.243 264.376);
     --chart-2: oklch(0.696 0.17 162.48);
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    --sidebar: #0a0a0a;
+    --sidebar-foreground: #d9d5cc;
+    --sidebar-primary: #f15a22;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: rgb(255 255 255 / 0.07);
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: rgb(255 255 255 / 0.08);
+    --sidebar-ring: #f15a22;
 }
 
 @layer base {
@@ -160,4 +165,28 @@
     body {
         @apply bg-background text-foreground;
     }
+}
+
+/* Pages d'authentification : toujours en clair, aux couleurs du site DYM
+   (papier, encre, orange) et angles droits, quel que soit le thème choisi. */
+.dym-auth {
+    --background: #f4f1ea;
+    --foreground: #141414;
+    --card: #ffffff;
+    --card-foreground: #141414;
+    --popover: #ffffff;
+    --popover-foreground: #141414;
+    --primary: #141414;
+    --primary-foreground: #ffffff;
+    --secondary: #ebe7de;
+    --secondary-foreground: #141414;
+    --muted: #ebe7de;
+    --muted-foreground: #6b675f;
+    --accent: #ebe7de;
+    --accent-foreground: #141414;
+    --border: rgb(20 20 20 / 0.12);
+    --input: rgb(20 20 20 / 0.18);
+    --ring: #f15a22;
+    --radius: 0px;
+    color-scheme: light;
 }

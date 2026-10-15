@@ -2,32 +2,14 @@ import { ArrowLeft, ArrowRight, Factory, HardHat, PencilRuler } from 'lucide-rea
 import { Fragment, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
+import { lines, useTexts, withDot } from '@/components/site/use-texts';
 
+// Textes des étapes : home.process.step_N_{title,text,alt} (/admin/texts).
 const steps = [
-    {
-        icon: PencilRuler,
-        title: ['Étudier', 'et concevoir'],
-        text: 'Relevés, plans 2D/3D et chiffrage par notre bureau d’études.',
-        image: '/images/process/01-bureau-etudes.jpg',
-        alt: 'Ingénieurs du bureau d’études DYM travaillant sur leurs plans',
-    },
-    {
-        icon: Factory,
-        title: ['Fabriquer dans', 'nos ateliers'],
-        text: 'Découpe laser, pliage, usinage, soudure et contrôle qualité.',
-        image: '/images/process/02-atelier.jpg',
-        alt: 'Opérateur DYM sur une plieuse dans l’atelier',
-    },
-    {
-        icon: HardHat,
-        title: ['Réaliser', 'sur site'],
-        text: 'Livraison, pose et mise en service par nos équipes.',
-        image: '/images/process/03-realisation.jpg',
-        alt: 'Pergola en métal découpé au laser posée sur une maison',
-    },
+    { icon: PencilRuler, image: '/images/process/01-bureau-etudes.jpg' },
+    { icon: Factory, image: '/images/process/02-atelier.jpg' },
+    { icon: HardHat, image: '/images/process/03-realisation.jpg' },
 ];
-
-const titleLines = ['Du plan', 'à la réalité.'];
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
@@ -35,6 +17,8 @@ export function Process() {
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
     const trackRef = useRef<HTMLOListElement>(null);
     const [current, setCurrent] = useState(0);
+    const t = useTexts();
+    const titleLines = lines(t('home.process.title'));
 
     // Carrousel mobile : étape affichée = celle dont le bord gauche est le plus proche.
     useEffect(() => {
@@ -76,20 +60,13 @@ export function Process() {
                 <div className="grid items-end gap-6 lg:grid-cols-2 lg:gap-10 lg:pl-[clamp(22px,3vw,52px)]">
                     <div>
                         <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
-                            <span className="inline-block size-[5px] bg-dym" /> NOTRE APPROCHE
+                            <span className="inline-block size-[5px] bg-dym" /> {t('home.process.eyebrow')}
                         </div>
                         <h2 id="approche-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] text-ink uppercase lg:text-[clamp(44px,3.8vw,68px)]">
                             {titleLines.map((line, i) => (
                                 <span key={line} className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
                                     <span style={delay(0.12 + i * 0.12)}>
-                                        {i === titleLines.length - 1 ? (
-                                            <>
-                                                {line.slice(0, -1)}
-                                                <span className="text-dym">.</span>
-                                            </>
-                                        ) : (
-                                            line
-                                        )}
+                                        {i === titleLines.length - 1 ? withDot(line) : line}
                                     </span>
                                 </span>
                             ))}
@@ -97,7 +74,7 @@ export function Process() {
                     </div>
 
                     <p className="hx-fade max-w-[460px] text-[15px] leading-[1.7] text-neutral-600" style={delay(0.35)}>
-                        Nous vous accompagnons à chaque étape, de l’étude technique à la fabrication, jusqu’à l’installation finale, avec un suivi rigoureux et une qualité constante.
+                        {t('home.process.text')}
                     </p>
                 </div>
 
@@ -108,6 +85,7 @@ export function Process() {
                 >
                     {steps.map((s, i) => {
                         const Icon = s.icon;
+                        const step = `home.process.step_${i + 1}`;
 
                         return (
                             <Fragment key={s.image}>
@@ -124,22 +102,24 @@ export function Process() {
                                         <div>
                                             <span className="hx-mono block text-[10px] text-dym">{String(i + 1).padStart(2, '0')}</span>
                                             <h3 className="hx-mono text-[11px] leading-snug tracking-[0.08em] text-ink uppercase">
-                                                {s.title[0]}
-                                                <br />
-                                                {s.title[1]}
+                                                {lines(t(`${step}_title`)).map((part, j) => (
+                                                    <span key={j} className="block">
+                                                        {part}
+                                                    </span>
+                                                ))}
                                             </h3>
                                         </div>
                                     </div>
 
                                     <div className="hx-hair relative mt-5 aspect-[4/3] overflow-hidden border bg-neutral-100">
-                                        <img src={s.image} alt={s.alt} width={1100} height={735} loading="lazy" className="hx-wipe size-full object-cover" style={delay(0.5 + i * 0.35)} />
+                                        <img src={s.image} alt={t(`${step}_alt`)} width={1100} height={735} loading="lazy" className="hx-wipe size-full object-cover" style={delay(0.5 + i * 0.35)} />
                                         <span className="hx-mono absolute right-2 bottom-2 bg-paper/90 px-2 py-1 text-[9px] tracking-[0.06em] text-ink" aria-hidden>
-                                            ÉTAPE {String(i + 1).padStart(2, '0')} / 03
+                                            {t('home.process.step_label')} {String(i + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
                                         </span>
                                     </div>
 
                                     <p className="hx-fade mt-4 text-sm leading-relaxed text-neutral-600" style={delay(0.6 + i * 0.35)}>
-                                        {s.text}
+                                        {t(`${step}_text`)}
                                     </p>
                                 </li>
                             </Fragment>
@@ -155,7 +135,7 @@ export function Process() {
                                 key={s.image}
                                 type="button"
                                 onClick={() => goTo(i)}
-                                aria-label={`Étape ${i + 1}`}
+                                aria-label={`${t('home.process.step_label')} ${i + 1}`}
                                 aria-current={i === current}
                                 className={`h-1 cursor-pointer transition-all duration-500 ${i === current ? 'w-10 bg-dym' : 'w-4 bg-ink/15'}`}
                             />

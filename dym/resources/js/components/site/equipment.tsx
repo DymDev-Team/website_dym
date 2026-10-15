@@ -1,73 +1,56 @@
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
+import { blueprintFor } from '@/components/site/blueprints';
+import type { Draw } from '@/components/site/blueprints';
 import { useInView } from '@/components/site/use-in-view';
 import type { Equipment as EquipmentItem } from '@/types/admin';
+import { lines, useTexts, withDot } from '@/components/site/use-texts';
 
-const titleLines = ['Une technologie', 'au service de la qualité.'];
 
 const ROTATE_MS = 4500;
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
-// Plan d'élévation simplifié d'une table de découpe, tracé au défilement.
+// Plan de la machine active, retracé à chaque changement (clé = nom).
 function MachineBlueprint({ label }: { label: string }) {
-    const draw = (d: number) => ({
-        className: 'hx-draw',
-        pathLength: 1,
-        style: delay(d),
-    });
+    const draw: Draw = (d) => ({ className: 'hx-draw', pathLength: 1, style: delay(d) });
+    const bp = blueprintFor(label);
+    const { x, y, left } = bp.callout;
+    const k = left ? -1 : 1;
 
     return (
-        <svg viewBox="0 0 520 270" className="h-auto w-full text-white" role="img" aria-label="Plan technique d’une machine de l’atelier">
+        <svg key={label} viewBox="0 0 520 270" className="h-auto w-full text-white" role="img" aria-label={`Plan technique : ${label}`}>
             <g fill="none" stroke="currentColor" strokeOpacity="0.55" strokeWidth="1">
-                {/* Bâti et pieds */}
-                <rect x="40" y="140" width="360" height="60" {...draw(0.3)} />
-                <rect x="58" y="200" width="22" height="34" {...draw(0.5)} />
-                <rect x="360" y="200" width="22" height="34" {...draw(0.5)} />
-                <line x1="40" y1="156" x2="400" y2="156" {...draw(0.45)} />
-                {Array.from({ length: 19 }, (_, i) => (
-                    <line key={i} x1={50 + i * 19} y1="140" x2={50 + i * 19} y2="156" strokeOpacity="0.3" {...draw(0.6 + i * 0.02)} />
-                ))}
-                {/* Portique et tête de coupe */}
-                <rect x="60" y="58" width="330" height="16" {...draw(0.4)} />
-                <rect x="70" y="74" width="14" height="66" {...draw(0.55)} />
-                <rect x="366" y="74" width="14" height="66" {...draw(0.55)} />
-                <rect x="190" y="74" width="34" height="40" {...draw(0.7)} />
-                <path d="M198 114 L216 114 L210 130 L204 130 Z" {...draw(0.8)} />
-                {/* Armoire de commande */}
-                <rect x="418" y="86" width="66" height="148" {...draw(0.5)} />
-                <rect x="428" y="98" width="46" height="30" {...draw(0.75)} />
-                <line x1="428" y1="142" x2="474" y2="142" {...draw(0.85)} />
-                <line x1="428" y1="152" x2="474" y2="152" {...draw(0.9)} />
+                {bp.parts(draw)}
                 {/* Cotes */}
                 <g strokeOpacity="0.35">
-                    <line x1="40" y1="30" x2="484" y2="30" {...draw(1)} />
-                    <line x1="40" y1="24" x2="40" y2="36" {...draw(1)} />
-                    <line x1="484" y1="24" x2="484" y2="36" {...draw(1)} />
-                    <line x1="502" y1="58" x2="502" y2="234" {...draw(1.1)} />
-                    <line x1="496" y1="58" x2="508" y2="58" {...draw(1.1)} />
-                    <line x1="496" y1="234" x2="508" y2="234" {...draw(1.1)} />
+                    <line x1="40" y1="20" x2="484" y2="20" {...draw(1)} />
+                    <line x1="40" y1="14" x2="40" y2="26" {...draw(1)} />
+                    <line x1="484" y1="14" x2="484" y2="26" {...draw(1)} />
+                    <line x1="510" y1="40" x2="510" y2="234" {...draw(1.1)} />
+                    <line x1="504" y1="40" x2="516" y2="40" {...draw(1.1)} />
+                    <line x1="504" y1="234" x2="516" y2="234" {...draw(1.1)} />
                     <line x1="20" y1="234" x2="500" y2="234" strokeDasharray="3 5" />
                 </g>
             </g>
             <g className="hx-mono" fill="currentColor" fillOpacity="0.6" fontSize="9">
-                <text x="262" y="24" textAnchor="middle">
-                    4 000
+                <text x="262" y="14" textAnchor="middle">
+                    {bp.width}
                 </text>
-                <text x="514" y="150" transform="rotate(90 514 150)" textAnchor="middle">
-                    1 800
+                <text x="520" y="137" transform="rotate(90 520 137)" textAnchor="middle">
+                    {bp.height}
                 </text>
                 <text x="40" y="258" fillOpacity="0.45">
                     FIG. / {label.toUpperCase()}
                 </text>
             </g>
-            {/* Repère orange sur la tête */}
+            {/* Repère orange */}
             <g className="text-dym">
-                <circle cx="207" cy="130" r="3" fill="currentColor" />
-                <polyline points="207,130 250,100 300,100" fill="none" stroke="currentColor" strokeWidth="0.8" />
-                <text x="254" y="94" fill="currentColor" fontSize="8" className="hx-mono">
-                    TÊTE DE COUPE
+                <circle cx={x} cy={y} r="3" fill="currentColor" />
+                <polyline points={`${x},${y} ${x + 43 * k},${y - 30} ${x + 93 * k},${y - 30}`} fill="none" stroke="currentColor" strokeWidth="0.8" />
+                <text x={x + 47 * k} y={y - 36} textAnchor={left ? 'end' : 'start'} fill="currentColor" fontSize="8" className="hx-mono">
+                    {bp.callout.label}
                 </text>
             </g>
         </svg>
@@ -76,6 +59,8 @@ function MachineBlueprint({ label }: { label: string }) {
 
 export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[] }) {
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
+    const t = useTexts();
+    const titleLines = lines(t('home.equipment.title'));
     const [active, setActive] = useState(0);
     const [paused, setPaused] = useState(false);
 
@@ -120,20 +105,13 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
                 <div className="grid gap-6 lg:w-[72%] lg:grid-cols-[auto_1fr] lg:items-end lg:gap-14">
                     <div>
                         <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-white/60" style={delay(0.05)}>
-                            <span className="inline-block size-[5px] bg-dym" /> NOS ÉQUIPEMENTS
+                            <span className="inline-block size-[5px] bg-dym" /> {t('home.equipment.eyebrow')}
                         </div>
                         <h2 id="equipements-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] uppercase lg:text-[clamp(40px,3.2vw,60px)] lg:whitespace-nowrap">
                             {titleLines.map((line, i) => (
                                 <span key={line} className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
                                     <span style={delay(0.12 + i * 0.12)}>
-                                        {i === titleLines.length - 1 ? (
-                                            <>
-                                                {line.slice(0, -1)}
-                                                <span className="text-dym">.</span>
-                                            </>
-                                        ) : (
-                                            line
-                                        )}
+                                        {i === titleLines.length - 1 ? withDot(line) : line}
                                     </span>
                                 </span>
                             ))}
@@ -141,12 +119,12 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
                     </div>
 
                     <div className="hx-fade" style={delay(0.35)}>
-                        <p className="max-w-[400px] text-[15px] leading-[1.7] text-white/70">Des machines performantes et des équipes qualifiées pour garantir précision, productivité et fiabilité.</p>
+                        <p className="max-w-[400px] text-[15px] leading-[1.7] text-white/70">{t('home.equipment.text')}</p>
                         <a
                             href="#contact"
                             className="hd-cta relative mt-6 inline-flex items-center gap-3 overflow-hidden bg-dym px-6 py-3.5 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark"
                         >
-                            Découvrir nos équipements
+                            {t('home.equipment.cta')}
                             <ArrowRight className="hd-arrow size-4" />
                         </a>
                     </div>

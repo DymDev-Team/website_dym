@@ -1,41 +1,46 @@
-import { Head } from '@inertiajs/react';
-import { useState } from 'react';
-import PendingInvitationsModal from '@/components/pending-invitations-modal';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import { dashboard } from '@/routes';
-import type { DashboardInvitation } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
+import { ArrowUpRight, Lock } from 'lucide-react';
+import Heading from '@/components/heading';
+import { Button } from '@/components/ui/button';
+import { dashboard, home } from '@/routes';
 
-type Props = {
-    pendingInvitations?: DashboardInvitation[];
-};
-
-export default function Dashboard({ pendingInvitations = [] }: Props) {
-    const [showInvitations, setShowInvitations] = useState(
-        pendingInvitations.length > 0,
-    );
+// Tableau de bord des comptes non administrateurs (les administrateurs sont
+// redirigés vers la vue d'ensemble par DashboardController).
+export default function Dashboard() {
+    const { auth } = usePage().props;
 
     return (
         <>
-            <Head title="Dashboard" />
-            <PendingInvitationsModal
-                invitations={pendingInvitations}
-                open={pendingInvitations.length > 0 && showInvitations}
-                onOpenChange={setShowInvitations}
-            />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+            <Head title="Tableau de bord" />
+
+            <div className="flex h-full flex-1 flex-col p-4 md:p-6">
+                <Heading
+                    title={`Bonjour, ${auth.user.name}`}
+                    description="Bienvenue dans l’espace DYM Manufacture."
+                />
+
+                <div className="max-w-2xl border bg-card p-6 md:p-8">
+                    <div className="flex items-start gap-4">
+                        <span className="grid size-10 shrink-0 place-items-center bg-dym/10 text-dym">
+                            <Lock className="size-5" />
+                        </span>
+                        <div>
+                            <h3 className="font-semibold">
+                                Accès à l’administration non activé
+                            </h3>
+                            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                                Votre compte est bien créé, mais il n’a pas
+                                encore les droits pour gérer le contenu du site.
+                                Demandez à un administrateur DYM de vous donner
+                                l’accès.
+                            </p>
+                            <Button asChild variant="outline" className="mt-5">
+                                <a href={home().url}>
+                                    Voir le site <ArrowUpRight />
+                                </a>
+                            </Button>
+                        </div>
                     </div>
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                </div>
-                <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                 </div>
             </div>
         </>
@@ -45,7 +50,7 @@ export default function Dashboard({ pendingInvitations = [] }: Props) {
 Dashboard.layout = (props: { currentTeam?: { slug: string } | null }) => ({
     breadcrumbs: [
         {
-            title: 'Dashboard',
+            title: 'Tableau de bord',
             href: props.currentTeam ? dashboard(props.currentTeam.slug) : '/',
         },
     ],

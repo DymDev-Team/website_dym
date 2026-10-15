@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import type { InertiaLinkProps } from '@inertiajs/react';
 import {
+    Calculator,
     ExternalLink,
     Factory,
     Handshake,
@@ -29,6 +30,7 @@ import {
     index as posts,
 } from '@/routes/admin/posts';
 import { index as projects } from '@/routes/admin/projects';
+import { index as quotes } from '@/routes/admin/quotes';
 import { index as testimonials } from '@/routes/admin/testimonials';
 import { index as users } from '@/routes/admin/users';
 import type { Post } from '@/types/admin';
@@ -44,6 +46,7 @@ type Props = {
         testimonials: Count;
         posts: Count;
         applications: { total: number; new: number; openOffers: number };
+        quotes: { total: number; new: number };
         users: { total: number; admins: number };
     };
     latestPosts: Post[];
@@ -97,6 +100,13 @@ export default function AdminDashboard({ stats, latestPosts }: Props) {
             }
         >
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <StatCard
+                    title="Demandes de devis"
+                    icon={Calculator}
+                    href={quotes()}
+                    value={stats.quotes.new}
+                    detail={`nouvelles · ${stats.quotes.total} au total`}
+                />
                 <StatCard
                     title="Candidatures"
                     icon={Inbox}

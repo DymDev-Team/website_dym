@@ -133,3 +133,11 @@ test('dashboard does not include or delete other users invitations', function ()
         'id' => $invitation->id,
     ]);
 });
+test('admins are redirected to the admin overview', function () {
+    $admin = User::factory()->create();
+    $admin->forceFill(['is_admin' => true])->save();
+
+    $this->actingAs($admin)
+        ->get(route('dashboard', $admin->currentTeam))
+        ->assertRedirect(route('admin.dashboard'));
+});

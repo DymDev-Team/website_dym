@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { apply } from '@/routes/careers';
 import { show as showLegal } from '@/routes/legal';
+import { useTexts } from '@/components/site/use-texts';
 
 const inputClass = 'w-full border border-black/15 bg-white px-4 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-neutral-400 focus:border-dym aria-invalid:border-red-500';
 
@@ -21,16 +22,17 @@ function SiteField({ label, error, children }: { label: string; error?: string; 
 export function ApplicationForm({ offerId }: { offerId?: number }) {
     const [sent, setSent] = useState(false);
     const [fileName, setFileName] = useState<string | null>(null);
+    const t = useTexts();
 
     if (sent) {
         return (
             <div className="flex items-start gap-4 border border-black/10 bg-white p-6 sm:p-8">
                 <CheckCircle2 className="size-6 shrink-0 text-dym" />
                 <div>
-                    <p className="text-lg font-semibold text-ink">Merci, votre candidature est bien arrivée.</p>
-                    <p className="mt-2 text-neutral-600">Notre équipe l’étudie et revient vers vous si votre profil correspond à nos besoins.</p>
+                    <p className="text-lg font-semibold text-ink">{t('careers.form.success_title')}</p>
+                    <p className="mt-2 text-neutral-600">{t('careers.form.success_text')}</p>
                     <button type="button" onClick={() => setSent(false)} className="hx-mono mt-5 text-[10px] tracking-[0.1em] text-dym uppercase hover:underline">
-                        Envoyer une autre candidature
+                        {t('careers.form.success_again')}
                     </button>
                 </div>
             </div>
@@ -56,26 +58,26 @@ export function ApplicationForm({ offerId }: { offerId?: number }) {
                     <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
 
                     <div className="grid gap-5 sm:grid-cols-2">
-                        <SiteField label="Nom et prénom *" error={errors.name}>
+                        <SiteField label={t('careers.form.name')} error={errors.name}>
                             <input name="name" required maxLength={120} autoComplete="name" className={inputClass} aria-invalid={!!errors.name} />
                         </SiteField>
-                        <SiteField label="E-mail *" error={errors.email}>
+                        <SiteField label={t('careers.form.email')} error={errors.email}>
                             <input name="email" type="email" required autoComplete="email" className={inputClass} aria-invalid={!!errors.email} />
                         </SiteField>
                     </div>
 
-                    <SiteField label="Téléphone" error={errors.phone}>
+                    <SiteField label={t('careers.form.phone')} error={errors.phone}>
                         <input name="phone" type="tel" maxLength={40} autoComplete="tel" className={inputClass} />
                     </SiteField>
 
-                    <SiteField label="Message" error={errors.message}>
-                        <textarea name="message" rows={5} maxLength={5000} placeholder="Parlez-nous de votre parcours et de ce qui vous motive." className={inputClass} />
+                    <SiteField label={t('careers.form.message')} error={errors.message}>
+                        <textarea name="message" rows={5} maxLength={5000} placeholder={t('careers.form.message_placeholder')} className={inputClass} />
                     </SiteField>
 
-                    <SiteField label="CV (PDF ou Word, 5 Mo max) *" error={errors.cv}>
+                    <SiteField label={t('careers.form.cv')} error={errors.cv}>
                         <span className={`${inputClass} flex cursor-pointer items-center gap-3 ${errors.cv ? 'border-red-500' : ''}`}>
                             <Paperclip className="size-4 shrink-0 text-dym" />
-                            <span className={`truncate ${fileName ? 'text-ink' : 'text-neutral-400'}`}>{fileName ?? 'Choisir un fichier…'}</span>
+                            <span className={`truncate ${fileName ? 'text-ink' : 'text-neutral-400'}`}>{fileName ?? t('careers.form.cv_placeholder')}</span>
                             <input
                                 name="cv"
                                 type="file"
@@ -90,9 +92,9 @@ export function ApplicationForm({ offerId }: { offerId?: number }) {
                     <label className="flex items-start gap-3 text-sm text-neutral-600">
                         <input type="checkbox" name="consent" value="1" required className="mt-1 size-4 accent-dym" />
                         <span>
-                            J’accepte que DYM Manufacture conserve mes données pour traiter ma candidature (voir la{' '}
+                            {t('careers.form.consent')} (
                             <a href={showLegal('politique-de-confidentialite').url} target="_blank" rel="noreferrer" className="text-dym underline underline-offset-2">
-                                politique de confidentialité
+                                {t('careers.form.consent_link')}
                             </a>
                             ).
                         </span>
@@ -105,7 +107,7 @@ export function ApplicationForm({ offerId }: { offerId?: number }) {
                         disabled={processing}
                         className="hd-cta relative inline-flex items-center gap-2 overflow-hidden bg-dym px-6 py-4 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark disabled:opacity-60"
                     >
-                        {processing ? 'Envoi en cours…' : 'Envoyer ma candidature'}
+                        {processing ? t('careers.form.sending') : t('careers.form.submit')}
                         <ArrowRight className="hd-arrow size-3.5" />
                     </button>
                 </>

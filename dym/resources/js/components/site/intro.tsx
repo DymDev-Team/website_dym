@@ -3,15 +3,16 @@ import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
 import { useParallax } from '@/components/site/use-parallax';
+import { lines, useTexts, withDot } from '@/components/site/use-texts';
 
-const values = ['Précision', 'Qualité', 'Innovation', 'Accompagnement'];
-
-const titleLines = ['Nous donnons', 'forme à vos idées.'];
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 export function Intro() {
     const [ref, inView] = useInView<HTMLElement>(0.2, false);
+    const t = useTexts();
+    const titleLines = lines(t('home.intro.title'));
+    const values = lines(t('home.intro.values'));
     const photoRef = useRef<HTMLImageElement>(null);
     const dialogRef = useRef<HTMLDialogElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -46,28 +47,21 @@ export function Intro() {
 
                 <div className="w-full max-w-[620px] lg:pl-[clamp(22px,3vw,52px)]">
                     <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-white/60" style={delay(0.15)}>
-                        <span className="inline-block size-[5px] bg-dym" /> DYM MANUFACTURE
+                        <span className="inline-block size-[5px] bg-dym" /> {t('home.intro.eyebrow')}
                     </div>
 
                     <h2 id="intro-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] uppercase lg:text-[clamp(44px,3.8vw,68px)]">
                         {titleLines.map((line, i) => (
                             <span key={line} className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
                                 <span style={delay(0.25 + i * 0.12)}>
-                                    {i === titleLines.length - 1 ? (
-                                        <>
-                                            {line.slice(0, -1)}
-                                            <span className="text-dym">.</span>
-                                        </>
-                                    ) : (
-                                        line
-                                    )}
+                                    {i === titleLines.length - 1 ? withDot(line) : line}
                                 </span>
                             </span>
                         ))}
                     </h2>
 
                     <p className="hx-fade mt-6 max-w-[460px] text-[15px] leading-[1.7] text-white/70" style={delay(0.55)}>
-                        Depuis 2016, DYM Manufacture, basée à Abidjan, met son expertise au service de vos projets métalliques avec rigueur, précision et passion.
+                        {t('home.intro.text')}
                     </p>
 
                     <button type="button" onClick={openVideo} className="group hx-fade mt-9 inline-flex cursor-pointer items-center gap-4 text-left" style={delay(0.7)}>
@@ -76,9 +70,11 @@ export function Intro() {
                             <Play className="size-4 translate-x-px fill-white" />
                         </span>
                         <span className="hx-mono text-[10px] leading-relaxed tracking-[0.1em] text-white/80 uppercase">
-                            Découvrir l’atelier
-                            <br />
-                            en vidéo
+                            {lines(t('home.intro.video_button')).map((part, i) => (
+                                <span key={i} className="block">
+                                    {part}
+                                </span>
+                            ))}
                         </span>
                     </button>
                 </div>
@@ -99,14 +95,14 @@ export function Intro() {
                 ref={dialogRef}
                 onClose={() => videoRef.current?.pause()}
                 onClick={(e) => e.target === dialogRef.current && closeVideo()}
-                aria-label="Vidéo de présentation de l’atelier DYM"
+                aria-label={t('home.intro.video_label')}
                 className="m-auto w-[min(1100px,92vw)] bg-transparent p-0 backdrop:bg-black/85"
             >
                 <button
                     type="button"
                     onClick={closeVideo}
                     className="ml-auto mb-3 grid size-10 cursor-pointer place-items-center border border-white/30 text-white hover:border-dym hover:bg-dym"
-                    aria-label="Fermer la vidéo"
+                    aria-label={t('home.intro.video_close')}
                 >
                     <X className="size-5" />
                 </button>

@@ -122,6 +122,23 @@ export type ApplicationStatus =
 
 export type StatusOption = { value: ApplicationStatus; label: string };
 
+export type QuoteStatus = 'new' | 'in_progress' | 'quoted' | 'won' | 'lost';
+
+export type QuoteStatusOption = { value: QuoteStatus; label: string };
+
+export type QuoteRequest = Timestamps & {
+    id: number;
+    name: string;
+    company: string | null;
+    email: string;
+    phone: string;
+    activity: string | null;
+    message: string;
+    deadline: string | null;
+    attachment_name: string | null;
+    status: QuoteStatus;
+};
+
 export type JobApplication = Timestamps & {
     id: number;
     job_offer_id: number | null;

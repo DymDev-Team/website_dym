@@ -7,16 +7,24 @@ export default function Heading({
     description?: string;
     variant?: 'default' | 'small';
 }) {
+    if (variant === 'small') {
+        return (
+            <header>
+                <h2 className="mb-0.5 text-base font-medium">{title}</h2>
+                {description && (
+                    <p className="text-sm text-muted-foreground">
+                        {description}
+                    </p>
+                )}
+            </header>
+        );
+    }
+
     return (
-        <header className={variant === 'small' ? '' : 'mb-8 space-y-0.5'}>
-            <h2
-                className={
-                    variant === 'small'
-                        ? 'mb-0.5 text-base font-medium'
-                        : 'text-xl font-semibold tracking-tight'
-                }
-            >
+        <header className="mb-8 space-y-2">
+            <h2 className="font-display text-[clamp(28px,3vw,38px)] leading-none tracking-normal uppercase">
                 {title}
+                <span className="text-dym">.</span>
             </h2>
             {description && (
                 <p className="text-sm text-muted-foreground">{description}</p>

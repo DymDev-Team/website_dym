@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
 import type { Project } from '@/types/admin';
+import { lines, useTexts, withDot } from '@/components/site/use-texts';
 
-const titleLines = ['Des projets concrets,', 'des clients satisfaits.'];
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
@@ -12,6 +12,8 @@ export function Projects({ projects }: { projects: Project[] }) {
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
     const trackRef = useRef<HTMLDivElement>(null);
     const [progress, setProgress] = useState(0);
+    const t = useTexts();
+    const titleLines = lines(t('home.projects.title'));
     const [edges, setEdges] = useState({ start: true, end: false });
 
     // Suit la position de défilement (barre de progression + état des flèches).
@@ -63,20 +65,13 @@ export function Projects({ projects }: { projects: Project[] }) {
                 <div className="mx-auto flex max-w-[1720px] flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:pl-[clamp(22px,3vw,52px)]">
                     <div>
                         <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
-                            <span className="inline-block size-[5px] bg-dym" /> NOS RÉALISATIONS
+                            <span className="inline-block size-[5px] bg-dym" /> {t('home.projects.eyebrow')}
                         </div>
                         <h2 id="realisations-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] text-ink uppercase lg:text-[clamp(44px,3.8vw,68px)]">
                             {titleLines.map((line, i) => (
                                 <span key={line} className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
                                     <span style={delay(0.12 + i * 0.12)}>
-                                        {i === titleLines.length - 1 ? (
-                                            <>
-                                                {line.slice(0, -1)}
-                                                <span className="text-dym">.</span>
-                                            </>
-                                        ) : (
-                                            line
-                                        )}
+                                        {i === titleLines.length - 1 ? withDot(line) : line}
                                     </span>
                                 </span>
                             ))}
@@ -85,7 +80,7 @@ export function Projects({ projects }: { projects: Project[] }) {
 
                     <div className="hx-fade flex items-center gap-6" style={delay(0.35)}>
                         <a href="#realisations" className="hx-mono group inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
-                            Voir toutes les réalisations
+                            {t('home.projects.link')}
                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                         </a>
                         <div className="flex gap-2">

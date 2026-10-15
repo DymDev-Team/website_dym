@@ -3,6 +3,7 @@
 use App\Http\Controllers\CareerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LegalPageController;
+use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureTeamMembership;
@@ -13,6 +14,9 @@ Route::get('/', [SiteController::class, 'home'])->name('home');
 Route::get('activites', [SiteController::class, 'activities'])->name('activities');
 Route::get('actualites', [SiteController::class, 'posts'])->name('posts.index');
 Route::get('actualites/{post}', [SiteController::class, 'post'])->name('posts.show');
+
+Route::get('devis', [QuoteController::class, 'create'])->name('quotes.create');
+Route::post('devis', [QuoteController::class, 'store'])->middleware('throttle:5,10')->name('quotes.store');
 
 Route::get('carriere', [CareerController::class, 'index'])->name('careers.index');
 Route::post('carriere/candidature', [CareerController::class, 'apply'])->middleware('throttle:5,10')->name('careers.apply');

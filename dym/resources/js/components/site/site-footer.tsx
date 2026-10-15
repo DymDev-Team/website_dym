@@ -4,6 +4,7 @@ import { Fragment } from 'react';
 import { SiteLogo, siteNav } from '@/components/site/site-header';
 import { show as showLegal } from '@/routes/legal';
 import type { Activity, SiteSettings } from '@/types/admin';
+import { useTexts } from '@/components/site/use-texts';
 
 type FooterActivity = Pick<Activity, 'id' | 'title'>;
 
@@ -15,9 +16,9 @@ const socialLinks = [
 ] as const;
 
 const legalLinks = [
-    { slug: 'mentions-legales', label: 'Mentions légales' },
-    { slug: 'politique-de-confidentialite', label: 'Confidentialité' },
-    { slug: 'cookies', label: 'Cookies' },
+    { slug: 'mentions-legales', key: 'legal_notice' },
+    { slug: 'politique-de-confidentialite', key: 'privacy' },
+    { slug: 'cookies', key: 'cookies' },
 ];
 
 const CREDIT_URL = 'https://ci.linkedin.com/in/yann-morel-effobi-brou-5474782a1';
@@ -27,6 +28,7 @@ function ColumnTitle({ children }: { children: string }) {
 }
 
 export function SiteFooter({ activities, site }: { activities: FooterActivity[]; site: SiteSettings }) {
+    const t = useTexts();
     // Coordonnées et réseaux saisis dans Admin › Paramètres ; les entrées vides sont masquées.
     const contact = [
         {
@@ -70,12 +72,12 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
 
                     {/* Navigation */}
                     <div className="lg:border-l lg:border-white/10 lg:px-10">
-                        <ColumnTitle>Navigation</ColumnTitle>
+                        <ColumnTitle>{t('layout.footer.nav_title')}</ColumnTitle>
                         <ul className="space-y-2.5 text-sm">
                             {siteNav.map((n) => (
                                 <li key={n.label}>
                                     <a href={n.href} className="transition-colors hover:text-white">
-                                        {n.label}
+                                        {t(`layout.header.nav_${n.key}`)}
                                     </a>
                                 </li>
                             ))}
@@ -84,7 +86,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
 
                     {/* Activités */}
                     <div className="lg:border-l lg:border-white/10 lg:px-10">
-                        <ColumnTitle>Nos activités</ColumnTitle>
+                        <ColumnTitle>{t('layout.footer.activities_title')}</ColumnTitle>
                         <ul className="space-y-2.5 text-sm">
                             {activities.map((a) => (
                                 <li key={a.id}>
@@ -98,7 +100,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
 
                     {/* Contact */}
                     <div className="lg:border-l lg:border-white/10 lg:pl-10">
-                        <ColumnTitle>Contact</ColumnTitle>
+                        <ColumnTitle>{t('layout.footer.contact_title')}</ColumnTitle>
                         <ul className="space-y-4 text-sm">
                             {contact.map(({ icon: Icon, label, href }) => {
                                 const content = (
@@ -127,7 +129,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                 {/* Barre basse */}
                 <div className="flex flex-col gap-3 border-t border-white/10 py-6 text-xs sm:flex-row sm:items-center sm:justify-between">
                     <p>
-                        © {new Date().getFullYear()} DYM Manufacture. Tous droits réservés. Fait par{' '}
+                        {t('layout.footer.copyright').replace('{année}', String(new Date().getFullYear()))} {t('layout.footer.credit')}{' '}
                         <a href={CREDIT_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-white underline decoration-dym decoration-1 underline-offset-4 transition-colors hover:text-dym">
                             DYM DEV
                         </a>
@@ -138,7 +140,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                             <Fragment key={l.slug}>
                                 {i > 0 && <span className="text-white/20">|</span>}
                                 <Link href={showLegal(l.slug)} className="transition-colors hover:text-white">
-                                    {l.label}
+                                    {t(`layout.footer.${l.key}`)}
                                 </Link>
                             </Fragment>
                         ))}
