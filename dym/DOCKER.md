@@ -131,6 +131,23 @@ Les migrations et la mise en cache s'exécutent au démarrage (`AUTORUN_*`),
 une fois MySQL prêt. Placer un reverse proxy TLS (Caddy, Traefik, Nginx)
 devant le port 8080. `.env.production` ne doit jamais être commité.
 
+### Déploiement sur le VPS (website.dym-manufacture.com)
+
+Prérequis : enregistrement DNS `A website → <IPv4 du VPS>` dans la zone LWS,
+ports 80/443 ouverts dans le pare-feu Contabo (s'il est activé).
+
+```bash
+git clone https://github.com/DymDev-Team/website_dym.git && cd website_dym
+sudo bash docker/deploy.sh
+docker compose --env-file .env.production -f compose.prod.yaml exec app php artisan app:make-admin vous@exemple.com
+```
+
+`docker/deploy.sh` installe Docker et Caddy, configure `ufw`, génère
+`.env.production` (clé et mots de passe aléatoires) au premier lancement,
+construit et démarre les conteneurs, puis installe `docker/Caddyfile`
+(HTTPS Let's Encrypt automatique). Le port 8080 n'écoute que sur 127.0.0.1.
+Pour une mise à jour : `git pull && sudo bash docker/deploy.sh`.
+
 Sauvegarde de la base :
 
 ```powershell

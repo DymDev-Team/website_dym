@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\Fortify\CreateNewUser;
 use App\Models\TeamInvitation;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
@@ -16,9 +17,16 @@ Artisan::command('app:make-admin {email}', function (string $email) {
     $user = User::query()->where('email', $email)->first();
 
     if (! $user) {
-        $this->error("Aucun compte avec l'adresse {$email}. Créez-le d'abord via /register.");
+        $this->info("Aucun compte avec l'adresse {$email} : création.");
 
-        return 1;
+        $password = $this->secret('Mot de passe');
+
+        $user = app(CreateNewUser::class)->create([
+            'name' => $this->ask('Nom', 'Administrateur'),
+            'email' => $email,
+            'password' => $password,
+            'password_confirmation' => $password,
+        ]);
     }
 
     $user->forceFill([
