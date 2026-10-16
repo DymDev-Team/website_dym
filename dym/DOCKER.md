@@ -131,72 +131,42 @@ Les migrations et la mise en cache s'exécutent au démarrage (`AUTORUN_*`),
 une fois MySQL prêt. Placer un reverse proxy TLS (Caddy, Traefik, Nginx)
 devant le port 8080. `.env.production` ne doit jamais être commité.
 
-### Déploiement sur le VPS (dym.ci)
+### Déploiement FTP (GitHub Actions + FTPS)
 
-Prérequis :
-- zone DNS de `dym.ci` (serveurs `ns1…ns4.dnshostservices.com`) : `A @` et
-  `A www` vers l'IPv4 du VPS. Tant que le domaine pointe vers l'hébergement
-  cPanel (`/public_html/dym-website/public`), c'est ce dernier qui répond ;
-- ports 80/443 ouverts dans le pare-feu Contabo (s'il est activé).
+Le workflow .github/workflows/deploy.yml se déclenche à chaque push sur
+main touchant dym/, ou manuellement depuis l'onglet Actions. Il installe les
+dépendances PHP de production, compile les assets Vite, puis transfère le
+projet sur cPanel en FTPS. Aucun accès SSH n'est utilisé.
 
-```bash
-sudo git clone https://github.com/DymDev-Team/website_dym.git /opt/website_dym
-cd /opt/website_dym/dym
-sudo bash docker/deploy.sh
-docker compose --env-file .env.production -f compose.prod.yaml exec app php artisan app:make-admin vous@exemple.com
-```
+Préparer cPanel avant le premier transfert :
 
-`docker/deploy.sh` installe Docker et Caddy, configure `ufw`, génère
-`.env.production` (clé et mots de passe aléatoires) au premier lancement,
-force `APP_URL=https://dym.ci`, construit et démarre les conteneurs, puis
-installe `docker/Caddyfile` (HTTPS Let's Encrypt automatique ; `www.dym.ci` et
-`website.dym-manufacture.com` redirigent vers `dym.ci`). Le port 8080 n'écoute
-que sur 127.0.0.1.
+1. Sélectionner PHP 8.3 ou plus et activer pdo_mysql, mbstring, fileinfo,
+   openssl, curl, xml, zip, bcmath et intl.
+2. Créer une base MySQL et un utilisateur autorisé sur cette base.
+3. Régler le document root du domaine sur le dossier public Laravel, par
+   exemple /home/COMPTE/public_html/dym-website/public. La cible FTP doit être
+   le dossier parent : /home/COMPTE/public_html/dym-website.
+4. Créer .env dans ce dossier parent depuis le gestionnaire de fichiers cPanel,
+   avec APP_ENV=production, APP_DEBUG=false, APP_KEY, APP_URL et les identifiants
+   MySQL du panneau. Le workflow exclut tous les fichiers .env du transfert.
+5. Donner les droits d'écriture PHP sur storage/ et bootstrap/cache/. Le
+   workflow préserve storage/ entre les déploiements.
 
-### Déploiement automatique (GitHub Actions + SSH)
-
-`.github/workflows/deploy.yml` (racine du dépôt) se déclenche à chaque push
-sur `main` touchant `dym/` (ou à la main depuis l'onglet Actions). Il se
-connecte au VPS en SSH, aligne `/opt/website_dym` sur le commit poussé
-(`git reset --hard`), relance `sudo docker/deploy.sh`, puis vérifie
-`https://dym.ci/up`.
-
-Sur le VPS, une seule fois (en root) :
-
-```bash
-adduser --disabled-password --gecos "" deploy
-usermod -aG docker deploy
-chown -R deploy:deploy /opt/website_dym
-echo 'deploy ALL=(root) NOPASSWD: /usr/bin/bash /opt/website_dym/dym/docker/deploy.sh' > /etc/sudoers.d/deploy
-chmod 440 /etc/sudoers.d/deploy
-
-# Clé dédiée au déploiement (la privée va dans GitHub, puis on la supprime d'ici)
-ssh-keygen -t ed25519 -N "" -C github-deploy -f /root/github-deploy
-install -d -m 700 -o deploy -g deploy /home/deploy/.ssh
-cat /root/github-deploy.pub >> /home/deploy/.ssh/authorized_keys
-chown deploy:deploy /home/deploy/.ssh/authorized_keys && chmod 600 /home/deploy/.ssh/authorized_keys
-cat /root/github-deploy        # → secret VPS_SSH_KEY, puis : rm /root/github-deploy*
-ssh-keyscan -H localhost       # (depuis votre poste : ssh-keyscan -H <IP>) → secret VPS_KNOWN_HOSTS
-```
-
-Si le dépôt GitHub est privé, ajouter aussi une *deploy key* en lecture seule
-pour l'utilisateur `deploy` (ou un remote HTTPS avec jeton) afin que
-`git fetch` fonctionne sur le VPS.
-
-Dans GitHub → *Settings → Secrets and variables → Actions* :
+Dans GitHub > Settings > Secrets and variables > Actions, ajouter :
 
 | Nom | Type | Valeur |
 | --- | --- | --- |
-| `VPS_HOST` | secret | IPv4 du VPS |
-| `VPS_USER` | secret | `deploy` |
-| `VPS_SSH_KEY` | secret | clé privée `github-deploy` (texte complet) |
-| `VPS_KNOWN_HOSTS` | secret | sortie de `ssh-keyscan -H <IP>` (recommandé) |
-| `VPS_PORT` | secret | facultatif, 22 par défaut |
-| `VPS_APP_DIR` | variable | facultatif, `/opt/website_dym` par défaut |
+| FTP_SERVER | secret | Hôte FTP de l'hébergeur |
+| FTP_USERNAME | secret | Identifiant du compte FTP |
+| FTP_PASSWORD | secret | Mot de passe du compte FTP |
+| FTP_SERVER_DIR | variable | Dossier projet, par ex. public_html/dym-website |
+| APP_HEALTHCHECK_URL | variable | Facultatif, par ex. https://dym.ci/up |
 
-Le script tournant en root et se trouvant dans le clone, l'accès SSH de
-`deploy` équivaut à un accès root : garder la clé uniquement dans GitHub.
-Mise à jour manuelle : `cd /opt/website_dym && git pull && sudo bash dym/docker/deploy.sh`.
+FTP ne peut pas exécuter php artisan migrate. Lancez les migrations depuis le
+terminal cPanel s'il est disponible, ou importez le schéma avec phpMyAdmin.
+Avant une mise à jour qui modifie la base, sauvegardez-la puis appliquez les
+migrations sur l'hébergement. Le workflow transfère le projet Laravel ; le
+document root doit rester réglé sur son sous-dossier public.
 
 Sauvegarde de la base :
 
