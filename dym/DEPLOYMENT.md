@@ -12,8 +12,9 @@ root.
 
 ## Prérequis LWS
 
-- Sélectionner **PHP 8.3 ou plus récent** pour le domaine. Le projet exige PHP
-  `^8.3` dans `composer.json`.
+- Sélectionner **PHP 8.4** pour le domaine. Le `composer.lock` contient des
+  composants Symfony 8 qui exigent PHP 8.4.1 ou plus. LWS propose PHP 8.4 dans
+  son sélecteur cPanel.
 - Activer les extensions PHP `pdo_mysql`, `mbstring`, `fileinfo`, `openssl`,
   `curl`, `xml`, `zip`, `bcmath` et `intl`.
 - Le miroir Git exige `git` et `proc_open` activés sur l'hébergement.
@@ -101,7 +102,7 @@ les fichiers ignorés, dont le `.env` et les fichiers de `storage/`.
 ## 5. Tester puis activer le miroir automatique
 
 Lancer **Actions > Deploy Git Mirror (LWS) > Run workflow** sur `main`. Le
-workflow construit l'application avec PHP 8.3 et Node 22, pousse les artefacts
+workflow construit l'application avec PHP 8.4 et Node 22, pousse les artefacts
 sur `deploy`, puis appelle `POST /api/deploy/git`. Vérifier que le run est vert
 et que `https://dym.ci/up` répond.
 
