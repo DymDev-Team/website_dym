@@ -1,89 +1,89 @@
-# Déploiement en production sur le VPS via SSH à chaque push sur main.
-# Le serveur met à jour son clone du dépôt puis relance dym/docker/deploy.sh.
-# Configuration : voir « Déploiement automatique (GitHub Actions + SSH) » dans dym/DOCKER.md.
-name: deploy
+name: Deploy via FTP (LWS)
 
+# Secours manuel : le déploiement automatique passe par deploy-git-mirror.yml.
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'dym/**'
-      - '.github/workflows/deploy.yml'
   workflow_dispatch:
-
-permissions:
-  contents: read
-
-# Un seul déploiement à la fois ; un push récent n'annule pas un déploiement en cours.
-concurrency:
-  group: production
-  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: https://dym.ci
-    timeout-minutes: 30
+
+    defaults:
+      run:
+        working-directory: dym
 
     steps:
-      - name: Validate SSH deployment secrets
-        env:
-          HOST: ${{ secrets.VPS_HOST }}
-          USER: ${{ secrets.VPS_USER }}
-          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-        run: |
-          for name in HOST USER SSH_KEY; do
-            if [ -z "${!name}" ]; then
-              echo "::error::Le secret GitHub VPS_${name} est absent de l'environnement production."
-              exit 1
-            fi
-          done
+      - uses: actions/checkout@v4
 
-      - name: Configure SSH
-        env:
-          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-          KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
-          HOST: ${{ secrets.VPS_HOST }}
-          PORT: ${{ secrets.VPS_PORT || '22' }}
+      - name: Create build .env
+        run: cp .env.example .env
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_mysql, gd, zip, bcmath, intl
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: dym/package-lock.json
+
+      - name: Build frontend assets
+        run: npm ci && npm run build
+
+      - name: Prepare storage directories
         run: |
-          install -m 700 -d ~/.ssh
-          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
-          chmod 600 ~/.ssh/id_deploy
-          if [ -n "$KNOWN_HOSTS" ]; then
-            printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
-          else
-            echo "::warning::VPS_KNOWN_HOSTS absent : empreinte récupérée par ssh-keyscan (non vérifiée)."
-            ssh-keyscan -p "$PORT" -H "$HOST" > ~/.ssh/known_hosts
+          mkdir -p storage/framework/views storage/framework/sessions storage/framework/cache/data storage/logs
+          touch storage/framework/views/.gitkeep
+          touch storage/framework/sessions/.gitkeep
+          touch storage/framework/cache/data/.gitkeep
+          touch storage/logs/.gitkeep
+
+      - name: Deploy to LWS via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          local-dir: ./dym/
+          server-dir: ${{ vars.FTP_SERVER_DIR }}/
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/node_modules/**
+            **/.env
+            **/.env.*
+            **/.env.example
+            **/README.md
+            **/phpunit.xml
+            **/tests/**
+            **/storage/logs/**
+            **/storage/framework/cache/data/**
+            **/storage/framework/sessions/**
+            **/storage/framework/views/*.php
+
+      - name: Run post-deploy commands
+        env:
+          WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL }}
+          WEBHOOK_TOKEN: ${{ secrets.DEPLOY_WEBHOOK_TOKEN }}
+        run: |
+          if [ -z "$WEBHOOK_URL" ] || [ -z "$WEBHOOK_TOKEN" ]; then
+            echo "::error::DEPLOY_WEBHOOK_URL et DEPLOY_WEBHOOK_TOKEN doivent être configurés."
+            exit 1
           fi
-          chmod 600 ~/.ssh/known_hosts
-
-      - name: Deploy
-        env:
-          HOST: ${{ secrets.VPS_HOST }}
-          USER: ${{ secrets.VPS_USER }}
-          PORT: ${{ secrets.VPS_PORT || '22' }}
-          APP_DIR: ${{ vars.VPS_APP_DIR || '/opt/website_dym' }}
-          SHA: ${{ github.sha }}
-        run: |
-          ssh -i ~/.ssh/id_deploy -p "$PORT" -o BatchMode=yes -o ServerAliveInterval=30 "$USER@$HOST" \
-            "set -euo pipefail
-             cd '$APP_DIR'
-             git fetch --prune origin main
-             git reset --hard '$SHA'
-             sudo -n bash '$APP_DIR/dym/docker/deploy.sh'"
-
-      - name: Check site
-        run: |
-          for i in $(seq 1 12); do
-            if curl -fsS -o /dev/null https://dym.ci/up; then echo "OK"; exit 0; fi
-            sleep 10
-          done
-          echo "::error::https://dym.ci/up ne répond pas après le déploiement."
-          exit 1
-
-      - name: Clean up
-        if: always()
-        run: rm -f ~/.ssh/id_deploy
+          HTTP_CODE=$(curl -sS -w "%{http_code}" -o /tmp/deploy_out.txt -X POST \
+            "${WEBHOOK_URL%/}" \
+            -H "X-Deploy-Token: $WEBHOOK_TOKEN" \
+            -H "Accept: application/json" \
+            --max-time 180 --retry 2 --retry-delay 5)
+          echo "HTTP $HTTP_CODE"
+          cat /tmp/deploy_out.txt | python3 -m json.tool 2>/dev/null || cat /tmp/deploy_out.txt
+          [ "$HTTP_CODE" -lt 400 ] || { echo "Post-deploy webhook failed with HTTP $HTTP_CODE"; exit 1; }

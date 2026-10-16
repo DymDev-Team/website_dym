@@ -1,0 +1,88 @@
+name: Deploy Git Mirror (LWS)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: production-git-mirror
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create build .env
+        working-directory: dym
+        run: cp .env.example .env
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_mysql, gd, zip, bcmath, intl
+
+      - name: Install Composer dependencies
+        working-directory: dym
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: dym/package-lock.json
+
+      - name: Build frontend assets
+        working-directory: dym
+        run: npm ci && npm run build
+
+      - name: Prepare storage directories
+        working-directory: dym
+        run: |
+          mkdir -p storage/framework/views storage/framework/sessions storage/framework/cache/data storage/logs
+          touch storage/framework/views/.gitkeep
+          touch storage/framework/sessions/.gitkeep
+          touch storage/framework/cache/data/.gitkeep
+          touch storage/logs/.gitkeep
+
+      - name: Push built application to deploy branch
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          rm -f dym/.env
+          rm -rf dym/node_modules
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B deploy
+          git add -f dym/vendor dym/public/build
+          git add -A
+          git commit -m "deploy: build ${GITHUB_SHA::7} $(date -u +%FT%TZ)"
+          git push --force origin deploy
+
+      - name: Trigger LWS git-mirror deploy
+        env:
+          WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL }}
+          WEBHOOK_TOKEN: ${{ secrets.DEPLOY_WEBHOOK_TOKEN }}
+        run: |
+          if [ -z "$WEBHOOK_URL" ] || [ -z "$WEBHOOK_TOKEN" ]; then
+            echo "::error::DEPLOY_WEBHOOK_URL et DEPLOY_WEBHOOK_TOKEN doivent être configurés."
+            exit 1
+          fi
+          HTTP_CODE=$(curl -sS -w "%{http_code}" -o /tmp/deploy_out.txt -X POST \
+            "${WEBHOOK_URL%/}/git" \
+            -H "X-Deploy-Token: $WEBHOOK_TOKEN" \
+            -H "Accept: application/json" \
+            --max-time 180 --retry 2 --retry-delay 5)
+          echo "HTTP $HTTP_CODE"
+          cat /tmp/deploy_out.txt | python3 -m json.tool 2>/dev/null || cat /tmp/deploy_out.txt
+          [ "$HTTP_CODE" -lt 400 ] || { echo "Git-mirror webhook failed with HTTP $HTTP_CODE"; exit 1; }

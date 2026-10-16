@@ -93,83 +93,12 @@ Si le moteur Docker est inaccessible, ouvrir Docker Desktop, attendre son
 démarrage et vérifier `docker info`. Sous Windows, sélectionner les conteneurs
 Linux si Docker Desktop utilise actuellement les conteneurs Windows.
 
-## Production
+## Déploiement en production
 
-`Dockerfile` (multi-étapes) construit une image `serversideup/php` FPM + Nginx
-avec les dépendances Composer sans dev et les assets Vite compilés.
-`compose.prod.yaml` lance l'application (port 8080), un worker de queue et
-MySQL 8.4. Les données MySQL et `storage/app` sont dans des volumes nommés ;
-MySQL n'est pas exposé hors du réseau Docker.
-
-```powershell
-Copy-Item .env.example .env.production   # puis renseigner les valeurs ci-dessous
-docker compose --env-file .env.production -f compose.prod.yaml build
-docker compose --env-file .env.production -f compose.prod.yaml up -d
-```
-
-`--env-file .env.production` est obligatoire : il fournit aussi les identifiants
-au conteneur MySQL (sinon la commande échoue avec « DB_… manquant »).
-
-Dans `.env.production` :
-
-```dotenv
-APP_ENV=production
-APP_DEBUG=false
-APP_KEY=base64:...            # php artisan key:generate --show
-APP_URL=https://dym.ci
-
-DB_CONNECTION=mysql
-DB_HOST=mysql
-DB_PORT=3306
-DB_DATABASE=dym
-DB_USERNAME=dym
-DB_PASSWORD=<mot de passe fort>
-DB_ROOT_PASSWORD=<autre mot de passe fort>
-```
-
-Les migrations et la mise en cache s'exécutent au démarrage (`AUTORUN_*`),
-une fois MySQL prêt. Placer un reverse proxy TLS (Caddy, Traefik, Nginx)
-devant le port 8080. `.env.production` ne doit jamais être commité.
-
-### Déploiement automatique (GitHub Actions + SSH)
-
-Le workflow [`../.github/workflows/deploy.yml`](../.github/workflows/deploy.yml)
-se déclenche sur chaque push vers `main` qui modifie `dym/`, ou manuellement
-depuis l'onglet Actions. Il se connecte au VPS, met le clone de
-`/opt/website_dym` sur le commit poussé, puis lance `dym/docker/deploy.sh` avec
-`sudo`. Le script reconstruit et redémarre les conteneurs Docker ; les
-migrations et le cache Laravel sont appliqués au démarrage de l'application.
-Le workflow vérifie ensuite `https://dym.ci/up`.
-
-#### Secrets et variables GitHub
-
-Dans **Settings > Secrets and variables > Actions**, ajouter les secrets
-suivants dans l'environnement GitHub `production` (ou au niveau du dépôt) :
-
-| Nom | Type | Valeur |
-| --- | --- | --- |
-| `VPS_HOST` | secret | Adresse IP ou nom DNS du VPS |
-| `VPS_USER` | secret | Utilisateur SSH autorisé à lancer le déploiement |
-| `VPS_SSH_KEY` | secret | Clé privée SSH correspondant à la clé publique installée sur le VPS |
-| `VPS_PORT` | secret, facultatif | Port SSH ; `22` par défaut |
-| `VPS_KNOWN_HOSTS` | secret, recommandé | Ligne `known_hosts` vérifiée pour le VPS |
-
-Variable facultative : `VPS_APP_DIR`, chemin absolu du clone sur le VPS ; sa
-valeur par défaut est `/opt/website_dym`.
-
-La clé publique SSH doit être autorisée pour `VPS_USER`. Cet utilisateur doit
-pouvoir lire le clone et exécuter `sudo -n bash /opt/website_dym/dym/docker/deploy.sh`
-sans saisie de mot de passe. Le script crée `.env.production` au premier
-lancement ; vérifier ensuite les paramètres de messagerie et conserver ce
-fichier uniquement sur le VPS.
-
-Si le job s'arrête pendant « Validate SSH deployment secrets », vérifier que
-`VPS_HOST`, `VPS_USER` et `VPS_SSH_KEY` existent dans la portée utilisée par
-l'environnement `production`. Le workflow échoue volontairement avant toute
-connexion lorsque l'un d'eux manque.
-
-Pour tester manuellement : **Actions > deploy > Run workflow**. Après le
-premier déploiement, vérifier l'étape de santé et ouvrir <https://dym.ci/up>.
+Le site de production est hébergé chez LWS. Le déploiement Git miroir, le FTP
+manuel de secours et les prérequis de l'hébergement sont documentés dans
+[`DEPLOYMENT.md`](DEPLOYMENT.md). Les fichiers Docker du dépôt servent au
+développement local et ne sont pas utilisés par le déploiement de production.
 
 Sauvegarde de la base :
 
