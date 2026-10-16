@@ -78,6 +78,14 @@ jobs:
             echo "::error::DEPLOY_WEBHOOK_URL et DEPLOY_WEBHOOK_TOKEN doivent être configurés."
             exit 1
           fi
+          python3 - "$WEBHOOK_URL" <<'PY'
+          import sys
+          from urllib.parse import urlparse
+
+          url = urlparse(sys.argv[1])
+          if url.scheme != "https" or not url.hostname or url.path.rstrip("/") != "/api/deploy" or url.query or url.fragment:
+              raise SystemExit("DEPLOY_WEBHOOK_URL doit être exactement https://dym.ci/api/deploy (sans guillemets ni paramètres).")
+          PY
           HTTP_CODE=$(curl -sS -w "%{http_code}" -o /tmp/deploy_out.txt -X POST \
             "${WEBHOOK_URL%/}/git" \
             -H "X-Deploy-Token: $WEBHOOK_TOKEN" \

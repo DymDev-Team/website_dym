@@ -12,7 +12,7 @@ root.
 
 ## Prérequis LWS
 
-- Sélectionner **PHP 8.4** pour le domaine. Le `composer.lock` contient des
+- Sélectionner **PHP 8.4.1 ou plus récent** pour le domaine. Le `composer.lock` contient des
   composants Symfony 8 qui exigent PHP 8.4.1 ou plus. LWS propose PHP 8.4 dans
   son sélecteur cPanel.
 - Activer les extensions PHP `pdo_mysql`, `mbstring`, `fileinfo`, `openssl`,
