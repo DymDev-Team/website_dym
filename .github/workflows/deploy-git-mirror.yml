@@ -69,6 +69,8 @@ jobs:
           export GIT_INDEX_FILE="$RUNNER_TEMP/deploy.index"
           git read-tree --empty
           git --git-dir="$GITHUB_WORKSPACE/.git" --work-tree="$GITHUB_WORKSPACE/dym" -C "$GITHUB_WORKSPACE/dym" add -A -- .
+          # Les workflows du dépôt ne font pas partie de l'application LWS.
+          git --git-dir="$GITHUB_WORKSPACE/.git" --work-tree="$GITHUB_WORKSPACE/dym" -C "$GITHUB_WORKSPACE/dym" rm -r --cached --ignore-unmatch .github
           git --git-dir="$GITHUB_WORKSPACE/.git" --work-tree="$GITHUB_WORKSPACE/dym" -C "$GITHUB_WORKSPACE/dym" add -f -- vendor public/build
           DEPLOY_TREE=$(git write-tree)
           DEPLOY_COMMIT=$(printf 'deploy: build %s %s\n' "${GITHUB_SHA::7}" "$(date -u +%FT%TZ)" | git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit-tree "$DEPLOY_TREE")
