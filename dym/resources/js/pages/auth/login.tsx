@@ -1,7 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
 import InputError from '@/components/input-error';
-import PasskeyVerify from '@/components/passkey-verify';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -30,12 +29,6 @@ export default function Login({ status, canResetPassword }: Props) {
             <Head title="Connexion" />
 
             {status && <div className={authStatus}>{status}</div>}
-
-            <PasskeyVerify
-                label="Se connecter avec une clé d’accès"
-                loadingLabel="Vérification…"
-                separator="ou avec votre e-mail"
-            />
 
             <Form
                 {...store.form()}

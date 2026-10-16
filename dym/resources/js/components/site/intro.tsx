@@ -30,23 +30,23 @@ export function Intro() {
     };
 
     return (
-        <section ref={ref} id="a-propos" aria-labelledby="intro-title" className={`hx-root relative isolate overflow-hidden bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
+        <section ref={ref} id="a-propos" aria-labelledby="intro-title" className={`hx-root relative isolate overflow-hidden bg-paper px-5 text-ink sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
             {/* Photo découpe laser, fondue dans le noir vers la gauche */}
             <div className="hx-fade absolute inset-0 -z-10 lg:left-[34%]" style={delay(0.1)} aria-hidden>
                 <img ref={photoRef} src="/images/images/16.jpg" alt="" width={1470} height={754} loading="lazy" className="size-full scale-[1.15] object-cover object-[60%_center] will-change-transform" />
             </div>
-            <div className="absolute inset-0 -z-10 bg-ink/80 lg:bg-transparent lg:bg-linear-to-r lg:from-ink lg:from-34% lg:via-ink/70 lg:via-46% lg:to-transparent lg:to-65%" aria-hidden />
+            <div className="absolute inset-0 -z-10 bg-paper/85 lg:bg-transparent lg:bg-linear-to-r lg:from-paper lg:from-34% lg:via-paper/80 lg:via-46% lg:to-transparent lg:to-65%" aria-hidden />
 
             <div className="relative mx-auto flex max-w-[1720px] py-16 lg:min-h-[460px] lg:items-center lg:py-20">
                 {/* Cote verticale décorative */}
                 <div aria-hidden className="absolute top-12 bottom-12 left-0 hidden w-3 lg:block">
-                    <span className="absolute inset-y-0 left-1/2 w-px bg-white/25" />
-                    <span className="absolute top-0 left-0 h-px w-3 bg-white/40" />
-                    <span className="absolute bottom-0 left-0 h-px w-3 bg-white/40" />
+                    <span className="absolute inset-y-0 left-1/2 w-px bg-ink/25" />
+                    <span className="absolute top-0 left-0 h-px w-3 bg-ink/40" />
+                    <span className="absolute bottom-0 left-0 h-px w-3 bg-ink/40" />
                 </div>
 
                 <div className="w-full max-w-[620px] lg:pl-[clamp(22px,3vw,52px)]">
-                    <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-white/60" style={delay(0.15)}>
+                    <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.15)}>
                         <span className="inline-block size-[5px] bg-dym" /> {t('home.intro.eyebrow')}
                     </div>
 
@@ -60,16 +60,16 @@ export function Intro() {
                         ))}
                     </h2>
 
-                    <p className="hx-fade mt-6 max-w-[460px] text-[15px] leading-[1.7] text-white/70" style={delay(0.55)}>
+                    <p className="hx-fade mt-6 max-w-[460px] text-[15px] leading-[1.7] text-neutral-600" style={delay(0.55)}>
                         {t('home.intro.text')}
                     </p>
 
                     <button type="button" onClick={openVideo} className="group hx-fade mt-9 inline-flex cursor-pointer items-center gap-4 text-left" style={delay(0.7)}>
-                        <span className="relative grid size-14 place-items-center rounded-full border border-white/60 transition-colors duration-300 group-hover:border-dym group-hover:bg-dym group-focus-visible:border-dym group-focus-visible:bg-dym">
-                            <span className="absolute -inset-2 animate-ping rounded-full border border-white/20 [animation-duration:2.4s] motion-reduce:animate-none" aria-hidden />
-                            <Play className="size-4 translate-x-px fill-white" />
+                        <span className="relative grid size-14 place-items-center rounded-full border border-ink/60 transition-colors duration-300 group-hover:border-dym group-hover:bg-dym group-focus-visible:border-dym group-focus-visible:bg-dym">
+                            <span className="absolute -inset-2 animate-ping rounded-full border border-ink/20 [animation-duration:2.4s] motion-reduce:animate-none" aria-hidden />
+                            <Play className="size-4 translate-x-px fill-ink" />
                         </span>
-                        <span className="hx-mono text-[10px] leading-relaxed tracking-[0.1em] text-white/80 uppercase">
+                        <span className="hx-mono text-[10px] leading-relaxed tracking-[0.1em] text-ink/80 uppercase">
                             {lines(t('home.intro.video_button')).map((part, i) => (
                                 <span key={i} className="block">
                                     {part}

@@ -11,7 +11,13 @@ function useForceLightTheme() {
     useLayoutEffect(() => {
         const html = document.documentElement;
         const wasDark = html.classList.contains('dark');
-        const strip = () => html.classList.remove('dark');
+        // Seulement si `dark` est présent : classList.remove réécrit l'attribut
+        // même sans changement, ce qui relancerait l'observateur à l'infini.
+        const strip = () => {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+            }
+        };
 
         strip();
         const observer = new MutationObserver(strip);
@@ -51,10 +57,10 @@ export default function AuthDymLayout({
                 <div className="relative flex items-center justify-between p-10">
                     <Link href={home()} aria-label="DYM Manufacture — accueil">
                         <img
-                            src="/images/logo-dym-blanc.png"
+                            src="/images/logo-dym-blanc.svg"
                             alt="DYM Manufacture"
-                            width={162}
-                            height={90}
+                            width={177}
+                            height={100}
                             className="h-12 w-auto"
                         />
                     </Link>
@@ -91,11 +97,11 @@ export default function AuthDymLayout({
                         aria-label="DYM Manufacture — accueil"
                     >
                         <img
-                            src="/images/logo-dym-blanc.png"
+                            src="/images/logo-dym-couleur.svg"
                             alt="DYM Manufacture"
-                            width={162}
-                            height={90}
-                            className="h-10 w-auto brightness-0"
+                            width={177}
+                            height={100}
+                            className="h-10 w-auto"
                         />
                     </Link>
                     <Link

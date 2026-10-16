@@ -1,7 +1,7 @@
 # Site web DYM
 
 Site vitrine de DYM avec panneau d'administration.
-En production : <https://website.dym-manufacture.com>
+En production : <https://dym.ci>
 
 Le code de l'application se trouve dans le dossier [`dym/`](dym/).
 
@@ -57,13 +57,13 @@ docker compose stop
 Le site tourne sur un VPS Ubuntu, derrière Caddy, qui gère le HTTPS automatiquement avec Let's Encrypt.
 
 Prérequis :
-- DNS chez LWS : un enregistrement `A website` qui pointe vers l'IPv4 du VPS
+- DNS de `dym.ci` (zone gérée par `ns1…ns4.dnshostservices.com`) : enregistrements `A @` et `A www` vers l'IPv4 du VPS
 - Ports 80 et 443 ouverts dans le pare-feu Contabo
 
 **Première installation** :
 
 ```bash
-git clone https://github.com/DymDev-Team/website_dym.git && cd website_dym/dym
+sudo git clone https://github.com/DymDev-Team/website_dym.git /opt/website_dym && cd /opt/website_dym/dym
 sudo bash docker/deploy.sh
 docker compose --env-file .env.production -f compose.prod.yaml exec app php artisan app:make-admin vous@exemple.com
 ```
@@ -75,10 +75,10 @@ Le script [`dym/docker/deploy.sh`](dym/docker/deploy.sh) fait tout :
 - construit et démarre les conteneurs
 - active le HTTPS
 
-**Mise à jour** :
+**Mise à jour** : automatique à chaque push sur `main` (GitHub Actions se connecte au VPS en SSH, voir [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) et la configuration dans [`dym/DOCKER.md`](dym/DOCKER.md)). À la main :
 
 ```bash
-git pull && sudo bash docker/deploy.sh
+cd /opt/website_dym && git pull && sudo bash dym/docker/deploy.sh
 ```
 
 Les migrations s'exécutent au démarrage du conteneur.

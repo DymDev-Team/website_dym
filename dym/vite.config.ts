@@ -29,12 +29,23 @@ export default defineConfig({
         }),
     ]),
     server: {
+        // Pré-compile l'admin au démarrage : sur un volume Windows, chaque
+        // module servi à la demande est lent (connexion au panel).
+        warmup: {
+            clientFiles: [
+                './resources/js/app.tsx',
+                './resources/js/layouts/**/*.tsx',
+                './resources/js/pages/admin/**/*.tsx',
+            ],
+        },
         ...(process.env.LARAVEL_SAIL
             ? {
-                  origin: `http://localhost:${process.env.VITE_PORT ?? 5173}`,
+                  // 127.0.0.1 et non localhost : sous Windows, localhost tente d'abord IPv6
+                  // (::1, non publié par Docker) et perd ~0,2 s par module chargé.
+                  origin: `http://127.0.0.1:${process.env.VITE_PORT ?? 5173}`,
                   cors: { origin: /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/ },
                   hmr: {
-                      host: 'localhost',
+                      host: '127.0.0.1',
                       clientPort: Number(process.env.VITE_PORT ?? 5173),
                   },
               }

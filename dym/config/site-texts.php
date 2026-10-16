@@ -34,9 +34,8 @@ return [
                 'fields' => [
                     'eyebrow' => ['label' => 'Surtitre', 'default' => 'FABRICATION MÉTALLIQUE & INDUSTRIELLE'],
                     'title' => ['label' => 'Titre', 'default' => "Des hommes\net des machines.", 'multiline' => true, 'help' => $title],
-                    'intro_label' => ['label' => 'Étiquette du paragraphe', 'default' => '[ NOTRE MÉTIER ]'],
                     'intro' => ['label' => 'Paragraphe', 'default' => 'DYM Manufacture accompagne les entreprises et les particuliers dans la réalisation d’ouvrages métalliques robustes, esthétiques et de haute qualité — de l’étude à la pose.', 'multiline' => true],
-                    'cta' => ['label' => 'Bouton', 'default' => 'DÉCOUVRIR NOS ACTIVITÉS'],
+                    'cta' => ['label' => 'Bouton', 'default' => 'Demander un devis par WhatsApp'],
                     'benefit_1' => ['label' => 'Engagement 1', 'default' => "Bureau d’études\n& plans", 'multiline' => true],
                     'benefit_2' => ['label' => 'Engagement 2', 'default' => "Devis & suivi\ntransparents", 'multiline' => true],
                     'benefit_3' => ['label' => 'Engagement 3', 'default' => "Fabrication\nsur mesure", 'multiline' => true],
@@ -157,8 +156,9 @@ return [
                 'label' => 'Menu (en-tête)',
                 'fields' => [
                     'nav_home' => ['label' => 'Menu — Accueil', 'default' => 'Accueil'],
-                    'nav_activities' => ['label' => 'Menu — Activités', 'default' => 'Activités'],
-                    'nav_projects' => ['label' => 'Menu — Réalisations', 'default' => 'Réalisations'],
+                    'nav_activities' => ['label' => 'Menu — Activités', 'default' => 'Nos activités'],
+                    'nav_projects' => ['label' => 'Menu — Réalisations', 'default' => 'Nos réalisations'],
+                    'nav_brands' => ['label' => 'Menu — Marques', 'default' => 'Nos marques'],
                     'nav_news' => ['label' => 'Menu — Actualités', 'default' => 'Actualités'],
                     'nav_careers' => ['label' => 'Menu — Carrière', 'default' => 'Carrière'],
                     'cta' => ['label' => 'Bouton', 'default' => 'Demander un devis'],
@@ -215,6 +215,31 @@ return [
                 'fields' => [
                     'title' => ['label' => 'Titre', 'default' => 'Un projet sur mesure ?', 'help' => 'Un « ? » ou un point final s’affiche en orange.'],
                     'button' => ['label' => 'Bouton', 'default' => 'Demander un devis'],
+                ],
+            ],
+        ],
+    ],
+
+    'brands' => [
+        'label' => 'Page Nos marques',
+        'sections' => [
+
+            'meta' => [
+                'label' => 'Référencement (onglet du navigateur, Google)',
+                'fields' => [
+                    'title' => ['label' => 'Titre de la page', 'default' => 'Nos marques — DYM Manufacture'],
+                    'description' => ['label' => 'Description', 'default' => 'Les marques de DYM Manufacture.', 'multiline' => true],
+                ],
+            ],
+
+            'header' => [
+                'label' => 'En-tête',
+                'fields' => [
+                    'eyebrow' => ['label' => 'Surtitre', 'default' => 'NOS MARQUES'],
+                    'title' => ['label' => 'Titre', 'default' => 'Nos marques.', 'help' => 'Un point final s’affiche en orange.'],
+                    'text' => ['label' => 'Paragraphe', 'default' => 'Découvrez les marques portées par DYM Manufacture.', 'multiline' => true],
+                    'empty' => ['label' => 'Message si aucune marque', 'default' => 'Aucune marque à afficher pour le moment.'],
+                    'link' => ['label' => 'Lien vers le site d’une marque', 'default' => 'Visiter le site'],
                 ],
             ],
         ],

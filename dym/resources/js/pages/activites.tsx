@@ -91,11 +91,11 @@ export default function ActivitesPage({ activities, site }: Props) {
             <div className="bg-paper text-ink">
                 <SiteHeader active="Activités" />
 
-                <Products />
-
                 <div className="hx-hair border-t">
-                    <Activities activities={activities} />
+                    <Activities activities={activities} linkToQuote />
                 </div>
+
+                <Products />
 
                 <section className="hx-hair border-b border-white/10 bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto flex max-w-[1720px] flex-wrap items-center justify-between gap-6 py-14 lg:pl-[clamp(22px,3vw,52px)]">

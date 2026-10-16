@@ -52,7 +52,7 @@ export default function Welcome({
             <div className="bg-paper text-ink">
                 <PageLoader />
                 <SiteHeader />
-                <Hero />
+                <Hero whatsappUrl={site.whatsapp_url} />
 
                 <Intro />
 

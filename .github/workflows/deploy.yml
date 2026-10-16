@@ -1,0 +1,76 @@
+# Déploiement en production sur le VPS via SSH à chaque push sur main.
+# Le serveur met à jour son clone du dépôt puis relance dym/docker/deploy.sh.
+# Configuration : voir « Déploiement automatique (GitHub Actions + SSH) » dans dym/DOCKER.md.
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'dym/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Un seul déploiement à la fois ; un push récent n'annule pas un déploiement en cours.
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://dym.ci
+    timeout-minutes: 30
+
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          HOST: ${{ secrets.VPS_HOST }}
+          PORT: ${{ secrets.VPS_PORT || '22' }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          if [ -n "$KNOWN_HOSTS" ]; then
+            printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            echo "::warning::VPS_KNOWN_HOSTS absent : empreinte récupérée par ssh-keyscan (non vérifiée)."
+            ssh-keyscan -p "$PORT" -H "$HOST" > ~/.ssh/known_hosts
+          fi
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+          USER: ${{ secrets.VPS_USER }}
+          PORT: ${{ secrets.VPS_PORT || '22' }}
+          APP_DIR: ${{ vars.VPS_APP_DIR || '/opt/website_dym' }}
+          SHA: ${{ github.sha }}
+        run: |
+          ssh -i ~/.ssh/id_deploy -p "$PORT" -o BatchMode=yes -o ServerAliveInterval=30 "$USER@$HOST" \
+            "set -euo pipefail
+             cd '$APP_DIR'
+             git fetch --prune origin main
+             git reset --hard '$SHA'
+             sudo -n bash '$APP_DIR/dym/docker/deploy.sh'"
+
+      - name: Check site
+        run: |
+          for i in $(seq 1 12); do
+            if curl -fsS -o /dev/null https://dym.ci/up; then echo "OK"; exit 0; fi
+            sleep 10
+          done
+          echo "::error::https://dym.ci/up ne répond pas après le déploiement."
+          exit 1
+
+      - name: Clean up
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

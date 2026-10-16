@@ -1,19 +1,12 @@
-import { ArrowLeft, ArrowRight, Quote } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
+import TestimonialCard from '@/components/ui/card-08';
 import type { Testimonial } from '@/types/admin';
 import { useTexts, withDot } from '@/components/site/use-texts';
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
-
-const initials = (name: string) =>
-    name
-        .split(' ')
-        .slice(0, 2)
-        .map((w) => w[0])
-        .join('')
-        .toUpperCase();
 
 export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) {
     const [ref, inView] = useInView<HTMLElement>(0.2, false);
@@ -71,46 +64,17 @@ export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) 
                     ref={trackRef}
                     className="-mx-5 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:mx-0 lg:mt-10 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden"
                 >
-                    {testimonials.map((t, i) => {
-                        const dark = i === 1;
-
-                        return (
-                            <figure
-                                key={t.id}
-                                className={`hx-fade group m-0 flex w-[84%] shrink-0 snap-start flex-col border transition-[transform,box-shadow,border-color] duration-500 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgb(20_20_20/0.12)] sm:w-[60%] lg:w-auto ${
-                                    dark ? 'border-ink bg-ink text-white' : 'hx-hair bg-white/60 text-ink hover:border-dym/40'
-                                }`}
-                                style={delay(0.25 + i * 0.12)}
-                            >
-                                {/* Photo du projet */}
-                                <div className="relative h-36">
-                                    <div className="absolute inset-0 overflow-hidden">
-                                        <img
-                                            src={t.image_url ?? '/images/hero/atelier-dym.jpg'}
-                                            alt=""
-                                            loading="lazy"
-                                            className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                        />
-                                        <span className="absolute inset-0 bg-linear-to-t from-ink/60 to-transparent" aria-hidden />
-                                    </div>
-                                    <span className="hx-mono absolute bottom-3 left-4 text-[9px] tracking-[0.1em] text-white uppercase">{t.project}</span>
-                                    <span className="absolute right-4 -bottom-5 grid size-10 place-items-center bg-dym text-white shadow-[0_6px_16px_rgb(241_90_34/0.35)]" aria-hidden>
-                                        <Quote className="size-4 fill-white" strokeWidth={0} />
-                                    </span>
-                                </div>
-
-                                <blockquote className={`m-0 flex-1 px-5 pt-7 pb-5 text-[15px] leading-[1.65] ${dark ? 'text-white/85' : 'text-neutral-700'}`}>« {t.quote} »</blockquote>
-
-                                <figcaption className={`mx-5 flex items-center gap-3 border-t py-4 ${dark ? 'border-white/15' : 'border-ink/10'}`}>
-                                    <span className={`grid size-9 shrink-0 place-items-center rounded-full font-display text-sm ${dark ? 'bg-white text-ink' : 'bg-ink text-white'}`}>{initials(t.author)}</span>
-                                    <span className="min-w-0">
-                                        <span className="block truncate text-sm font-semibold">{t.author}</span>
-                                        <span className={`hx-mono block truncate text-[9px] tracking-[0.08em] uppercase ${dark ? 'text-white/50' : 'text-neutral-500'}`}>{t.role}</span>
-                                    </span>
-                                </figcaption>
-                            </figure>
-                        );
-                    })}
+                    {testimonials.map((t, i) => (
+                        <div key={t.id} className="hx-fade w-[84%] shrink-0 snap-start sm:w-[60%] lg:w-auto" style={delay(0.25 + i * 0.12)}>
+                            <TestimonialCard
+                                quote={t.quote}
+                                author={t.author}
+                                role={[t.role, t.project].filter(Boolean).join(' · ') || null}
+                                avatarUrl={t.image_url}
+                                className="h-full max-w-none"
+                            />
+                        </div>
+                    ))}
                 </div>
             </div>
         </section>

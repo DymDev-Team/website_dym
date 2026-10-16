@@ -1,6 +1,12 @@
 # Reverse proxy TLS devant l'application (compose.prod.yaml, port 8080 local).
-# Copié vers /etc/caddy/Caddyfile par docker/deploy.sh. Certificat Let's Encrypt automatique.
-website.dym-manufacture.com {
+# Copié vers /etc/caddy/Caddyfile par docker/deploy.sh. Certificat Let's Encrypt automatique
+# pour chaque nom ci-dessous : son enregistrement DNS A doit pointer vers le VPS.
+dym.ci {
 	encode zstd gzip
 	reverse_proxy 127.0.0.1:8080
+}
+
+# Anciens noms et www : redirection permanente vers le domaine principal.
+www.dym.ci, website.dym-manufacture.com {
+	redir https://dym.ci{uri} permanent
 }

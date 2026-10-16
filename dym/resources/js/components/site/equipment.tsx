@@ -20,7 +20,7 @@ function MachineBlueprint({ label }: { label: string }) {
     const k = left ? -1 : 1;
 
     return (
-        <svg key={label} viewBox="0 0 520 270" className="h-auto w-full text-white" role="img" aria-label={`Plan technique : ${label}`}>
+        <svg key={label} viewBox="0 0 520 270" className="h-auto w-full text-ink" role="img" aria-label={`Plan technique : ${label}`}>
             <g fill="none" stroke="currentColor" strokeOpacity="0.55" strokeWidth="1">
                 {bp.parts(draw)}
                 {/* Cotes */}
@@ -84,9 +84,9 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
             ref={ref}
             id="equipements"
             aria-labelledby="equipements-title"
-            className={`hx-root relative isolate overflow-hidden bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}
+            className={`hx-root relative isolate overflow-hidden bg-paper px-5 text-ink sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}
         >
-            {/* Photos des machines, fondues dans le noir vers la gauche */}
+            {/* Photos des machines, fondues dans le fond clair vers la gauche */}
             <div className="hx-fade absolute inset-y-0 right-0 -z-10 hidden w-[42%] lg:block" style={delay(0.2)} aria-hidden>
                 {equipments.map((e, i) => (
                     <img
@@ -97,14 +97,14 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
                         className={`absolute inset-0 size-full object-cover transition-[opacity,transform] duration-1000 ease-out ${i === active ? 'scale-100 opacity-100' : 'scale-105 opacity-0'}`}
                     />
                 ))}
-                <div className="absolute inset-0 bg-linear-to-r from-ink via-ink/40 via-35% to-transparent to-70%" />
+                <div className="absolute inset-0 bg-linear-to-r from-paper via-paper/55 via-35% to-transparent to-70%" />
             </div>
 
             <div className="relative mx-auto max-w-[1720px] py-16 lg:py-20 lg:pl-[clamp(22px,3vw,52px)]">
                 {/* En-tête */}
                 <div className="grid gap-6 lg:w-[72%] lg:grid-cols-[auto_1fr] lg:items-end lg:gap-14">
                     <div>
-                        <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-white/60" style={delay(0.05)}>
+                        <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
                             <span className="inline-block size-[5px] bg-dym" /> {t('home.equipment.eyebrow')}
                         </div>
                         <h2 id="equipements-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] uppercase lg:text-[clamp(40px,3.2vw,60px)] lg:whitespace-nowrap">
@@ -119,7 +119,7 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
                     </div>
 
                     <div className="hx-fade" style={delay(0.35)}>
-                        <p className="max-w-[400px] text-[15px] leading-[1.7] text-white/70">{t('home.equipment.text')}</p>
+                        <p className="max-w-[400px] text-[15px] leading-[1.7] text-neutral-600">{t('home.equipment.text')}</p>
                         <a
                             href="#contact"
                             className="hd-cta relative mt-6 inline-flex items-center gap-3 overflow-hidden bg-dym px-6 py-3.5 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark"
@@ -132,12 +132,12 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
 
                 {/* Liste + plan */}
                 <div className="mt-12 grid gap-10 lg:mt-16 lg:w-[66%] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-end">
-                    <ul className="hx-hair border-t border-white/15" onMouseLeave={() => setPaused(false)}>
+                    <ul className="hx-hair border-t border-ink/15" onMouseLeave={() => setPaused(false)}>
                         {equipments.map((e, i) => {
                             const on = i === active;
 
                             return (
-                                <li key={e.name} className="hx-fade border-b border-white/15" style={delay(0.45 + i * 0.08)}>
+                                <li key={e.name} className="hx-fade border-b border-ink/15" style={delay(0.45 + i * 0.08)}>
                                     <button
                                         type="button"
                                         onMouseEnter={() => {
@@ -152,11 +152,11 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
                                         aria-pressed={on}
                                         className="group flex w-full cursor-pointer items-start gap-4 py-4 text-left"
                                     >
-                                        <span className={`hx-mono pt-0.5 text-[10px] transition-colors ${on ? 'text-dym' : 'text-white/40'}`}>{String(i + 1).padStart(2, '0')}</span>
+                                        <span className={`hx-mono pt-0.5 text-[10px] transition-colors ${on ? 'text-dym' : 'text-neutral-400'}`}>{String(i + 1).padStart(2, '0')}</span>
                                         <span className="flex-1">
-                                            <span className={`hx-mono block text-[12px] tracking-[0.12em] uppercase transition-colors ${on ? 'text-white' : 'text-white/60 group-hover:text-white'}`}>{e.name}</span>
+                                            <span className={`hx-mono block text-[12px] tracking-[0.12em] uppercase transition-colors ${on ? 'text-ink' : 'text-neutral-500 group-hover:text-ink'}`}>{e.name}</span>
                                             <span
-                                                className={`grid text-[13px] leading-relaxed text-white/55 transition-[grid-template-rows,opacity,margin] duration-500 ${
+                                                className={`grid text-[13px] leading-relaxed text-neutral-600 transition-[grid-template-rows,opacity,margin] duration-500 ${
                                                     on ? 'mt-2 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                                                 }`}
                                             >

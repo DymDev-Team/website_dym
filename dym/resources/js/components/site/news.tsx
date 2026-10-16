@@ -31,15 +31,15 @@ export function News({ posts: news }: { posts: Post[] }) {
     }
 
     return (
-        <section ref={ref} id="actualites" aria-labelledby="actualites-title" className={`hx-root hx-hair relative border-t bg-paper px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
+        <section ref={ref} id="actualites" aria-labelledby="actualites-title" className={`hx-root hx-dark hx-hair relative border-t border-white/15 bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
             <div className="mx-auto max-w-[1720px] py-14 lg:py-16 lg:pl-[clamp(22px,3vw,52px)]">
                 {/* En-tête */}
                 <div className="flex flex-wrap items-end justify-between gap-5">
                     <div>
-                        <div className="hx-mono hx-fade mb-4 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
+                        <div className="hx-mono hx-fade mb-4 flex items-center gap-3 text-[10px] tracking-[0.075em] text-white/55" style={delay(0.05)}>
                             <span className="inline-block size-[5px] bg-dym" /> {t('home.news.eyebrow')}
                         </div>
-                        <h2 id="actualites-title" className="font-display text-[clamp(34px,7vw,44px)] leading-[0.95] text-ink uppercase lg:text-[clamp(36px,2.8vw,50px)]">
+                        <h2 id="actualites-title" className="font-display text-[clamp(34px,7vw,44px)] leading-[0.95] text-white uppercase lg:text-[clamp(36px,2.8vw,50px)]">
                             <span className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
                                 <span style={delay(0.12)}>{withDot(t('home.news.title'))}</span>
                             </span>
@@ -58,7 +58,7 @@ export function News({ posts: news }: { posts: Post[] }) {
                                     type="button"
                                     onClick={() => scroll(dir)}
                                     aria-label={dir < 0 ? 'Actualité précédente' : 'Actualité suivante'}
-                                    className="hx-hair grid size-10 cursor-pointer place-items-center border text-ink transition-colors hover:border-dym hover:bg-dym hover:text-white"
+                                    className="hx-hair grid size-10 cursor-pointer place-items-center border border-white/20 text-white transition-colors hover:border-dym hover:bg-dym hover:text-white"
                                 >
                                     {dir < 0 ? <ArrowLeft className="size-4" /> : <ArrowRight className="size-4" />}
                                 </button>
@@ -75,10 +75,10 @@ export function News({ posts: news }: { posts: Post[] }) {
                                 <div className="relative aspect-[2.2/1] overflow-hidden bg-neutral-100">
                                     <img src={n.image_url ?? undefined} alt="" loading="lazy" className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                                 </div>
-                                <p className="hx-mono mt-5 flex items-center gap-2 text-[10px] tracking-[0.1em] text-neutral-500 uppercase">
+                                <p className="hx-mono mt-5 flex items-center gap-2 text-[10px] tracking-[0.1em] text-white/55 uppercase">
                                     <span className="size-[5px] bg-dym" aria-hidden /> {n.category}
                                 </p>
-                                <h3 className="mt-2 text-[17px] leading-snug font-semibold text-ink">
+                                <h3 className="mt-2 text-[17px] leading-snug font-semibold text-white">
                                     <span className="bg-linear-to-r from-dym to-dym bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 group-hover:bg-[length:100%_1px]">
                                         {n.title}
                                     </span>

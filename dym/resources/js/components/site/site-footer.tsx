@@ -1,7 +1,8 @@
 import { Link } from '@inertiajs/react';
-import { Facebook, Linkedin, Mail, MapPin, MessageCircle, Phone, Youtube } from 'lucide-react';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import { Fragment } from 'react';
 import { SiteLogo, siteNav } from '@/components/site/site-header';
+import { FacebookIcon, InstagramIcon, LinkedInIcon, WhatsAppIcon, YouTubeIcon } from '@/components/site/social-icons';
 import { show as showLegal } from '@/routes/legal';
 import type { Activity, SiteSettings } from '@/types/admin';
 import { useTexts } from '@/components/site/use-texts';
@@ -9,10 +10,11 @@ import { useTexts } from '@/components/site/use-texts';
 type FooterActivity = Pick<Activity, 'id' | 'title'>;
 
 const socialLinks = [
-    { key: 'linkedin_url', icon: Linkedin, label: 'LinkedIn' },
-    { key: 'facebook_url', icon: Facebook, label: 'Facebook' },
-    { key: 'whatsapp_url', icon: MessageCircle, label: 'WhatsApp' },
-    { key: 'youtube_url', icon: Youtube, label: 'YouTube' },
+    { key: 'whatsapp_url', icon: WhatsAppIcon, label: 'WhatsApp' },
+    { key: 'facebook_url', icon: FacebookIcon, label: 'Facebook' },
+    { key: 'linkedin_url', icon: LinkedInIcon, label: 'LinkedIn' },
+    { key: 'instagram_url', icon: InstagramIcon, label: 'Instagram' },
+    { key: 'youtube_url', icon: YouTubeIcon, label: 'YouTube' },
 ] as const;
 
 const legalLinks = [
@@ -24,7 +26,7 @@ const legalLinks = [
 const CREDIT_URL = 'https://ci.linkedin.com/in/yann-morel-effobi-brou-5474782a1';
 
 function ColumnTitle({ children }: { children: string }) {
-    return <p className="hx-mono mb-5 text-[10px] tracking-[0.14em] text-white uppercase">{children}</p>;
+    return <p className="hx-mono mb-5 text-[10px] tracking-[0.14em] text-ink uppercase">{children}</p>;
 }
 
 export function SiteFooter({ activities, site }: { activities: FooterActivity[]; site: SiteSettings }) {
@@ -47,12 +49,12 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
     const socials = socialLinks.filter((s) => site[s.key]).map((s) => ({ ...s, href: site[s.key] as string }));
 
     return (
-        <footer id="contact" className="bg-ink px-5 text-neutral-400 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+        <footer id="contact" className="bg-paper px-5 text-neutral-600 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
             <div className="mx-auto max-w-[1720px] lg:pl-[clamp(22px,3vw,52px)]">
                 <div className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1.1fr_1.2fr] lg:gap-0 lg:py-16">
                     {/* Marque */}
                     <div className="lg:pr-10">
-                        <SiteLogo light className="h-12" />
+                        <SiteLogo className="h-12" />
                         {site.tagline && <p className="mt-5 max-w-[300px] text-sm leading-relaxed">{site.tagline}</p>}
                         <div className="mt-6 flex gap-2">
                             {socials.map(({ icon: Icon, label, href }) => (
@@ -62,7 +64,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label={label}
-                                    className="grid size-9 place-items-center border border-white/15 text-white/80 transition-colors hover:border-dym hover:bg-dym hover:text-white"
+                                    className="grid size-9 place-items-center border border-ink/15 text-ink/80 transition-colors hover:border-dym hover:bg-dym hover:text-white"
                                 >
                                     <Icon className="size-4" />
                                 </a>
@@ -71,35 +73,35 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                     </div>
 
                     {/* Navigation */}
-                    <div className="lg:border-l lg:border-white/10 lg:px-10">
+                    <div className="lg:border-l lg:border-ink/10 lg:px-10">
                         <ColumnTitle>{t('layout.footer.nav_title')}</ColumnTitle>
                         <ul className="space-y-2.5 text-sm">
                             {siteNav.map((n) => (
                                 <li key={n.label}>
-                                    <a href={n.href} className="transition-colors hover:text-white">
-                                        {t(`layout.header.nav_${n.key}`)}
-                                    </a>
+                                    <Link href={n.href} className="transition-colors hover:text-ink">
+                                        {n.navLabel ?? t(`layout.header.nav_${n.key}`)}
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
                     {/* Activités */}
-                    <div className="lg:border-l lg:border-white/10 lg:px-10">
+                    <div className="lg:border-l lg:border-ink/10 lg:px-10">
                         <ColumnTitle>{t('layout.footer.activities_title')}</ColumnTitle>
                         <ul className="space-y-2.5 text-sm">
                             {activities.map((a) => (
                                 <li key={a.id}>
-                                    <a href="/#activites" className="transition-colors hover:text-white">
+                                    <Link href="/#activites" className="transition-colors hover:text-ink">
                                         {a.title}
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
                     {/* Contact */}
-                    <div className="lg:border-l lg:border-white/10 lg:pl-10">
+                    <div className="lg:border-l lg:border-ink/10 lg:pl-10">
                         <ColumnTitle>{t('layout.footer.contact_title')}</ColumnTitle>
                         <ul className="space-y-4 text-sm">
                             {contact.map(({ icon: Icon, label, href }) => {
@@ -113,11 +115,11 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                                 return (
                                     <li key={label}>
                                         {href ? (
-                                            <a href={href} className="flex items-start gap-3 text-white/85 transition-colors hover:text-white">
+                                            <a href={href} className="flex items-start gap-3 text-ink/85 transition-colors hover:text-ink">
                                                 {content}
                                             </a>
                                         ) : (
-                                            <span className="flex items-start gap-3 text-white/85">{content}</span>
+                                            <span className="flex items-start gap-3 text-ink/85">{content}</span>
                                         )}
                                     </li>
                                 );
@@ -127,10 +129,10 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                 </div>
 
                 {/* Barre basse */}
-                <div className="flex flex-col gap-3 border-t border-white/10 py-6 text-xs sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-3 border-t border-ink/10 py-6 text-xs sm:flex-row sm:items-center sm:justify-between">
                     <p>
                         {t('layout.footer.copyright').replace('{année}', String(new Date().getFullYear()))} {t('layout.footer.credit')}{' '}
-                        <a href={CREDIT_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-white underline decoration-dym decoration-1 underline-offset-4 transition-colors hover:text-dym">
+                        <a href={CREDIT_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-ink underline decoration-dym decoration-1 underline-offset-4 transition-colors hover:text-dym">
                             DYM DEV
                         </a>
                         .
@@ -138,8 +140,8 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                     <p className="flex flex-wrap items-center gap-3">
                         {legalLinks.map((l, i) => (
                             <Fragment key={l.slug}>
-                                {i > 0 && <span className="text-white/20">|</span>}
-                                <Link href={showLegal(l.slug)} className="transition-colors hover:text-white">
+                                {i > 0 && <span className="text-ink/20">|</span>}
+                                <Link href={showLegal(l.slug)} className="transition-colors hover:text-ink">
                                     {t(`layout.footer.${l.key}`)}
                                 </Link>
                             </Fragment>

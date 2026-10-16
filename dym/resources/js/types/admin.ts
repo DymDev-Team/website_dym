@@ -46,6 +46,16 @@ export type Partner = Timestamps &
         website_url: string | null;
     };
 
+export type Brand = Timestamps &
+    Orderable & {
+        id: number;
+        name: string;
+        logo: string;
+        logo_url: string | null;
+        description: string | null;
+        website_url: string | null;
+    };
+
 export type Testimonial = Timestamps &
     Orderable & {
         id: number;
@@ -77,6 +87,7 @@ export type SiteSettings = {
     linkedin_url: string | null;
     facebook_url: string | null;
     whatsapp_url: string | null;
+    instagram_url: string | null;
     youtube_url: string | null;
 };
 

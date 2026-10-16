@@ -8,10 +8,10 @@ export default function AppLogo() {
             </div>
             <div className="flex min-w-0 flex-1 items-center gap-3 group-data-[collapsible=icon]:hidden">
                 <img
-                    src="/images/logo-dym-blanc.png"
+                    src="/images/logo-dym-blanc.svg"
                     alt="DYM Manufacture"
-                    width={162}
-                    height={90}
+                    width={177}
+                    height={100}
                     className="h-9 w-auto"
                 />
                 <span className="hx-mono border-l border-white/15 pl-3 text-[9px] leading-tight tracking-[0.12em] text-white/55 uppercase">

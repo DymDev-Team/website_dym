@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ActivityController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Admin\JobApplicationController;
@@ -28,6 +29,7 @@ Route::prefix('admin')
         Route::resource('posts', PostController::class)->except('show');
         Route::resource('equipment', EquipmentController::class)->except('show');
         Route::resource('partners', PartnerController::class)->except('show');
+        Route::resource('brands', BrandController::class)->except('show');
         Route::resource('testimonials', TestimonialController::class)->except('show');
 
         Route::resource('job-offers', JobOfferController::class)->except('show');

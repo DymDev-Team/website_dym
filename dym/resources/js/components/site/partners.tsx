@@ -21,14 +21,14 @@ function LogoSet({ partners, copy }: { partners: Partner[]; copy: number }) {
                     key={`${copy}-${r}-${p.id}`}
                     title={p.name}
                     aria-hidden={decorative || undefined}
-                    className="group grid size-16 shrink-0 place-items-center overflow-hidden rounded-full border border-black/10 bg-white shadow-[0_4px_14px_rgb(20_20_20/0.05)] transition-[border-color,box-shadow] duration-300 hover:border-dym/40 hover:shadow-[0_6px_20px_rgb(241_90_34/0.15)] sm:size-[76px]"
+                    className="group grid size-16 shrink-0 place-items-center overflow-hidden rounded-full border border-ink/10 bg-white shadow-[0_4px_14px_rgb(20_20_20/0.08)] transition-[border-color,box-shadow] duration-300 hover:border-dym/40 hover:shadow-[0_6px_20px_rgb(241_90_34/0.15)] min-[420px]:size-20 sm:size-24"
                 >
                     <img
                         src={p.logo_url ?? undefined}
                         alt={decorative ? '' : p.name}
                         loading="lazy"
                         onError={hideBroken}
-                        className="max-h-[62%] max-w-[72%] object-contain opacity-70 brightness-105 grayscale transition-[filter,opacity,transform] duration-300 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0"
+                        className="max-h-[80%] max-w-[80%] object-contain transition-transform duration-300 group-hover:scale-105"
                     />
                 </span>
             );
@@ -44,10 +44,10 @@ export function Partners({ partners }: { partners: Partner[] }) {
     }
 
     return (
-        <section id="references" className="border-t border-black/10 bg-paper py-9">
-            <p className="mb-5 text-center text-[11px] font-bold tracking-[0.18em] text-neutral-500 uppercase">{t('home.partners.title')}</p>
-            <div className="overflow-hidden bg-paper mask-[linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
-                <div className="flex w-max animate-partners items-center gap-6 hover:paused motion-reduce:animate-none">
+        <section id="references" className="border-t border-ink/10 bg-white py-9">
+            <p className="mb-5 text-center text-[11px] font-bold tracking-[0.18em] text-ink/60 uppercase">{t('home.partners.title')}</p>
+            <div className="overflow-hidden mask-[linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
+                <div className="flex w-max animate-partners items-center gap-4 hover:paused motion-reduce:animate-none sm:gap-6">
                     <LogoSet partners={partners} copy={0} />
                     <LogoSet partners={partners} copy={1} />
                 </div>

@@ -131,22 +131,72 @@ Les migrations et la mise en cache s'exécutent au démarrage (`AUTORUN_*`),
 une fois MySQL prêt. Placer un reverse proxy TLS (Caddy, Traefik, Nginx)
 devant le port 8080. `.env.production` ne doit jamais être commité.
 
-### Déploiement sur le VPS (website.dym-manufacture.com)
+### Déploiement sur le VPS (dym.ci)
 
-Prérequis : enregistrement DNS `A website → <IPv4 du VPS>` dans la zone LWS,
-ports 80/443 ouverts dans le pare-feu Contabo (s'il est activé).
+Prérequis :
+- zone DNS de `dym.ci` (serveurs `ns1…ns4.dnshostservices.com`) : `A @` et
+  `A www` vers l'IPv4 du VPS. Tant que le domaine pointe vers l'hébergement
+  cPanel (`/public_html/dym-website/public`), c'est ce dernier qui répond ;
+- ports 80/443 ouverts dans le pare-feu Contabo (s'il est activé).
 
 ```bash
-git clone https://github.com/DymDev-Team/website_dym.git && cd website_dym/dym
+sudo git clone https://github.com/DymDev-Team/website_dym.git /opt/website_dym
+cd /opt/website_dym/dym
 sudo bash docker/deploy.sh
 docker compose --env-file .env.production -f compose.prod.yaml exec app php artisan app:make-admin vous@exemple.com
 ```
 
 `docker/deploy.sh` installe Docker et Caddy, configure `ufw`, génère
 `.env.production` (clé et mots de passe aléatoires) au premier lancement,
-construit et démarre les conteneurs, puis installe `docker/Caddyfile`
-(HTTPS Let's Encrypt automatique). Le port 8080 n'écoute que sur 127.0.0.1.
-Pour une mise à jour : `git pull && sudo bash docker/deploy.sh`.
+force `APP_URL=https://dym.ci`, construit et démarre les conteneurs, puis
+installe `docker/Caddyfile` (HTTPS Let's Encrypt automatique ; `www.dym.ci` et
+`website.dym-manufacture.com` redirigent vers `dym.ci`). Le port 8080 n'écoute
+que sur 127.0.0.1.
+
+### Déploiement automatique (GitHub Actions + SSH)
+
+`.github/workflows/deploy.yml` (racine du dépôt) se déclenche à chaque push
+sur `main` touchant `dym/` (ou à la main depuis l'onglet Actions). Il se
+connecte au VPS en SSH, aligne `/opt/website_dym` sur le commit poussé
+(`git reset --hard`), relance `sudo docker/deploy.sh`, puis vérifie
+`https://dym.ci/up`.
+
+Sur le VPS, une seule fois (en root) :
+
+```bash
+adduser --disabled-password --gecos "" deploy
+usermod -aG docker deploy
+chown -R deploy:deploy /opt/website_dym
+echo 'deploy ALL=(root) NOPASSWD: /usr/bin/bash /opt/website_dym/dym/docker/deploy.sh' > /etc/sudoers.d/deploy
+chmod 440 /etc/sudoers.d/deploy
+
+# Clé dédiée au déploiement (la privée va dans GitHub, puis on la supprime d'ici)
+ssh-keygen -t ed25519 -N "" -C github-deploy -f /root/github-deploy
+install -d -m 700 -o deploy -g deploy /home/deploy/.ssh
+cat /root/github-deploy.pub >> /home/deploy/.ssh/authorized_keys
+chown deploy:deploy /home/deploy/.ssh/authorized_keys && chmod 600 /home/deploy/.ssh/authorized_keys
+cat /root/github-deploy        # → secret VPS_SSH_KEY, puis : rm /root/github-deploy*
+ssh-keyscan -H localhost       # (depuis votre poste : ssh-keyscan -H <IP>) → secret VPS_KNOWN_HOSTS
+```
+
+Si le dépôt GitHub est privé, ajouter aussi une *deploy key* en lecture seule
+pour l'utilisateur `deploy` (ou un remote HTTPS avec jeton) afin que
+`git fetch` fonctionne sur le VPS.
+
+Dans GitHub → *Settings → Secrets and variables → Actions* :
+
+| Nom | Type | Valeur |
+| --- | --- | --- |
+| `VPS_HOST` | secret | IPv4 du VPS |
+| `VPS_USER` | secret | `deploy` |
+| `VPS_SSH_KEY` | secret | clé privée `github-deploy` (texte complet) |
+| `VPS_KNOWN_HOSTS` | secret | sortie de `ssh-keyscan -H <IP>` (recommandé) |
+| `VPS_PORT` | secret | facultatif, 22 par défaut |
+| `VPS_APP_DIR` | variable | facultatif, `/opt/website_dym` par défaut |
+
+Le script tournant en root et se trouvant dans le clone, l'accès SSH de
+`deploy` équivaut à un accès root : garder la clé uniquement dans GitHub.
+Mise à jour manuelle : `cd /opt/website_dym && git pull && sudo bash dym/docker/deploy.sh`.
 
 Sauvegarde de la base :
 

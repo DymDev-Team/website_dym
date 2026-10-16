@@ -13,6 +13,8 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const publicPages = [
     'welcome',
     'activites',
+    'realisations',
+    'marques',
     'actualites',
     'post',
     'carriere',

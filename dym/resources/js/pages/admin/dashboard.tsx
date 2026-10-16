@@ -5,6 +5,7 @@ import {
     ExternalLink,
     Factory,
     Handshake,
+    Tag,
     Hammer,
     ImageIcon,
     Inbox,
@@ -24,6 +25,7 @@ import { index as activities } from '@/routes/admin/activities';
 import { index as applications } from '@/routes/admin/applications';
 import { index as equipment } from '@/routes/admin/equipment';
 import { index as partners } from '@/routes/admin/partners';
+import { index as brands } from '@/routes/admin/brands';
 import {
     create as createPost,
     edit as editPost,
@@ -43,6 +45,7 @@ type Props = {
         projects: Count;
         equipment: Count;
         partners: Count;
+        brands: Count;
         testimonials: Count;
         posts: Count;
         applications: { total: number; new: number; openOffers: number };
@@ -148,6 +151,13 @@ export default function AdminDashboard({ stats, latestPosts }: Props) {
                     href={partners()}
                     value={stats.partners.total}
                     detail={visible(stats.partners)}
+                />
+                <StatCard
+                    title="Marques"
+                    icon={Tag}
+                    href={brands()}
+                    value={stats.brands.total}
+                    detail={visible(stats.brands)}
                 />
                 <StatCard
                     title="Témoignages"

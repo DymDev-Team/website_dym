@@ -3,14 +3,16 @@ import { ArrowRight, Menu, X } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { create as quoteCreate } from '@/routes/quotes';
+import { brands, realisations } from '@/routes';
 import { useTexts } from '@/components/site/use-texts';
 
 export const siteNav = [
     // `label` identifie l'entrée (prop `active` des pages) ; le texte affiché
     // vient de t(`layout.header.nav_${key}`).
     { key: 'home', label: 'Accueil', href: '/' },
-    { key: 'activities', label: 'Activités', href: '/activites' },
-    { key: 'projects', label: 'Réalisations', href: '/#realisations' },
+    { key: 'activities', label: 'Activités', navLabel: 'Nos activités', href: '/activites' },
+    { key: 'projects', label: 'Réalisations', navLabel: 'Nos réalisations', href: realisations.url() },
+    { key: 'brands', label: 'Marques', href: brands.url() },
     { key: 'news', label: 'Actualités', href: '/actualites' },
     { key: 'careers', label: 'Carrière', href: '/carriere' },
 ];
@@ -20,7 +22,7 @@ const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 export function SiteLogo({ light = false, className = 'h-12' }: { light?: boolean; className?: string }) {
     return (
         <Link href="/" className="block shrink-0" aria-label="DYM Manufacture — accueil">
-            <img src="/images/logo-dym-blanc.png" alt="DYM Manufacture" width={162} height={90} className={`w-auto transition-[height] duration-300 ${className} ${light ? '' : 'brightness-0'}`} />
+            <img src={light ? '/images/logo-dym-blanc.svg' : '/images/logo-dym-couleur.svg'} alt="DYM Manufacture" width={177} height={100} className={`w-auto transition-[height] duration-300 ${className}`} />
         </Link>
     );
 }
@@ -73,7 +75,7 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
 
                 <nav className="relative hidden h-full items-stretch lg:flex" onMouseLeave={() => setHovered(null)}>
                     {siteNav.map((item, i) => (
-                        <a
+                        <Link
                             key={item.label}
                             ref={(el) => {
                                 itemsRef.current[i] = el;
@@ -88,8 +90,8 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
                                 i === target ? 'text-ink' : 'text-neutral-600 hover:text-ink'
                             }`}
                         >
-                            {t(`layout.header.nav_${item.key}`)}
-                        </a>
+                            {item.navLabel ?? t(`layout.header.nav_${item.key}`)}
+                        </Link>
                     ))}
                     <span
                         aria-hidden
@@ -118,15 +120,15 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
             {open && (
                 <nav className="hd-mobile border-t border-black/10 bg-paper px-5 pb-6 lg:hidden">
                     {siteNav.map((item, i) => (
-                        <a
+                        <Link
                             key={item.label}
                             href={item.href}
                             onClick={() => setOpen(false)}
                             style={delay(0.05 + i * 0.05)}
                             className={`block border-b border-black/10 py-3 text-xs font-semibold tracking-[0.14em] uppercase ${item.label === active ? 'text-dym' : ''}`}
                         >
-                            {t(`layout.header.nav_${item.key}`)}
-                        </a>
+                            {item.navLabel ?? t(`layout.header.nav_${item.key}`)}
+                        </Link>
                     ))}
                     <Link
                         href={quoteCreate()}

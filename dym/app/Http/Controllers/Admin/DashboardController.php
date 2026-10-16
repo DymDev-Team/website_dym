@@ -6,6 +6,7 @@ use App\Enums\ApplicationStatus;
 use App\Enums\QuoteStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
+use App\Models\Brand;
 use App\Models\Equipment;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
@@ -32,6 +33,7 @@ class DashboardController extends Controller
                 'projects' => $this->count(Project::class),
                 'equipment' => $this->count(Equipment::class),
                 'partners' => $this->count(Partner::class),
+                'brands' => $this->count(Brand::class),
                 'testimonials' => $this->count(Testimonial::class),
                 'posts' => [
                     'total' => Post::query()->count(),

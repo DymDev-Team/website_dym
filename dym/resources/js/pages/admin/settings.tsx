@@ -10,9 +10,10 @@ import { edit, update } from '@/routes/admin/settings';
 import type { SiteSettings } from '@/types/admin';
 
 const socials: { key: keyof SiteSettings; label: string }[] = [
-    { key: 'linkedin_url', label: 'LinkedIn' },
-    { key: 'facebook_url', label: 'Facebook' },
     { key: 'whatsapp_url', label: 'WhatsApp' },
+    { key: 'facebook_url', label: 'Facebook' },
+    { key: 'linkedin_url', label: 'LinkedIn' },
+    { key: 'instagram_url', label: 'Instagram' },
     { key: 'youtube_url', label: 'YouTube' },
 ];
 

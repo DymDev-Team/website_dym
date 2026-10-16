@@ -59,15 +59,15 @@ export function Projects({ projects }: { projects: Project[] }) {
     }
 
     return (
-        <section ref={ref} id="realisations" aria-labelledby="realisations-title" className={`hx-root hx-hair relative overflow-hidden border-t bg-paper ${inView ? 'is-ready' : ''}`}>
+        <section ref={ref} id="realisations" aria-labelledby="realisations-title" className={`hx-root hx-dark hx-hair relative overflow-hidden border-t border-white/15 bg-ink text-white ${inView ? 'is-ready' : ''}`}>
             {/* En-tête */}
             <div className="px-5 pt-16 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] lg:pt-20">
                 <div className="mx-auto flex max-w-[1720px] flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:pl-[clamp(22px,3vw,52px)]">
                     <div>
-                        <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
+                        <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-white/55" style={delay(0.05)}>
                             <span className="inline-block size-[5px] bg-dym" /> {t('home.projects.eyebrow')}
                         </div>
-                        <h2 id="realisations-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] text-ink uppercase lg:text-[clamp(44px,3.8vw,68px)]">
+                        <h2 id="realisations-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] text-white uppercase lg:text-[clamp(44px,3.8vw,68px)]">
                             {titleLines.map((line, i) => (
                                 <span key={line} className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
                                     <span style={delay(0.12 + i * 0.12)}>
@@ -79,7 +79,7 @@ export function Projects({ projects }: { projects: Project[] }) {
                     </div>
 
                     <div className="hx-fade flex items-center gap-6" style={delay(0.35)}>
-                        <a href="#realisations" className="hx-mono group inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
+                        <a href="#realisations" className="hx-mono group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
                             {t('home.projects.link')}
                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                         </a>
@@ -94,7 +94,7 @@ export function Projects({ projects }: { projects: Project[] }) {
                                         onClick={() => scroll(dir)}
                                         disabled={disabled}
                                         aria-label={dir < 0 ? 'Réalisations précédentes' : 'Réalisations suivantes'}
-                                        className="hx-hair grid size-11 cursor-pointer place-items-center border text-ink transition-colors hover:border-dym hover:bg-dym hover:text-white disabled:cursor-default disabled:opacity-35 disabled:hover:border-ink/20 disabled:hover:bg-transparent disabled:hover:text-ink"
+                                        className="hx-hair grid size-11 cursor-pointer place-items-center border border-white/20 text-white transition-colors hover:border-dym hover:bg-dym hover:text-white disabled:cursor-default disabled:opacity-35 disabled:hover:border-white/20 disabled:hover:bg-transparent disabled:hover:text-white"
                                     >
                                         {dir < 0 ? <ArrowLeft className="size-4" /> : <ArrowRight className="size-4" />}
                                     </button>
@@ -122,13 +122,13 @@ export function Projects({ projects }: { projects: Project[] }) {
                                 draggable={false}
                                 className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                             />
-                            <span className="hx-mono absolute top-3 left-3 bg-paper/90 px-2 py-1 text-[9px] text-ink">{String(i + 1).padStart(2, '0')}</span>
+                            <span className="hx-mono absolute top-3 left-3 bg-ink/90 px-2 py-1 text-[9px] text-white">{String(i + 1).padStart(2, '0')}</span>
                             <span className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink/55 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                         </div>
                         <figcaption className="hx-fade mt-4 flex items-start justify-between gap-3" style={delay(0.5 + Math.min(i, 5) * 0.12)}>
                             <div>
-                                <p className="text-[15px] font-semibold text-ink">{p.title}</p>
-                                <p className="hx-mono mt-1 text-[10px] tracking-[0.08em] text-neutral-500 uppercase">{p.category}</p>
+                                <p className="text-[15px] font-semibold text-white">{p.title}</p>
+                                <p className="hx-mono mt-1 text-[10px] tracking-[0.08em] text-white/55 uppercase">{p.category}</p>
                             </div>
                             <ArrowRight className="mt-1 size-4 shrink-0 -translate-x-1 text-dym opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
                         </figcaption>
@@ -139,11 +139,11 @@ export function Projects({ projects }: { projects: Project[] }) {
             {/* Progression */}
             <div className="px-5 pt-8 pb-16 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] lg:pb-20">
                 <div className="mx-auto flex max-w-[1720px] items-center gap-4 lg:pl-[clamp(22px,3vw,52px)]">
-                    <span className="hx-mono text-[10px] text-neutral-500">01</span>
-                    <div className="relative h-px flex-1 bg-ink/15">
+                    <span className="hx-mono text-[10px] text-white/55">01</span>
+                    <div className="relative h-px flex-1 bg-white/20">
                         <span className="absolute inset-y-0 left-0 bg-dym transition-[width] duration-200" style={{ width: `${Math.max(8, progress * 100)}%` }} />
                     </div>
-                    <span className="hx-mono text-[10px] text-neutral-500">{String(projects.length).padStart(2, '0')}</span>
+                    <span className="hx-mono text-[10px] text-white/55">{String(projects.length).padStart(2, '0')}</span>
                 </div>
             </div>
         </section>

@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [SiteController::class, 'home'])->name('home');
 Route::get('activites', [SiteController::class, 'activities'])->name('activities');
+Route::get('realisations', [SiteController::class, 'projects'])->name('realisations');
+Route::get('marques', [SiteController::class, 'brands'])->name('brands');
 Route::get('actualites', [SiteController::class, 'posts'])->name('posts.index');
 Route::get('actualites/{post}', [SiteController::class, 'post'])->name('posts.show');
 

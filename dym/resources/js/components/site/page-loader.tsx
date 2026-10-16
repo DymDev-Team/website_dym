@@ -91,7 +91,6 @@ export function PageLoader() {
 
     const bp = blueprints.laser;
     const draw: Draw = (d) => ({ className: 'hx-draw', pathLength: 1, style: delay(d * 0.8) });
-    const { x, y } = bp.callout;
 
     return (
         <div
@@ -129,18 +128,8 @@ export function PageLoader() {
                             </g>
                         </g>
                         <g className="hx-mono" fill="currentColor" fillOpacity="0.55" fontSize="9">
-                            <text x="262" y="14" textAnchor="middle">
-                                {bp.width}
-                            </text>
                             <text x="520" y="137" transform="rotate(90 520 137)" textAnchor="middle">
                                 {bp.height}
-                            </text>
-                        </g>
-                        <g className="text-dym">
-                            <circle cx={x} cy={y} r="3" fill="currentColor" className="animate-pulse" />
-                            <polyline points={`${x},${y} ${x + 43},${y - 30} ${x + 93},${y - 30}`} fill="none" stroke="currentColor" strokeWidth="0.8" {...draw(1.2)} />
-                            <text x={x + 47} y={y - 36} fill="currentColor" fontSize="8" className="hx-mono">
-                                {bp.callout.label}
                             </text>
                         </g>
                     </svg>

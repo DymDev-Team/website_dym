@@ -7,6 +7,7 @@ import {
     Gauge,
     Hammer,
     Handshake,
+    Tag,
     ImageIcon,
     Inbox,
     LayoutGrid,
@@ -68,6 +69,12 @@ const contentItems: NavItem[] = [
         title: 'Partenaires',
         href: admin.partners.index(),
         icon: Handshake,
+        matchChildren: true,
+    },
+    {
+        title: 'Marques',
+        href: admin.brands.index(),
+        icon: Tag,
         matchChildren: true,
     },
     {

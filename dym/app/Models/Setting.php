@@ -29,7 +29,9 @@ class Setting extends Model
         'address' => 'Abidjan, CHU Angré — 28 BP 1061 Abidjan 28',
         'linkedin_url' => null,
         'facebook_url' => null,
-        'whatsapp_url' => null,
+        // Numéro DYM : le bouton WhatsApp du hero et du pied de page fonctionne d'emblée.
+        'whatsapp_url' => 'https://wa.me/2250789303000',
+        'instagram_url' => null,
         'youtube_url' => null,
     ];
 

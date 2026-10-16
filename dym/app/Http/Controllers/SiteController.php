@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activity;
+use App\Models\Brand;
 use App\Models\Equipment;
 use App\Models\Partner;
 use App\Models\Post;
@@ -37,6 +38,30 @@ class SiteController extends Controller
     public function activities(): Response
     {
         return Inertia::render('activites', [
+            'activities' => Activity::query()->published()->ordered()->get(),
+            'site' => Setting::values(),
+        ]);
+    }
+
+    /**
+     * Public page listing published projects.
+     */
+    public function projects(): Response
+    {
+        return Inertia::render('realisations', [
+            'projects' => Project::query()->published()->ordered()->get(),
+            'activities' => Activity::query()->published()->ordered()->get(),
+            'site' => Setting::values(),
+        ]);
+    }
+
+    /**
+     * Public page listing the brands distributed or carried by DYM.
+     */
+    public function brands(): Response
+    {
+        return Inertia::render('marques', [
+            'brands' => Brand::query()->published()->ordered()->get(),
             'activities' => Activity::query()->published()->ordered()->get(),
             'site' => Setting::values(),
         ]);

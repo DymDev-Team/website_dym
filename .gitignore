@@ -1,0 +1,6 @@
+
+# Fichiers locaux à ne pas versionner
+nul
+dym.zip
+*.zip
+dym/public/logo dym def 1.pdf
