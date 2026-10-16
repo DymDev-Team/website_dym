@@ -5,10 +5,11 @@ Le déploiement automatique est un miroir Git : GitHub Actions construit
 `deploy`, puis appelle le webhook Laravel sur LWS. Le FTP reste un secours
 manuel. Aucun accès SSH au serveur n'est requis.
 
-Le dépôt Git est à la racine `website_dym/` ; l'application Laravel est dans
-`website_dym/dym/`. Le document root de `dym.ci` doit pointer vers
-`website_dym/dym/public/`. Le dossier `.git` est donc au-dessus du document
-root.
+Sur LWS, le clone Git et l'application Laravel sont dans
+`~/public_html/dym-website/`. Le document root de `dym.ci` doit pointer vers
+`~/public_html/dym-website/public/`. La branche GitHub `deploy` est construite
+avec le contenu de `dym/` aplati à sa racine pour correspondre à cette
+structure.
 
 ## Prérequis LWS
 
@@ -28,7 +29,7 @@ Le webhook de diagnostic, une fois configuré, confirme la version PHP,
 
 ## 1. Préparer le `.env` de production
 
-Créer `website_dym/dym/.env` sur LWS et y renseigner au minimum :
+Créer `~/public_html/dym-website/.env` sur LWS et y renseigner au minimum :
 
 ```dotenv
 APP_NAME=DYM
@@ -68,7 +69,7 @@ Dans **Settings > Secrets and variables > Actions**, ajouter :
 | `FTP_SERVER` | secret | Hôte FTP fourni par LWS, pour le secours manuel |
 | `FTP_USERNAME` | secret | Identifiant FTP, pour le secours manuel |
 | `FTP_PASSWORD` | secret | Mot de passe FTP, pour le secours manuel |
-| `FTP_SERVER_DIR` | variable | Chemin FTP du dossier `website_dym/dym/` |
+| `FTP_SERVER_DIR` | variable | `public_html/dym-website` (valeur par défaut du workflow) |
 
 La clé `GITHUB_TOKEN` intégrée au workflow Git miroir doit conserver la
 permission d'écriture du contenu du dépôt. Pour le clone LWS, créer un token
@@ -77,18 +78,18 @@ GitHub en lecture seule avec accès au dépôt `DymDev-Team/website_dym`.
 ## 3. Déployer le webhook une première fois par FTP
 
 Depuis **Actions > Deploy via FTP (LWS) > Run workflow**, lancer le workflow
-FTP manuel. Il copie l'application dans `website_dym/dym/` et appelle
+FTP manuel. Il copie l'application dans `public_html/dym-website/` et appelle
 `/api/deploy` pour lancer les migrations et nettoyer les caches. Cette étape
 installe les routes du webhook sur LWS avant le premier miroir Git.
 
 ## 4. Initialiser le dépôt Git sur LWS
 
-Dans le terminal LWS, se placer à la racine `website_dym/` (le parent de `dym/`)
-et configurer le remote en lecture seule. Remplacer `LE_TOKEN` par le token
+Dans le terminal LWS, se placer à la racine de l'application et du dépôt,
+`~/public_html/dym-website/`. Remplacer `LE_TOKEN` par le token
 GitHub, sans l'enregistrer dans un historique partagé :
 
 ```bash
-cd ~/public_html/website_dym
+cd ~/public_html/dym-website
 git init
 git remote add origin https://github.com/DymDev-Team/website_dym.git
 git config http.extraheader "Authorization: Basic $(printf 'x-access-token:%s' LE_TOKEN | base64 -w0)"

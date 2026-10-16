@@ -63,11 +63,18 @@ jobs:
           rm -rf dym/node_modules
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B deploy
-          git add -f dym/vendor dym/public/build
-          git add -A
-          git commit -m "deploy: build ${GITHUB_SHA::7} $(date -u +%FT%TZ)"
-          git push --force origin deploy
+
+          # La branche deploy reproduit le contenu de dym/ à sa racine pour
+          # correspondre directement à public_html/dym-website sur LWS.
+          export GIT_INDEX_FILE="$RUNNER_TEMP/deploy.index"
+          git read-tree --empty
+          git --git-dir="$GITHUB_WORKSPACE/.git" --work-tree="$GITHUB_WORKSPACE/dym" -C "$GITHUB_WORKSPACE/dym" add -A -- .
+          git --git-dir="$GITHUB_WORKSPACE/.git" --work-tree="$GITHUB_WORKSPACE/dym" -C "$GITHUB_WORKSPACE/dym" add -f -- vendor public/build
+          DEPLOY_TREE=$(git write-tree)
+          DEPLOY_COMMIT=$(printf 'deploy: build %s %s\n' "${GITHUB_SHA::7}" "$(date -u +%FT%TZ)" | git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit-tree "$DEPLOY_TREE")
+          rm -f "$GIT_INDEX_FILE"
+          unset GIT_INDEX_FILE
+          git push --force origin "$DEPLOY_COMMIT:refs/heads/deploy"
 
       - name: Trigger LWS git-mirror deploy
         env:

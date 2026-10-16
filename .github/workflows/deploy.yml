@@ -54,7 +54,7 @@ jobs:
           protocol: ftp
           port: 21
           local-dir: ./dym/
-          server-dir: ${{ vars.FTP_SERVER_DIR }}/
+          server-dir: ${{ vars.FTP_SERVER_DIR || 'public_html/dym-website' }}/
           exclude: |
             **/.git*
             **/.github/**

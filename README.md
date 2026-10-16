@@ -60,5 +60,7 @@ Le FTP reste disponible comme secours manuel. La procédure, les secrets GitHub,
 le réglage PHP et l'installation initiale sont décrits dans
 [`dym/DEPLOYMENT.md`](dym/DEPLOYMENT.md).
 
-Le projet Laravel est dans `dym/`. Le document root du domaine doit viser
-`dym/public`. Ne jamais commiter le fichier `.env` de production.
+Sur LWS, l'application Laravel et le dépôt Git se trouvent dans
+`public_html/dym-website/`. Le document root doit viser
+`public_html/dym-website/public/`. La branche `deploy` place le contenu de
+`dym/` à la racine de ce dossier. Ne jamais commiter le `.env` de production.
