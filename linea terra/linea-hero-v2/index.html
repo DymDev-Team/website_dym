@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f5ee" />
+  <meta name="description" content="Démonstration du Hero architectural interactif inspiré du projet Linea Terra." />
+  <title>Linea Terra — Hero architectural interactif</title>
+  <link rel="stylesheet" href="hero.css" />
+  <script defer src="hero.js"></script>
+</head>
+<body>
+  <header class="site-header" aria-label="Navigation principale">
+    <a class="brand" href="#accueil" aria-label="Linea Terra — Accueil">
+      <span class="brand-symbol" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>LINEA<span class="brand-dot">.</span>TERRA</span>
+    </a>
+    <nav class="site-nav" aria-label="Menu">
+      <a href="#accueil" class="nav-current">Accueil</a>
+      <a href="#services">Notre approche</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="header-cta" href="#contact">Parlons de votre projet <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="accueil">
+    <section class="home-hero" aria-labelledby="hero-title">
+      <div class="hero-edge-label" aria-hidden="true"><span>LT / ARCHITECTURAL STUDIO</span><span>ÉTUDE VISUELLE — 001</span></div>
+
+      <div class="home-hero-inner">
+        <div class="hero-visual" id="hero-visual">
+          <div class="visual-head" aria-hidden="true"><span>FIG.01 / FAÇADE & COMPOSITION</span><span class="visual-head-right"><b class="indicator"></b> MODE EXPLORATION</span></div>
+          <div class="hero-stage" id="hero-stage" aria-label="Dessin architectural interactif. Déplacez la souris pour découvrir des détails du bâtiment.">
+            <img class="hero-architecture" src="assets/architecture-originale.png" alt="Façade d'un bâtiment moderne en dessin architectural noir et blanc avec deux repères orange" loading="eager" fetchpriority="high" draggable="false" />
+            <div class="technical-grid" aria-hidden="true"></div>
+            <div class="picture-vignette" aria-hidden="true"></div>
+            <div class="scan-glow" aria-hidden="true"></div>
+            <div class="cursor-system" aria-hidden="true">
+              <div class="crosshair crosshair-x"></div>
+              <div class="crosshair crosshair-y"></div>
+              <div class="cursor-center"><span></span></div>
+              <div class="cursor-readout"><span>X: <b data-control="x">0000</b> PX</span><span>Y: <b data-control="y">0000</b> PX</span></div>
+              <div class="magnifier" id="hero-magnifier"></div>
+            </div>
+            <div class="hotspot" data-asset-x="704" data-asset-y="366" style="--hot-x:38%;--hot-y:67%">
+              <button class="hotspot-marker" type="button" aria-label="Afficher le détail du garde-corps" aria-expanded="false"><span></span></button>
+              <div class="hotspot-detail"><span class="detail-index">01 / ÉLÉMENT</span><strong>Garde-corps</strong><span>Protection métallique intégrée à la composition de la façade.</span></div>
+            </div>
+            <div class="hotspot" data-asset-x="1123" data-asset-y="371" style="--hot-x:62%;--hot-y:67%">
+              <button class="hotspot-marker" type="button" aria-label="Afficher le détail des éléments de finition" aria-expanded="false"><span></span></button>
+              <div class="hotspot-detail"><span class="detail-index">02 / ÉLÉMENT</span><strong>Éléments de finition</strong><span>Repères d'assemblage et de précision architecturale.</span></div>
+            </div>
+            <div class="registration reg-tl" aria-hidden="true">+</div>
+            <div class="registration reg-tr" aria-hidden="true">+</div>
+            <div class="registration reg-bl" aria-hidden="true">+</div>
+            <div class="registration reg-br" aria-hidden="true">+</div>
+            <div class="stage-notice" aria-hidden="true"><span class="notice-square"></span> SURVOLEZ POUR INSPECTER</div>
+            <div class="stage-index" aria-hidden="true">01 — 04</div>
+          </div>
+          <div class="technical-ruler" aria-hidden="true">
+            <span>00</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span><span>60</span><span>70</span><span>80</span><span>90</span>
+          </div>
+          <div class="visual-bottom">
+            <span>ARCHITECTURE / PLAN D'EXÉCUTION</span>
+            <div class="visual-controls" role="group" aria-label="Réglages du visuel">
+              <button type="button" class="visual-control is-selected" data-toggle="guides" aria-pressed="true">REPÈRES <span>ON</span></button>
+              <button type="button" class="visual-control" data-toggle="zoom" aria-pressed="false">LOUPE <span>OFF</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="home-hero-content">
+          <div class="content-rail"><span>01 <i></i> ACCUEIL</span><span>ARCHITECTURE • DESIGN • RÉALISATION</span></div>
+          <div class="hero-copy">
+            <div class="eyebrow"><span class="orange-dash"></span> CONCEVOIR L'EXCEPTIONNEL</div>
+            <h1 id="hero-title"><span class="title-line"><span>Une touche</span></span><span class="title-line"><span>d’élégance pour</span></span><span class="title-line"><span>vos espaces<span class="accent-period">.</span></span></span></h1>
+            <div class="copy-divider"></div>
+            <div class="hero-description">
+              <span class="description-id">[ NOTRE VISION ]</span>
+              <p>Des espaces pensés dans les moindres détails. Du premier croquis à la réalisation, nous réunissons esthétique, précision technique et savoir-faire.</p>
+            </div>
+            <a class="hero-button" href="#services"><span class="button-label">DÉCOUVRIR NOTRE APPROCHE</span><span class="button-arrow" aria-hidden="true">↗</span></a>
+          </div>
+          <div class="hero-benefits" aria-label="Notre expertise">
+            <div class="benefit"><span class="benefit-symbol">◇</span><span>Conception <br />3D & plans</span></div>
+            <div class="benefit"><span class="benefit-symbol">⌗</span><span>Devis & suivi <br />transparents</span></div>
+            <div class="benefit"><span class="benefit-symbol">⊙</span><span>Réalisation <br />sur mesure</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-footer"><span>DESIGN STUDY / EXPERIMENT 01</span><span class="scroll-note">FAIRE DÉFILER <span aria-hidden="true">↓</span></span><span>© LINEA TERRA — DÉMONSTRATION</span></div>
+    </section>
+
+    <section class="demo-followup" id="services">
+      <p class="section-counter">02 / SAVOIR-FAIRE</p>
+      <h2>De l’idée au détail.</h2>
+      <p>Une maquette interactive conçue pour tester les animations du Hero. Les informations et boutons servent uniquement à cette démonstration autonome.</p>
+      <a href="#accueil">Revenir au Hero <span aria-hidden="true">↗</span></a>
+    </section>
+    <footer class="demo-footer" id="contact">LINEA TERRA — DÉMONSTRATION DE HERO INTERACTIF</footer>
+  </main>
+</body>
+</html>

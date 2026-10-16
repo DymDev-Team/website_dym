@@ -1,0 +1,101 @@
+services:
+    laravel.test:
+        build:
+            context: ./vendor/laravel/sail/runtimes/8.5
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP:-1000}'
+                NODE_VERSION: '24'
+        image: dym-sail/app
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        ports:
+            - '127.0.0.1:${APP_PORT:-8000}:80'
+        environment:
+            WWWUSER: '${WWWUSER:-1000}'
+            LARAVEL_SAIL: 1
+            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
+            XDEBUG_CONFIG: 'client_host=host.docker.internal'
+            PHP_OPCACHE_VALIDATE_TIMESTAMPS: '${PHP_OPCACHE_VALIDATE_TIMESTAMPS:-0}'
+            # Plusieurs workers pour « artisan serve » : sinon une requête lente bloque toutes les autres.
+            PHP_CLI_SERVER_WORKERS: '${PHP_CLI_SERVER_WORKERS:-4}'
+        volumes:
+            - '.:/var/www/html'
+            - './docker/php/99-dev.ini:/etc/php/8.5/cli/conf.d/99-dev.ini:ro'
+            - type: volume
+              source: node_modules
+              target: /var/www/html/node_modules
+              volume:
+                  nocopy: true
+        depends_on:
+            mysql:
+                condition: service_healthy
+        networks:
+            - sail
+
+    mysql:
+        image: 'mysql:8.4'
+        ports:
+            - '127.0.0.1:${FORWARD_DB_PORT:-3307}:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+        volumes:
+            - 'mysql_data:/var/lib/mysql'
+        healthcheck:
+            test: ['CMD', 'mysqladmin', 'ping', '-p${DB_PASSWORD}']
+            retries: 5
+            timeout: 5s
+        networks:
+            - sail
+
+    vite:
+        image: dym-sail/app
+        command: ['npm', 'run', 'dev', '--', '--host', '0.0.0.0', '--port', '5173', '--strictPort']
+        environment:
+            WWWUSER: '${WWWUSER:-1000}'
+            LARAVEL_SAIL: 1
+            SUPERVISOR_PHP_USER: root
+            VITE_PORT: '${VITE_PORT:-5173}'
+        ports:
+            - '127.0.0.1:${VITE_PORT:-5173}:5173'
+        volumes:
+            - '.:/var/www/html'
+            - type: volume
+              source: node_modules
+              target: /var/www/html/node_modules
+              volume:
+                  nocopy: true
+        depends_on:
+            - laravel.test
+        networks:
+            - sail
+
+    queue:
+        image: dym-sail/app
+        command: ['php', 'artisan', 'queue:listen', '--tries=1', '--timeout=90']
+        environment:
+            WWWUSER: '${WWWUSER:-1000}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+            - type: volume
+              source: node_modules
+              target: /var/www/html/node_modules
+              volume:
+                  nocopy: true
+        depends_on:
+            - laravel.test
+        networks:
+            - sail
+
+networks:
+    sail:
+        driver: bridge
+
+volumes:
+    node_modules:
+    mysql_data:

@@ -1,0 +1,1 @@
+var e=new Intl.DateTimeFormat(`fr-FR`,{dateStyle:`medium`});function t(t){if(!t.published_at)return{label:`Brouillon`,visible:!1};let n=new Date(t.published_at);return n>new Date?{label:`Programmé · ${e.format(n)}`,visible:!1}:{label:`Publié · ${e.format(n)}`,visible:!0}}export{t};
