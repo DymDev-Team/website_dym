@@ -131,42 +131,45 @@ Les migrations et la mise en cache s'exécutent au démarrage (`AUTORUN_*`),
 une fois MySQL prêt. Placer un reverse proxy TLS (Caddy, Traefik, Nginx)
 devant le port 8080. `.env.production` ne doit jamais être commité.
 
-### Déploiement FTP (GitHub Actions + FTPS)
+### Déploiement automatique (GitHub Actions + SSH)
 
-Le workflow .github/workflows/deploy.yml se déclenche à chaque push sur
-main touchant dym/, ou manuellement depuis l'onglet Actions. Il installe les
-dépendances PHP de production, compile les assets Vite, puis transfère le
-projet sur cPanel en FTPS. Aucun accès SSH n'est utilisé.
+Le workflow [`../.github/workflows/deploy.yml`](../.github/workflows/deploy.yml)
+se déclenche sur chaque push vers `main` qui modifie `dym/`, ou manuellement
+depuis l'onglet Actions. Il se connecte au VPS, met le clone de
+`/opt/website_dym` sur le commit poussé, puis lance `dym/docker/deploy.sh` avec
+`sudo`. Le script reconstruit et redémarre les conteneurs Docker ; les
+migrations et le cache Laravel sont appliqués au démarrage de l'application.
+Le workflow vérifie ensuite `https://dym.ci/up`.
 
-Préparer cPanel avant le premier transfert :
+#### Secrets et variables GitHub
 
-1. Sélectionner PHP 8.3 ou plus et activer pdo_mysql, mbstring, fileinfo,
-   openssl, curl, xml, zip, bcmath et intl.
-2. Créer une base MySQL et un utilisateur autorisé sur cette base.
-3. Régler le document root du domaine sur le dossier public Laravel, par
-   exemple /home/COMPTE/public_html/dym-website/public. La cible FTP doit être
-   le dossier parent : /home/COMPTE/public_html/dym-website.
-4. Créer .env dans ce dossier parent depuis le gestionnaire de fichiers cPanel,
-   avec APP_ENV=production, APP_DEBUG=false, APP_KEY, APP_URL et les identifiants
-   MySQL du panneau. Le workflow exclut tous les fichiers .env du transfert.
-5. Donner les droits d'écriture PHP sur storage/ et bootstrap/cache/. Le
-   workflow préserve storage/ entre les déploiements.
-
-Dans GitHub > Settings > Secrets and variables > Actions, ajouter :
+Dans **Settings > Secrets and variables > Actions**, ajouter les secrets
+suivants dans l'environnement GitHub `production` (ou au niveau du dépôt) :
 
 | Nom | Type | Valeur |
 | --- | --- | --- |
-| FTP_SERVER | secret | Hôte FTP de l'hébergeur |
-| FTP_USERNAME | secret | Identifiant du compte FTP |
-| FTP_PASSWORD | secret | Mot de passe du compte FTP |
-| FTP_SERVER_DIR | variable | Dossier projet, par ex. public_html/dym-website |
-| APP_HEALTHCHECK_URL | variable | Facultatif, par ex. https://dym.ci/up |
+| `VPS_HOST` | secret | Adresse IP ou nom DNS du VPS |
+| `VPS_USER` | secret | Utilisateur SSH autorisé à lancer le déploiement |
+| `VPS_SSH_KEY` | secret | Clé privée SSH correspondant à la clé publique installée sur le VPS |
+| `VPS_PORT` | secret, facultatif | Port SSH ; `22` par défaut |
+| `VPS_KNOWN_HOSTS` | secret, recommandé | Ligne `known_hosts` vérifiée pour le VPS |
 
-FTP ne peut pas exécuter php artisan migrate. Lancez les migrations depuis le
-terminal cPanel s'il est disponible, ou importez le schéma avec phpMyAdmin.
-Avant une mise à jour qui modifie la base, sauvegardez-la puis appliquez les
-migrations sur l'hébergement. Le workflow transfère le projet Laravel ; le
-document root doit rester réglé sur son sous-dossier public.
+Variable facultative : `VPS_APP_DIR`, chemin absolu du clone sur le VPS ; sa
+valeur par défaut est `/opt/website_dym`.
+
+La clé publique SSH doit être autorisée pour `VPS_USER`. Cet utilisateur doit
+pouvoir lire le clone et exécuter `sudo -n bash /opt/website_dym/dym/docker/deploy.sh`
+sans saisie de mot de passe. Le script crée `.env.production` au premier
+lancement ; vérifier ensuite les paramètres de messagerie et conserver ce
+fichier uniquement sur le VPS.
+
+Si le job s'arrête pendant « Validate SSH deployment secrets », vérifier que
+`VPS_HOST`, `VPS_USER` et `VPS_SSH_KEY` existent dans la portée utilisée par
+l'environnement `production`. Le workflow échoue volontairement avant toute
+connexion lorsque l'un d'eux manque.
+
+Pour tester manuellement : **Actions > deploy > Run workflow**. Après le
+premier déploiement, vérifier l'étape de santé et ouvrir <https://dym.ci/up>.
 
 Sauvegarde de la base :
 
