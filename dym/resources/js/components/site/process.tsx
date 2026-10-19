@@ -4,11 +4,11 @@ import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
 
-// Textes des étapes : home.process.step_N_{title,text,alt} (/admin/texts).
+// Textes et photos des étapes : home.process.step_N_{title,text,alt,image} (/admin/texts).
 const steps = [
-    { icon: PencilRuler, image: '/images/process/01-bureau-etudes.jpg' },
-    { icon: Factory, image: '/images/process/02-atelier.jpg' },
-    { icon: HardHat, image: '/images/process/03-realisation.jpg' },
+    { id: 'etudier', icon: PencilRuler },
+    { id: 'fabriquer', icon: Factory },
+    { id: 'realiser', icon: HardHat },
 ];
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
@@ -88,7 +88,7 @@ export function Process() {
                         const step = `home.process.step_${i + 1}`;
 
                         return (
-                            <Fragment key={s.image}>
+                            <Fragment key={s.id}>
                                 {i > 0 && (
                                     <li aria-hidden className="hx-fade hidden items-center text-neutral-400 lg:flex" style={delay(0.5 + i * 0.35)}>
                                         <ArrowRight className="size-5" />
@@ -112,7 +112,7 @@ export function Process() {
                                     </div>
 
                                     <div className="hx-hair relative mt-5 aspect-[4/3] overflow-hidden border bg-neutral-100">
-                                        <img src={s.image} alt={t(`${step}_alt`)} width={1100} height={735} loading="lazy" className="hx-wipe size-full object-cover" style={delay(0.5 + i * 0.35)} />
+                                        <img src={t(`${step}_image`)} alt={t(`${step}_alt`)} width={1100} height={735} loading="lazy" className="hx-wipe size-full object-cover" style={delay(0.5 + i * 0.35)} />
                                         <span className="hx-mono absolute right-2 bottom-2 bg-paper/90 px-2 py-1 text-[9px] tracking-[0.06em] text-ink" aria-hidden>
                                             {t('home.process.step_label')} {String(i + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
                                         </span>
@@ -132,7 +132,7 @@ export function Process() {
                     <div className="flex gap-2">
                         {steps.map((s, i) => (
                             <button
-                                key={s.image}
+                                key={s.id}
                                 type="button"
                                 onClick={() => goTo(i)}
                                 aria-label={`${t('home.process.step_label')} ${i + 1}`}

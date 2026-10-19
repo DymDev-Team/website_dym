@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { RotateCcw } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import AdminPage from '@/components/admin/admin-page';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ type TextField = {
     key: string;
     label: string;
     help: string | null;
+    type: 'text' | 'image';
     multiline: boolean;
     default: string;
     value: string;
@@ -28,26 +29,160 @@ type TextPage = {
 
 const fieldsOf = (page: TextPage) => page.sections.flatMap((s) => s.fields);
 
+type TextsForm = {
+    values: Record<string, string>;
+    images: Record<string, File>;
+    resets: string[];
+};
+
+// Photo remplaçable : aperçu, envoi d'un fichier, retour à la photo d'origine.
+function ImageTextField({
+    field,
+    file,
+    reset,
+    error,
+    onFile,
+    onReset,
+}: {
+    field: TextField;
+    file: File | undefined;
+    reset: boolean;
+    error?: string;
+    onFile: (file: File | null) => void;
+    onReset: () => void;
+}) {
+    const preview = useMemo(
+        () => (file ? URL.createObjectURL(file) : null),
+        [file],
+    );
+
+    useEffect(
+        () => () => {
+            if (preview) {
+                URL.revokeObjectURL(preview);
+            }
+        },
+        [preview],
+    );
+
+    const src = preview ?? (reset ? field.default : field.value);
+    const changed = src !== field.default;
+
+    return (
+        <div className="grid gap-2">
+            <div className="flex items-center gap-2">
+                <Label htmlFor={field.key}>{field.label}</Label>
+                {changed && (
+                    <>
+                        <span
+                            className="size-1.5 bg-dym"
+                            title="Photo modifiée"
+                        />
+                        <button
+                            type="button"
+                            onClick={onReset}
+                            className="ml-auto inline-flex cursor-pointer items-center gap-1 text-xs text-muted-foreground hover:text-dym"
+                        >
+                            <RotateCcw className="size-3" />
+                            Photo d’origine
+                        </button>
+                    </>
+                )}
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+                <img
+                    src={src}
+                    alt=""
+                    className="aspect-[3/2] w-40 shrink-0 border bg-muted object-cover"
+                />
+                <Input
+                    key={file ? 'file' : 'empty'}
+                    id={field.key}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="max-w-sm"
+                    onChange={(e) => onFile(e.target.files?.[0] ?? null)}
+                />
+            </div>
+            <p className="text-xs text-muted-foreground">
+                JPG, PNG ou WebP, 5 Mo max. Format paysage conseillé (3:2).
+            </p>
+            <InputError message={error} />
+        </div>
+    );
+}
+
 function PageForm({ page }: { page: TextPage }) {
     const fields = fieldsOf(page);
-    const form = useForm<{ values: Record<string, string> }>({
-        values: Object.fromEntries(fields.map((f) => [f.key, f.value])),
+    const textFields = fields.filter((f) => f.type !== 'image');
+    const imageFields = fields.filter((f) => f.type === 'image');
+    const form = useForm<TextsForm>({
+        values: Object.fromEntries(textFields.map((f) => [f.key, f.value])),
+        images: {},
+        resets: [],
     });
 
     const set = (key: string, value: string) =>
         form.setData('values', { ...form.data.values, [key]: value });
 
+    // Ordre d'envoi des photos, pour relier les erreurs « images.N.file ».
+    const sentImages = imageFields
+        .map((f) => f.key)
+        .filter((key) => form.data.images[key]);
+
+    const setImage = (key: string, file: File | null) => {
+        const images = { ...form.data.images };
+
+        if (file) {
+            images[key] = file;
+        } else {
+            delete images[key];
+        }
+
+        form.setData((data) => ({
+            ...data,
+            images,
+            resets: data.resets.filter((k) => k !== key),
+        }));
+    };
+
+    const resetImage = (field: TextField) => {
+        const images = { ...form.data.images };
+        delete images[field.key];
+
+        form.setData((data) => ({
+            ...data,
+            images,
+            // Seule une photo déjà envoyée doit être supprimée côté serveur.
+            resets:
+                field.value !== field.default
+                    ? [...new Set([...data.resets, field.key])]
+                    : data.resets,
+        }));
+    };
+
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         form.transform((data) => ({
-            texts: fields.map((f) => ({
+            // Fichiers : POST + _method, car PUT ne transporte pas le multipart.
+            _method: 'put',
+            texts: textFields.map((f) => ({
                 key: f.key,
                 value: data.values[f.key],
             })),
+            images: sentImages.map((key) => ({
+                key,
+                file: data.images[key],
+            })),
+            reset_images: data.resets,
         }));
-        form.put(update.url(), {
+        form.post(update.url(), {
             preserveScroll: true,
-            onSuccess: () => form.setDefaults(),
+            forceFormData: true,
+            onSuccess: () => {
+                form.setDefaults({ ...form.data, images: {}, resets: [] });
+                form.reset('images', 'resets');
+            },
         });
     };
 
@@ -60,11 +195,41 @@ function PageForm({ page }: { page: TextPage }) {
                     </h2>
                     <div className="grid gap-5 p-5">
                         {section.fields.map((field) => {
+                            const errors = form.errors as Record<
+                                string,
+                                string
+                            >;
+
+                            if (field.type === 'image') {
+                                const index = sentImages.indexOf(field.key);
+
+                                return (
+                                    <ImageTextField
+                                        key={field.key}
+                                        field={field}
+                                        file={form.data.images[field.key]}
+                                        reset={form.data.resets.includes(
+                                            field.key,
+                                        )}
+                                        error={
+                                            index >= 0
+                                                ? errors[`images.${index}.file`]
+                                                : undefined
+                                        }
+                                        onFile={(file) =>
+                                            setImage(field.key, file)
+                                        }
+                                        onReset={() => resetImage(field)}
+                                    />
+                                );
+                            }
+
                             const value = form.data.values[field.key] ?? '';
                             const changed = value.trim() !== field.default;
-                            const error = (
-                                form.errors as Record<string, string>
-                            )[`texts.${fields.indexOf(field)}.value`];
+                            const error =
+                                errors[
+                                    `texts.${textFields.indexOf(field)}.value`
+                                ];
                             const Control = field.multiline ? Textarea : Input;
 
                             return (
@@ -158,7 +323,7 @@ export default function Texts({ pages }: { pages: TextPage[] }) {
     return (
         <AdminPage
             title="Textes du site"
-            description="Titres, paragraphes et boutons des pages publiques. Un champ vidé reprend son texte d’origine. Sur les titres, chaque ligne s’affiche sur une nouvelle ligne ; un point final s’affiche en orange."
+            description="Titres, paragraphes, boutons et photos des pages publiques. Un champ vidé reprend son texte d’origine. Sur les titres, chaque ligne s’affiche sur une nouvelle ligne ; un point final s’affiche en orange."
         >
             <div className="grid items-start gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
                 <nav className="flex gap-1 overflow-x-auto lg:sticky lg:top-4 lg:flex-col">

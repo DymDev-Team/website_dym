@@ -10,6 +10,8 @@
 | avec t('home.hero.title'). « default » est le texte affiché tant que
 | l'administrateur ne l'a pas modifié ; « multiline » affiche une zone de
 | texte (pour les titres, chaque ligne s'affiche sur une nouvelle ligne).
+| « type » => 'image' : photo remplaçable par un envoi de fichier ; la valeur
+| par défaut est un chemin dans public/, lue côté React comme une URL.
 |
 */
 
@@ -84,12 +86,15 @@ return [
                     'step_1_title' => ['label' => 'Étape 1 — titre', 'default' => "Étudier\net concevoir", 'multiline' => true],
                     'step_1_text' => ['label' => 'Étape 1 — texte', 'default' => 'Relevés, plans 2D/3D et chiffrage par notre bureau d’études.', 'multiline' => true],
                     'step_1_alt' => ['label' => 'Étape 1 — description de la photo', 'default' => 'Ingénieurs du bureau d’études DYM travaillant sur leurs plans'],
+                    'step_1_image' => ['label' => 'Étape 1 — photo', 'type' => 'image', 'default' => '/images/process/01-bureau-etudes.jpg'],
                     'step_2_title' => ['label' => 'Étape 2 — titre', 'default' => "Fabriquer dans\nnos ateliers", 'multiline' => true],
                     'step_2_text' => ['label' => 'Étape 2 — texte', 'default' => 'Découpe laser, pliage, usinage, soudure et contrôle qualité.', 'multiline' => true],
                     'step_2_alt' => ['label' => 'Étape 2 — description de la photo', 'default' => 'Opérateur DYM sur une plieuse dans l’atelier'],
+                    'step_2_image' => ['label' => 'Étape 2 — photo', 'type' => 'image', 'default' => '/images/process/02-atelier.jpg'],
                     'step_3_title' => ['label' => 'Étape 3 — titre', 'default' => "Réaliser\nsur site", 'multiline' => true],
                     'step_3_text' => ['label' => 'Étape 3 — texte', 'default' => 'Livraison, pose et mise en service par nos équipes.', 'multiline' => true],
                     'step_3_alt' => ['label' => 'Étape 3 — description de la photo', 'default' => 'Pergola en métal découpé au laser posée sur une maison'],
+                    'step_3_image' => ['label' => 'Étape 3 — photo', 'type' => 'image', 'default' => '/images/process/03-realisation.jpg'],
                 ],
             ],
 
@@ -176,6 +181,26 @@ return [
                     'legal_notice' => ['label' => 'Lien — mentions légales', 'default' => 'Mentions légales'],
                     'privacy' => ['label' => 'Lien — confidentialité', 'default' => 'Confidentialité'],
                     'cookies' => ['label' => 'Lien — cookies', 'default' => 'Cookies'],
+                    'cookie_settings' => ['label' => 'Lien — gérer les cookies', 'default' => 'Gérer les cookies'],
+                ],
+            ],
+
+            'cookies' => [
+                'label' => 'Fenêtre de consentement aux cookies',
+                'fields' => [
+                    'title' => ['label' => 'Titre', 'default' => 'Vos choix en matière de cookies'],
+                    'text' => ['label' => 'Texte', 'default' => 'Nous utilisons des cookies nécessaires au fonctionnement du site et, avec votre accord, des cookies de mesure d’audience et de marketing. Vous pouvez modifier vos choix à tout moment.', 'multiline' => true],
+                    'policy_link' => ['label' => 'Lien vers la politique', 'default' => 'En savoir plus'],
+                    'accept' => ['label' => 'Bouton — tout accepter', 'default' => 'Tout accepter'],
+                    'reject' => ['label' => 'Bouton — tout refuser', 'default' => 'Tout refuser'],
+                    'customize' => ['label' => 'Bouton — personnaliser', 'default' => 'Personnaliser'],
+                    'save' => ['label' => 'Bouton — enregistrer', 'default' => 'Enregistrer mes choix'],
+                    'necessary_title' => ['label' => 'Catégorie — nécessaires', 'default' => 'Nécessaires'],
+                    'necessary_text' => ['label' => 'Description — nécessaires', 'default' => 'Session, sécurité des formulaires et mémorisation de vos choix. Toujours actifs.', 'multiline' => true],
+                    'analytics_title' => ['label' => 'Catégorie — mesure d’audience', 'default' => 'Mesure d’audience'],
+                    'analytics_text' => ['label' => 'Description — mesure d’audience', 'default' => 'Statistiques de fréquentation anonymes pour améliorer le site.', 'multiline' => true],
+                    'marketing_title' => ['label' => 'Catégorie — marketing', 'default' => 'Marketing'],
+                    'marketing_text' => ['label' => 'Description — marketing', 'default' => 'Contenus des réseaux sociaux et mesure de nos campagnes.', 'multiline' => true],
                 ],
             ],
         ],
