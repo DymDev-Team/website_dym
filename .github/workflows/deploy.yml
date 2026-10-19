@@ -52,51 +52,77 @@ jobs:
           touch storage/framework/cache/data/.gitkeep
           touch storage/logs/.gitkeep
 
-      # Les caches Laravel restés sur le serveur (config, routes, paquets d'une
-      # version précédente ou de l'ancienne application) masqueraient le nouveau
-      # code : on les supprime avant l'envoi. Ils sont régénérés au besoin.
-      - name: Clear Laravel caches on LWS
+      - name: Install lftp
+        run: sudo apt-get install -y -qq lftp >/dev/null
+
+      # Envoi incrémental : un manifeste (empreinte SHA-1 de chaque fichier) est
+      # conservé sur le serveur ; seuls les fichiers modifiés sont envoyés, sur
+      # 8 connexions en parallèle, avec reconnexion automatique. Un envoi
+      # interrompu se reprend au run suivant (le manifeste n'est écrit qu'à la fin).
+      - name: Deploy to LWS via FTP
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          # Lu par « open --env-password » : le mot de passe n'apparaît dans aucune commande.
+          LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          # Le compte FTP LWS s'ouvre directement dans public_html/dym-website.
           FTP_DIR: ${{ vars.FTP_SERVER_DIR || '.' }}
         run: |
-          sudo apt-get install -y -qq lftp >/dev/null
+          set -euo pipefail
+          T="$RUNNER_TEMP"
+
+          # Fichiers utiles en production : sources front, tests, docs et contenu
+          # de storage/ exclus (seule l'arborescence de storage/ est envoyée).
+          {
+            find . \( -path ./node_modules -o -path ./tests -o -path ./resources/js -o -path ./resources/css \
+                      -o -path ./docker -o -path './linea terra' -o -path ./.github -o -path ./.git \
+                      -o -path ./storage -o -path ./public/storage -o -path ./bootstrap/cache \) -prune \
+                 -o -type f ! -name '.env*' ! -name '*.md' ! -path ./public/hot -printf '%P\0'
+            find storage bootstrap/cache -type f \( -name .gitkeep -o -name .gitignore \) -printf '%p\0'
+          } | sort -z | xargs -0 sha1sum | sed -E 's/^([0-9a-f]{40}) [ *]/\1|/' >"$T/local.manifest"
+          echo "$(wc -l < "$T/local.manifest") fichiers suivis"
+
           # Certificat FTPS de l'hébergement mutualisé émis pour le nom du serveur,
           # pas pour ftp.dym-manufacture.com : chiffré, mais non vérifié.
-          lftp -u "$FTP_USERNAME,$FTP_PASSWORD" -e "
-            set ftp:ssl-force true; set ssl:verify-certificate no; set net:max-retries 2;
-            cd '$FTP_DIR/bootstrap/cache';
-            rm -f config.php routes-v7.php events.php packages.php services.php;
-            bye" "$FTP_SERVER" || echo "::warning::Nettoyage des caches impossible (dossier absent au premier envoi ?)."
+          cat > "$T/settings.lftp" <<'LFTP'
+          set ftp:ssl-force true
+          set ssl:verify-certificate no
+          set ftp:passive-mode true
+          set net:timeout 30
+          set net:max-retries 8
+          set net:reconnect-interval-base 5
+          set net:reconnect-interval-max 60
+          set xfer:clobber true
+          LFTP
 
-      - name: Deploy to LWS via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          # Le compte FTP LWS s'ouvre directement dans public_html/dym-website.
-          protocol: ftps
-          security: loose
-          port: 21
-          local-dir: ./dym/
-          server-dir: ${{ vars.FTP_SERVER_DIR || '.' }}/
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/node_modules/**
-            **/.env
-            **/.env.*
-            **/.env.example
-            **/README.md
-            **/phpunit.xml
-            **/tests/**
-            **/storage/logs/**
-            **/storage/framework/cache/data/**
-            **/storage/framework/sessions/**
-            **/storage/framework/views/*.php
+          : > "$T/remote.manifest"
+          lftp -e "source '$T/settings.lftp'; set net:max-retries 2; open --env-password -u '$FTP_USERNAME' '$FTP_SERVER'; get '$FTP_DIR/.deploy-manifest' -o '$T/remote.manifest'; bye" \
+            || echo "Pas de manifeste distant : envoi complet."
+
+          awk -F'|' 'NR==FNR { r[$2] = $1; next } r[$2] != $1 { print $2 }' "$T/remote.manifest" "$T/local.manifest" > "$T/changed"
+          awk -F'|' 'NR==FNR { l[$2] = 1; next } !($2 in l) { print $2 }' "$T/local.manifest" "$T/remote.manifest" > "$T/deleted"
+          echo "$(wc -l < "$T/changed") fichier(s) à envoyer, $(wc -l < "$T/deleted") à supprimer"
+
+          mkdir -p "$T/stage"
+          rsync -a --files-from="$T/changed" ./ "$T/stage/"
+
+          {
+            echo "source '$T/settings.lftp'"
+            echo "set cmd:fail-exit true"
+            echo "open --env-password -u '$FTP_USERNAME' '$FTP_SERVER'"
+            echo "mirror -R --parallel=8 --transfer-all --no-perms --no-umask '$T/stage/' '$FTP_DIR'"
+            echo "set cmd:fail-exit false"
+            echo "cd '$FTP_DIR'"
+            sed 's/"/\\"/g; s/.*/rm -f "&"/' "$T/deleted"
+            # Caches Laravel (config, routes, paquets) d'une version précédente ou de
+            # l'ancienne application : supprimés, ils sont régénérés au besoin.
+            echo "rm -f bootstrap/cache/config.php bootstrap/cache/routes-v7.php bootstrap/cache/events.php bootstrap/cache/packages.php bootstrap/cache/services.php"
+            echo "set cmd:fail-exit true"
+            echo "put '$T/local.manifest' -o .deploy-manifest"
+            echo "bye"
+          } > "$T/sync.lftp"
+
+          lftp -f "$T/sync.lftp"
 
       - name: Run post-deploy commands
         env:
