@@ -1,16 +1,14 @@
 name: Deploy Git Mirror (LWS)
 
+# Manuel : le déploiement automatique passe par deploy.yml (FTP).
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: production-git-mirror
+  group: production
   cancel-in-progress: false
 
 jobs:

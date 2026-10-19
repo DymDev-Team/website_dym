@@ -123,8 +123,8 @@ workflow construit l'application avec PHP 8.4 et Node 22, pousse les artefacts
 sur `deploy`, puis appelle `POST /api/deploy/git`. Vérifier que le run est vert
 et que `https://dym.ci/up` répond.
 
-Après un premier run manuel réussi, les push sur `main` déclenchent le miroir
-automatiquement. Le workflow `Deploy via FTP (LWS)` reste manuel comme secours.
+Les push sur `main` déploient automatiquement par FTP (`deploy.yml`). Le miroir
+Git (`deploy-git-mirror.yml`) se lance à la main.
 
 Le webhook exécute `migrate --force`, `storage:link --force`, `optimize:clear`
 et `queue:restart`. Le miroir remplace les fichiers suivis ; `.env` et

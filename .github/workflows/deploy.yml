@@ -1,9 +1,15 @@
 name: Deploy via FTP (LWS)
 
-# Secours manuel, et première installation : le déploiement automatique passe
-# par deploy-git-mirror.yml, dont le webhook doit d'abord exister sur le serveur.
+# Déploiement automatique à chaque push sur main (et lançable à la main).
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
+
+concurrency:
+  group: production
+  cancel-in-progress: false
 
 jobs:
   deploy:
