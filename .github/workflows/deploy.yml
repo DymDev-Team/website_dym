@@ -6,6 +6,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      full_upload:
+        description: 'Tout renvoyer (ignorer le manifeste du serveur)'
+        type: boolean
+        default: false
 
 concurrency:
   group: production
@@ -67,6 +72,7 @@ jobs:
           LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           # Le compte FTP LWS s'ouvre directement dans public_html/dym-website.
           FTP_DIR: ${{ vars.FTP_SERVER_DIR || '.' }}
+          FULL_UPLOAD: ${{ inputs.full_upload || 'false' }}
         run: |
           set -euo pipefail
           T="$RUNNER_TEMP"
@@ -96,12 +102,20 @@ jobs:
           LFTP
 
           : > "$T/remote.manifest"
-          lftp -e "source '$T/settings.lftp'; set net:max-retries 2; open --env-password -u '$FTP_USERNAME' '$FTP_SERVER'; get '$FTP_DIR/.deploy-manifest' -o '$T/remote.manifest'; bye" \
-            || echo "Pas de manifeste distant : envoi complet."
+          if [ "$FULL_UPLOAD" = "true" ]; then
+            echo "Envoi complet demandé : manifeste distant ignoré."
+          else
+            lftp -e "source '$T/settings.lftp'; set net:max-retries 2; open --env-password -u '$FTP_USERNAME' '$FTP_SERVER'; get '$FTP_DIR/.deploy-manifest' -o '$T/remote.manifest'; bye" \
+              || echo "Pas de manifeste distant : envoi complet."
+          fi
 
-          awk -F'|' 'NR==FNR { r[$2] = $1; next } r[$2] != $1 { print $2 }' "$T/remote.manifest" "$T/local.manifest" > "$T/changed"
-          awk -F'|' 'NR==FNR { l[$2] = 1; next } !($2 in l) { print $2 }' "$T/local.manifest" "$T/remote.manifest" > "$T/deleted"
+          # FILENAME et non NR==FNR : ce dernier se trompe quand le premier fichier est vide.
+          awk -F'|' 'FILENAME == ARGV[1] { r[$2] = $1; next } r[$2] != $1 { print $2 }' "$T/remote.manifest" "$T/local.manifest" > "$T/changed"
+          awk -F'|' 'FILENAME == ARGV[1] { l[$2] = 1; next } !($2 in l) { print $2 }' "$T/local.manifest" "$T/remote.manifest" > "$T/deleted"
           echo "$(wc -l < "$T/changed") fichier(s) à envoyer, $(wc -l < "$T/deleted") à supprimer"
+          if [ ! -s "$T/remote.manifest" ] && [ ! -s "$T/changed" ]; then
+            echo "::error::Aucun manifeste distant mais rien à envoyer : comparaison incohérente."; exit 1
+          fi
 
           mkdir -p "$T/stage"
           rsync -a --files-from="$T/changed" ./ "$T/stage/"
