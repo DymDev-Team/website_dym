@@ -1,10 +1,8 @@
-import { Play, X } from 'lucide-react';
 import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
 import { useParallax } from '@/components/site/use-parallax';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
-
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
@@ -14,20 +12,8 @@ export function Intro() {
     const titleLines = lines(t('home.intro.title'));
     const values = lines(t('home.intro.values'));
     const photoRef = useRef<HTMLImageElement>(null);
-    const dialogRef = useRef<HTMLDialogElement>(null);
-    const videoRef = useRef<HTMLVideoElement>(null);
 
     useParallax(ref, photoRef);
-
-    const openVideo = () => {
-        dialogRef.current?.showModal();
-        videoRef.current?.play().catch(() => {});
-    };
-
-    const closeVideo = () => {
-        videoRef.current?.pause();
-        dialogRef.current?.close();
-    };
 
     return (
         <section ref={ref} id="a-propos" aria-labelledby="intro-title" className={`hx-root relative isolate overflow-hidden bg-paper px-5 text-ink sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
@@ -63,20 +49,6 @@ export function Intro() {
                     <p className="hx-fade mt-6 max-w-[460px] text-[15px] leading-[1.7] text-neutral-600" style={delay(0.55)}>
                         {t('home.intro.text')}
                     </p>
-
-                    <button type="button" onClick={openVideo} className="group hx-fade mt-9 inline-flex cursor-pointer items-center gap-4 text-left" style={delay(0.7)}>
-                        <span className="relative grid size-14 place-items-center rounded-full border border-ink/60 transition-colors duration-300 group-hover:border-dym group-hover:bg-dym group-focus-visible:border-dym group-focus-visible:bg-dym">
-                            <span className="absolute -inset-2 animate-ping rounded-full border border-ink/20 [animation-duration:2.4s] motion-reduce:animate-none" aria-hidden />
-                            <Play className="size-4 translate-x-px fill-ink" />
-                        </span>
-                        <span className="hx-mono text-[10px] leading-relaxed tracking-[0.1em] text-ink/80 uppercase">
-                            {lines(t('home.intro.video_button')).map((part, i) => (
-                                <span key={i} className="block">
-                                    {part}
-                                </span>
-                            ))}
-                        </span>
-                    </button>
                 </div>
 
                 {/* Valeurs */}
@@ -89,25 +61,6 @@ export function Intro() {
                     ))}
                 </ul>
             </div>
-
-            {/* Lecteur vidéo (chargé seulement à l'ouverture) */}
-            <dialog
-                ref={dialogRef}
-                onClose={() => videoRef.current?.pause()}
-                onClick={(e) => e.target === dialogRef.current && closeVideo()}
-                aria-label={t('home.intro.video_label')}
-                className="m-auto w-[min(1100px,92vw)] bg-transparent p-0 backdrop:bg-black/85"
-            >
-                <button
-                    type="button"
-                    onClick={closeVideo}
-                    className="ml-auto mb-3 grid size-10 cursor-pointer place-items-center border border-white/30 text-white hover:border-dym hover:bg-dym"
-                    aria-label={t('home.intro.video_close')}
-                >
-                    <X className="size-5" />
-                </button>
-                <video ref={videoRef} src="/videos/presentation.mp4" poster="/videos/presentation.jpg" controls playsInline preload="none" className="aspect-video w-full bg-black" />
-            </dialog>
         </section>
     );
 }
