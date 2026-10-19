@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CareerController;
+use App\Http\Controllers\CookieConsentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LegalPageController;
 use App\Http\Controllers\QuoteController;
@@ -19,6 +20,8 @@ Route::get('actualites/{post}', [SiteController::class, 'post'])->name('posts.sh
 
 Route::get('devis', [QuoteController::class, 'create'])->name('quotes.create');
 Route::post('devis', [QuoteController::class, 'store'])->middleware('throttle:5,10')->name('quotes.store');
+
+Route::post('cookie-consent', [CookieConsentController::class, 'store'])->middleware('throttle:20,1')->name('cookie-consent.store');
 
 Route::get('carriere', [CareerController::class, 'index'])->name('careers.index');
 Route::post('carriere/candidature', [CareerController::class, 'apply'])->middleware('throttle:5,10')->name('careers.apply');

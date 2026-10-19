@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { Fragment } from 'react';
+import { CookieConsentBanner, openCookieSettings } from '@/components/site/cookie-consent';
 import { SiteLogo, siteNav } from '@/components/site/site-header';
 import { FacebookIcon, InstagramIcon, LinkedInIcon, WhatsAppIcon, YouTubeIcon } from '@/components/site/social-icons';
 import { show as showLegal } from '@/routes/legal';
@@ -146,9 +147,15 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                                 </Link>
                             </Fragment>
                         ))}
+                        <span className="text-ink/20">|</span>
+                        <button type="button" onClick={openCookieSettings} className="transition-colors hover:text-ink">
+                            {t('layout.footer.cookie_settings')}
+                        </button>
                     </p>
                 </div>
             </div>
+
+            <CookieConsentBanner />
         </footer>
     );
 }

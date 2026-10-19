@@ -20,7 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Derrière Caddy (TLS) : faire confiance aux en-têtes X-Forwarded-*.
         $middleware->trustProxies(at: '*');
 
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+        // Cookies écrits par le navigateur (pas par Laravel) : non chiffrés.
+        $middleware->encryptCookies(except: ['appearance', 'sidebar_state', 'dym_cookie_consent']);
 
         $middleware->web(append: [
             HandleAppearance::class,
