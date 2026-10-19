@@ -41,7 +41,7 @@ class ActivityController extends Controller
     public function store(SaveActivityRequest $request): RedirectResponse
     {
         Activity::query()->create([
-            ...$request->safe()->except('image'),
+            ...$request->safe()->except(['image', 'image_media']),
             'position' => $request->integer('position', (int) Activity::query()->max('position') + 1),
             'image' => $this->storeUpload($request, 'image', 'activities'),
         ]);
@@ -67,7 +67,7 @@ class ActivityController extends Controller
     public function update(SaveActivityRequest $request, Activity $activity): RedirectResponse
     {
         $activity->update([
-            ...$request->safe()->except('image'),
+            ...$request->safe()->except(['image', 'image_media']),
             'position' => $request->integer('position', $activity->position),
             'image' => $this->storeUpload($request, 'image', 'activities', $activity->image),
         ]);

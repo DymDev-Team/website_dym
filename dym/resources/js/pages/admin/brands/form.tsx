@@ -17,9 +17,7 @@ type Props = {
 export default function BrandForm({ brand, nextPosition = 1 }: Props) {
     return (
         <AdminPage
-            title={
-                brand ? `Modifier « ${brand.name} »` : 'Nouvelle marque'
-            }
+            title={brand ? `Modifier « ${brand.name} »` : 'Nouvelle marque'}
         >
             <Form
                 {...(brand ? update.form(brand.id) : store.form())}
@@ -44,7 +42,7 @@ export default function BrandForm({ brand, nextPosition = 1 }: Props) {
                             currentUrl={brand?.logo_url}
                             required
                             contain
-                            error={errors.logo}
+                            error={errors.logo ?? errors.logo_media}
                         />
 
                         <Field

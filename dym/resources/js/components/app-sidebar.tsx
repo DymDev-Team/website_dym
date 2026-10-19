@@ -7,6 +7,7 @@ import {
     Gauge,
     Hammer,
     Handshake,
+    Images,
     Tag,
     ImageIcon,
     Inbox,
@@ -41,6 +42,7 @@ const overviewItems: NavItem[] = [
 
 const contentItems: NavItem[] = [
     { title: 'Textes du site', href: admin.texts.edit(), icon: Type },
+    { title: 'Médiathèque', href: admin.media.index(), icon: Images },
     {
         title: 'Actualités',
         href: admin.posts.index(),

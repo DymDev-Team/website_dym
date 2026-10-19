@@ -41,7 +41,7 @@ class BrandController extends Controller
     public function store(SaveBrandRequest $request): RedirectResponse
     {
         Brand::query()->create([
-            ...$request->safe()->except('logo'),
+            ...$request->safe()->except(['logo', 'logo_media']),
             'position' => $request->integer('position', (int) Brand::query()->max('position') + 1),
             'logo' => $this->storeUpload($request, 'logo', 'brands'),
         ]);
@@ -67,7 +67,7 @@ class BrandController extends Controller
     public function update(SaveBrandRequest $request, Brand $brand): RedirectResponse
     {
         $brand->update([
-            ...$request->safe()->except('logo'),
+            ...$request->safe()->except(['logo', 'logo_media']),
             'position' => $request->integer('position', $brand->position),
             'logo' => $this->storeUpload($request, 'logo', 'brands', $brand->logo),
         ]);

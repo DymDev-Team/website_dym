@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Rules\ExistingMedia;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -27,7 +28,9 @@ class SaveActivityRequest extends FormRequest
             'title' => ['required', 'string', 'max:120'],
             'description' => ['required', 'string', 'max:500'],
             'image_alt' => ['nullable', 'string', 'max:255'],
-            'image' => [Rule::requiredIf($this->route('activity') === null), 'nullable', 'image', 'max:5120'],
+            'image' => [Rule::requiredIf($this->route('activity') === null && ! $this->filled('image_media')), 'nullable', 'image', 'max:5120'],
+            // Image choisie dans la médiathèque à la place d'un envoi.
+            'image_media' => ['nullable', 'string', new ExistingMedia],
             'position' => ['nullable', 'integer', 'min:0', 'max:9999'],
             'is_published' => ['boolean'],
         ];

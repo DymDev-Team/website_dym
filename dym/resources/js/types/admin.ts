@@ -161,3 +161,16 @@ export type JobApplication = Timestamps & {
     status: ApplicationStatus;
     job_offer: Pick<JobOffer, 'id' | 'title' | 'slug'> | null;
 };
+
+// Image de la médiathèque (App\Support\MediaLibrary). « path » est la valeur
+// enregistrée : « /images/… » (fournie avec le site) ou « media/… » (envoyée).
+export type MediaItem = {
+    path: string;
+    url: string;
+    name: string;
+    folder: string;
+    source: 'site' | 'upload';
+    size: number;
+    modified: number;
+    used_by: string[];
+};

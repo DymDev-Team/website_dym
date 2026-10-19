@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Models\Post;
+use App\Rules\ExistingMedia;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -33,7 +34,9 @@ class SavePostRequest extends FormRequest
             'category' => ['required', 'string', 'max:60'],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'body' => ['nullable', 'string', 'max:50000'],
-            'image' => [Rule::requiredIf($post === null), 'nullable', 'image', 'max:5120'],
+            'image' => [Rule::requiredIf($post === null && ! $this->filled('image_media')), 'nullable', 'image', 'max:5120'],
+            // Image choisie dans la médiathèque à la place d'un envoi.
+            'image_media' => ['nullable', 'string', new ExistingMedia],
             'published_at' => ['nullable', 'date'],
         ];
     }

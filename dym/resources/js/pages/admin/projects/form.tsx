@@ -89,7 +89,7 @@ export default function ProjectForm({ project, nextPosition = 1 }: Props) {
                             label="Photo"
                             currentUrl={project?.image_url}
                             required
-                            error={errors.image}
+                            error={errors.image ?? errors.image_media}
                         />
 
                         <PublishFields

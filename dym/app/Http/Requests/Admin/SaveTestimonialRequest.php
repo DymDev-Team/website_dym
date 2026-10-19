@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Rules\ExistingMedia;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -28,6 +29,8 @@ class SaveTestimonialRequest extends FormRequest
             'role' => ['nullable', 'string', 'max:120'],
             'project' => ['nullable', 'string', 'max:120'],
             'image' => ['nullable', 'image', 'max:5120'],
+            // Image choisie dans la médiathèque à la place d'un envoi.
+            'image_media' => ['nullable', 'string', new ExistingMedia],
             'position' => ['nullable', 'integer', 'min:0', 'max:9999'],
             'is_published' => ['boolean'],
         ];

@@ -41,7 +41,7 @@ class EquipmentController extends Controller
     public function store(SaveEquipmentRequest $request): RedirectResponse
     {
         Equipment::query()->create([
-            ...$request->safe()->except('image'),
+            ...$request->safe()->except(['image', 'image_media']),
             'position' => $request->integer('position', (int) Equipment::query()->max('position') + 1),
             'image' => $this->storeUpload($request, 'image', 'equipment'),
         ]);
@@ -67,7 +67,7 @@ class EquipmentController extends Controller
     public function update(SaveEquipmentRequest $request, Equipment $equipment): RedirectResponse
     {
         $equipment->update([
-            ...$request->safe()->except('image'),
+            ...$request->safe()->except(['image', 'image_media']),
             'position' => $request->integer('position', $equipment->position),
             'image' => $this->storeUpload($request, 'image', 'equipment', $equipment->image),
         ]);

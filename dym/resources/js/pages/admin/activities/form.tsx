@@ -65,7 +65,7 @@ export default function ActivityForm({ activity, nextPosition = 1 }: Props) {
                             label="Photo"
                             currentUrl={activity?.image_url}
                             required
-                            error={errors.image}
+                            error={errors.image ?? errors.image_media}
                         />
 
                         <Field

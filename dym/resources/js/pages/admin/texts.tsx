@@ -2,6 +2,7 @@ import { useForm } from '@inertiajs/react';
 import { RotateCcw } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import AdminPage from '@/components/admin/admin-page';
+import MediaPicker from '@/components/admin/media-picker';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +33,8 @@ const fieldsOf = (page: TextPage) => page.sections.flatMap((s) => s.fields);
 type TextsForm = {
     values: Record<string, string>;
     images: Record<string, File>;
+    // Image choisie dans la médiathèque, par clé de champ.
+    media: Record<string, { path: string; url: string }>;
     resets: string[];
 };
 
@@ -39,16 +42,20 @@ type TextsForm = {
 function ImageTextField({
     field,
     file,
+    picked,
     reset,
     error,
     onFile,
+    onPick,
     onReset,
 }: {
     field: TextField;
     file: File | undefined;
+    picked: { path: string; url: string } | undefined;
     reset: boolean;
     error?: string;
     onFile: (file: File | null) => void;
+    onPick: (media: { path: string; url: string }) => void;
     onReset: () => void;
 }) {
     const preview = useMemo(
@@ -65,7 +72,7 @@ function ImageTextField({
         [preview],
     );
 
-    const src = preview ?? (reset ? field.default : field.value);
+    const src = preview ?? picked?.url ?? (reset ? field.default : field.value);
     const changed = src !== field.default;
 
     return (
@@ -103,6 +110,12 @@ function ImageTextField({
                     className="max-w-sm"
                     onChange={(e) => onFile(e.target.files?.[0] ?? null)}
                 />
+                <MediaPicker
+                    selected={picked?.path}
+                    onSelect={(item) =>
+                        onPick({ path: item.path, url: item.url })
+                    }
+                />
             </div>
             <p className="text-xs text-muted-foreground">
                 JPG, PNG ou WebP, 5 Mo max. Format paysage conseillé (3:2).
@@ -119,6 +132,7 @@ function PageForm({ page }: { page: TextPage }) {
     const form = useForm<TextsForm>({
         values: Object.fromEntries(textFields.map((f) => [f.key, f.value])),
         images: {},
+        media: {},
         resets: [],
     });
 
@@ -139,9 +153,25 @@ function PageForm({ page }: { page: TextPage }) {
             delete images[key];
         }
 
+        const media = { ...form.data.media };
+        delete media[key];
+
         form.setData((data) => ({
             ...data,
             images,
+            media,
+            resets: data.resets.filter((k) => k !== key),
+        }));
+    };
+
+    const pickImage = (key: string, picked: { path: string; url: string }) => {
+        const images = { ...form.data.images };
+        delete images[key];
+
+        form.setData((data) => ({
+            ...data,
+            images,
+            media: { ...data.media, [key]: picked },
             resets: data.resets.filter((k) => k !== key),
         }));
     };
@@ -149,10 +179,13 @@ function PageForm({ page }: { page: TextPage }) {
     const resetImage = (field: TextField) => {
         const images = { ...form.data.images };
         delete images[field.key];
+        const media = { ...form.data.media };
+        delete media[field.key];
 
         form.setData((data) => ({
             ...data,
             images,
+            media,
             // Seule une photo déjà envoyée doit être supprimée côté serveur.
             resets:
                 field.value !== field.default
@@ -174,22 +207,53 @@ function PageForm({ page }: { page: TextPage }) {
                 key,
                 file: data.images[key],
             })),
+            media: Object.entries(data.media).map(([key, m]) => ({
+                key,
+                path: m.path,
+            })),
             reset_images: data.resets,
         }));
         form.post(update.url(), {
             preserveScroll: true,
             forceFormData: true,
             onSuccess: () => {
-                form.setDefaults({ ...form.data, images: {}, resets: [] });
-                form.reset('images', 'resets');
+                form.setDefaults({
+                    ...form.data,
+                    images: {},
+                    media: {},
+                    resets: [],
+                });
+                form.reset('images', 'media', 'resets');
             },
         });
     };
 
     return (
         <form onSubmit={submit} className="space-y-6">
+            {/* Raccourcis : une page comme l'accueil compte une dizaine de sections. */}
+            {page.sections.length > 1 && (
+                <nav
+                    aria-label="Sections de la page"
+                    className="flex flex-wrap gap-2"
+                >
+                    {page.sections.map((section) => (
+                        <a
+                            key={section.key}
+                            href={`#section-${page.key}-${section.key}`}
+                            className="border bg-card px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-dym hover:text-foreground"
+                        >
+                            {section.label}
+                        </a>
+                    ))}
+                </nav>
+            )}
+
             {page.sections.map((section) => (
-                <section key={section.key} className="border bg-card">
+                <section
+                    key={section.key}
+                    id={`section-${page.key}-${section.key}`}
+                    className="scroll-mt-4 border bg-card"
+                >
                     <h2 className="hx-mono border-b px-5 py-3 text-[10px] tracking-[0.12em] text-muted-foreground uppercase">
                         {section.label}
                     </h2>
@@ -208,6 +272,7 @@ function PageForm({ page }: { page: TextPage }) {
                                         key={field.key}
                                         field={field}
                                         file={form.data.images[field.key]}
+                                        picked={form.data.media[field.key]}
                                         reset={form.data.resets.includes(
                                             field.key,
                                         )}
@@ -219,6 +284,7 @@ function PageForm({ page }: { page: TextPage }) {
                                         onFile={(file) =>
                                             setImage(field.key, file)
                                         }
+                                        onPick={(m) => pickImage(field.key, m)}
                                         onReset={() => resetImage(field)}
                                     />
                                 );

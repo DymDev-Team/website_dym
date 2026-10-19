@@ -51,7 +51,7 @@ class PostController extends Controller
     public function store(SavePostRequest $request): RedirectResponse
     {
         Post::query()->create([
-            ...$request->safe()->except('image'),
+            ...$request->safe()->except(['image', 'image_media']),
             'image' => $this->storeUpload($request, 'image', 'posts'),
         ]);
 
@@ -77,7 +77,7 @@ class PostController extends Controller
     public function update(SavePostRequest $request, Post $post): RedirectResponse
     {
         $post->update([
-            ...$request->safe()->except('image'),
+            ...$request->safe()->except(['image', 'image_media']),
             'slug' => $request->validated('slug') ?? Post::uniqueSlug($request->validated('title'), $post->id),
             'image' => $this->storeUpload($request, 'image', 'posts', $post->image),
         ]);

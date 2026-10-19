@@ -41,7 +41,7 @@ class ProjectController extends Controller
     public function store(SaveProjectRequest $request): RedirectResponse
     {
         Project::query()->create([
-            ...$request->safe()->except('image'),
+            ...$request->safe()->except(['image', 'image_media']),
             'position' => $request->integer('position', (int) Project::query()->max('position') + 1),
             'image' => $this->storeUpload($request, 'image', 'projects'),
         ]);
@@ -67,7 +67,7 @@ class ProjectController extends Controller
     public function update(SaveProjectRequest $request, Project $project): RedirectResponse
     {
         $project->update([
-            ...$request->safe()->except('image'),
+            ...$request->safe()->except(['image', 'image_media']),
             'position' => $request->integer('position', $project->position),
             'image' => $this->storeUpload($request, 'image', 'projects', $project->image),
         ]);

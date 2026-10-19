@@ -96,7 +96,7 @@ export default function TestimonialForm({
                             name="image"
                             label="Photo du projet (optionnelle)"
                             currentUrl={testimonial?.image_url}
-                            error={errors.image}
+                            error={errors.image ?? errors.image_media}
                         />
 
                         <PublishFields

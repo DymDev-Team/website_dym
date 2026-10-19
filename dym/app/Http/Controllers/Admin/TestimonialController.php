@@ -41,7 +41,7 @@ class TestimonialController extends Controller
     public function store(SaveTestimonialRequest $request): RedirectResponse
     {
         Testimonial::query()->create([
-            ...$request->safe()->except('image'),
+            ...$request->safe()->except(['image', 'image_media']),
             'position' => $request->integer('position', (int) Testimonial::query()->max('position') + 1),
             'image' => $this->storeUpload($request, 'image', 'testimonials'),
         ]);
@@ -67,7 +67,7 @@ class TestimonialController extends Controller
     public function update(SaveTestimonialRequest $request, Testimonial $testimonial): RedirectResponse
     {
         $testimonial->update([
-            ...$request->safe()->except('image'),
+            ...$request->safe()->except(['image', 'image_media']),
             'position' => $request->integer('position', $testimonial->position),
             'image' => $this->storeUpload($request, 'image', 'testimonials', $testimonial->image),
         ]);

@@ -43,7 +43,7 @@ export default function PartnerForm({ partner, nextPosition = 1 }: Props) {
                             currentUrl={partner?.logo_url}
                             required
                             contain
-                            error={errors.logo}
+                            error={errors.logo ?? errors.logo_media}
                         />
 
                         <Field

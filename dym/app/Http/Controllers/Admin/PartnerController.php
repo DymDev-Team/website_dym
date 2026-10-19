@@ -41,7 +41,7 @@ class PartnerController extends Controller
     public function store(SavePartnerRequest $request): RedirectResponse
     {
         Partner::query()->create([
-            ...$request->safe()->except('logo'),
+            ...$request->safe()->except(['logo', 'logo_media']),
             'position' => $request->integer('position', (int) Partner::query()->max('position') + 1),
             'logo' => $this->storeUpload($request, 'logo', 'partners'),
         ]);
@@ -67,7 +67,7 @@ class PartnerController extends Controller
     public function update(SavePartnerRequest $request, Partner $partner): RedirectResponse
     {
         $partner->update([
-            ...$request->safe()->except('logo'),
+            ...$request->safe()->except(['logo', 'logo_media']),
             'position' => $request->integer('position', $partner->position),
             'logo' => $this->storeUpload($request, 'logo', 'partners', $partner->logo),
         ]);

@@ -115,7 +115,7 @@ export default function PostForm({ post, categories }: Props) {
                             label="Image principale"
                             currentUrl={post?.image_url}
                             required
-                            error={errors.image}
+                            error={errors.image ?? errors.image_media}
                         />
 
                         <Field

@@ -60,7 +60,7 @@ export default function EquipmentForm({ equipment, nextPosition = 1 }: Props) {
                             label="Photo"
                             currentUrl={equipment?.image_url}
                             required
-                            error={errors.image}
+                            error={errors.image ?? errors.image_media}
                         />
 
                         <PublishFields

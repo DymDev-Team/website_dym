@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Admin\JobApplicationController;
 use App\Http\Controllers\Admin\JobOfferController;
 use App\Http\Controllers\Admin\LegalPageController;
+use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProjectController;
@@ -40,6 +41,11 @@ Route::prefix('admin')
         Route::resource('quotes', QuoteRequestController::class)->only(['index', 'show', 'update', 'destroy']);
 
         Route::resource('legal-pages', LegalPageController::class)->only(['index', 'edit', 'update']);
+
+        Route::get('media', [MediaController::class, 'index'])->name('media.index');
+        Route::get('media/browse', [MediaController::class, 'browse'])->name('media.browse');
+        Route::post('media', [MediaController::class, 'store'])->name('media.store');
+        Route::delete('media', [MediaController::class, 'destroy'])->name('media.destroy');
 
         Route::get('texts', [SiteTextController::class, 'edit'])->name('texts.edit');
         Route::put('texts', [SiteTextController::class, 'update'])->name('texts.update');

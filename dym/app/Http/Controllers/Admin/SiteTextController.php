@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\Concerns\StoresUploads;
 use App\Http\Controllers\Controller;
 use App\Models\SiteText;
+use App\Rules\ExistingMedia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -63,23 +64,35 @@ class SiteTextController extends Controller
             'images' => ['sometimes', 'array'],
             'images.*.key' => ['required', 'string', Rule::in($imageKeys)],
             'images.*.file' => ['required', 'image', 'max:5120'],
+            'media' => ['sometimes', 'array'],
+            'media.*.key' => ['required', 'string', Rule::in($imageKeys)],
+            'media.*.path' => ['required', 'string', new ExistingMedia],
             'reset_images' => ['sometimes', 'array'],
             'reset_images.*' => ['string', Rule::in($imageKeys)],
         ]);
 
         SiteText::store(collect($validated['texts'] ?? [])->pluck('value', 'key')->all());
 
+        // Ancien fichier supprimé après la mise à jour, et seulement s'il ne sert plus.
+        $replace = function (string $key, ?string $path): void {
+            $current = SiteText::storedPath($key);
+            SiteText::storeImage($key, $path);
+
+            if ($current !== $path) {
+                $this->deleteUpload($current);
+            }
+        };
+
         foreach ($validated['reset_images'] ?? [] as $key) {
-            $this->deleteUpload(SiteText::storedPath($key));
-            SiteText::storeImage($key, null);
+            $replace($key, null);
+        }
+
+        foreach ($validated['media'] ?? [] as $media) {
+            $replace($media['key'], $media['path']);
         }
 
         foreach ($validated['images'] ?? [] as $index => $image) {
-            $current = SiteText::storedPath($image['key']);
-            $path = $request->file("images.{$index}.file")->store('site-texts', 'public');
-
-            SiteText::storeImage($image['key'], $path);
-            $this->deleteUpload($current);
+            $replace($image['key'], $request->file("images.{$index}.file")->store('site-texts', 'public'));
         }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Textes enregistrés.']);
