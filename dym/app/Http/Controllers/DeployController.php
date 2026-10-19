@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Process\ProcessResult;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Process;
 
@@ -29,7 +29,10 @@ class DeployController extends Controller
             return $this->unauthorized();
         }
 
-        $fetch = Process::path(base_path())->timeout(180)->run(['git', 'fetch', '--all']);
+        $this->ensureOrigin();
+
+        // Seule la branche construite par le CI est utile : pas de « fetch --all ».
+        $fetch = Process::path(base_path())->timeout(180)->run(['git', 'fetch', '--prune', 'origin', 'deploy']);
 
         if ($fetch->failed()) {
             return response()->json([
@@ -38,7 +41,7 @@ class DeployController extends Controller
             ], 500);
         }
 
-        $reset = Process::path(base_path())->timeout(60)->run(['git', 'reset', '--hard', 'origin/deploy']);
+        $reset = Process::path(base_path())->timeout(60)->run(['git', 'reset', '--hard', 'FETCH_HEAD']);
 
         if ($reset->failed()) {
             return response()->json([
@@ -50,6 +53,7 @@ class DeployController extends Controller
 
         [$output, $errors] = $this->runPostDeployCommands();
         $output['git'] = $this->processOutput($reset);
+        $output['git_remote'] = trim(Process::path(base_path())->run(['git', 'remote', 'get-url', 'origin'])->output());
 
         return $errors === []
             ? response()->json(['deployed' => true, 'output' => $output])
@@ -86,6 +90,27 @@ class DeployController extends Controller
             ],
             'option1_git_reset_possible' => $canRun('proc_open') && $git !== null && $this->gitRoot() !== null,
         ]);
+    }
+
+    /**
+     * Le dossier LWS hébergeait auparavant un autre dépôt : on rebranche son
+     * remote sur celui du site et on retire les en-têtes d'authentification de
+     * l'ancien dépôt (le dépôt du site est public).
+     */
+    private function ensureOrigin(): void
+    {
+        $repository = (string) config('app.deploy_repository');
+        $current = trim(Process::path(base_path())->run(['git', 'remote', 'get-url', 'origin'])->output());
+
+        if ($repository === '' || $current === $repository) {
+            return;
+        }
+
+        Process::path(base_path())->run(['git', 'config', '--unset-all', 'http.extraheader']);
+        Process::path(base_path())->run(['git', 'config', '--remove-section', 'http.https://github.com/']);
+        Process::path(base_path())->run(
+            $current === '' ? ['git', 'remote', 'add', 'origin', $repository] : ['git', 'remote', 'set-url', 'origin', $repository],
+        );
     }
 
     private function runPostDeployCommands(): array

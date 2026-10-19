@@ -56,6 +56,8 @@ return [
 
     'deploy_token' => env('DEPLOY_TOKEN', ''),
 
+    'deploy_repository' => env('DEPLOY_REPOSITORY', 'https://github.com/DymDev-Team/website_dym.git'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

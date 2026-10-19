@@ -6,101 +6,117 @@ Le déploiement automatique est un miroir Git : GitHub Actions construit
 manuel. Aucun accès SSH au serveur n'est requis.
 
 Sur LWS, le clone Git et l'application Laravel sont dans
-`~/public_html/dym-website/`. Le document root de `dym.ci` doit pointer vers
-`~/public_html/dym-website/public/`. La branche GitHub `deploy` est construite
-avec le contenu de `dym/` aplati à sa racine pour correspondre à cette
-structure.
+`~/public_html/dym-website/`, et le document root de `dym.ci` pointe vers
+`~/public_html/dym-website/public/`. La branche GitHub `deploy` contient
+`dym/` aplati à sa racine (avec `vendor/` et `public/build/`) : le serveur n'a
+besoin ni de Composer ni de Node.
 
 ## Prérequis LWS
 
-- Sélectionner **PHP 8.4.1 ou plus récent** pour le domaine. Le `composer.lock` contient des
-  composants Symfony 8 qui exigent PHP 8.4.1 ou plus. LWS propose PHP 8.4 dans
-  son sélecteur cPanel.
-- Activer les extensions PHP `pdo_mysql`, `mbstring`, `fileinfo`, `openssl`,
-  `curl`, `xml`, `zip`, `bcmath` et `intl`.
-- Le miroir Git exige `git` et `proc_open` activés sur l'hébergement.
-- Configurer la base MySQL LWS et les droits d'écriture sur `storage/` et
-  `bootstrap/cache/`.
-- Le serveur doit pouvoir joindre GitHub en HTTPS.
+- **PHP 8.4.1 ou plus récent** pour le domaine `dym.ci` (cPanel > *MultiPHP
+  Manager*) : le `composer.lock` contient des composants Symfony 8. En PHP 8.2,
+  Laravel s'arrête sur une erreur de `platform_check.php`.
+- Extensions PHP `pdo_mysql`, `mbstring`, `fileinfo`, `openssl`, `curl`, `xml`,
+  `zip`, `bcmath` et `intl`.
+- `git` et `proc_open` disponibles (déjà vérifié sur ce compte LWS).
 
-Le webhook de diagnostic, une fois configuré, confirme la version PHP,
-`proc_open` et la présence de Git sans modifier les fichiers :
-`https://dym.ci/api/deploy/probe?token=LE_DEPLOY_TOKEN`.
+## 1. Bascule du dossier (une seule fois, depuis cPanel)
 
-## 1. Préparer le `.env` de production
+`~/public_html/dym-website/` contient encore l'ancienne application (dépôt
+`DymDev-Team/dym-website`), sans le webhook du site : le premier envoi passe
+par le workflow FTP, ensuite tout passe par le miroir Git.
 
-Créer `~/public_html/dym-website/.env` sur LWS et y renseigner au minimum :
+1. **Sauvegarde** : cPanel > *phpMyAdmin* > Exporter la base actuelle, et
+   *Gestionnaire de fichiers* > `public_html/dym-website` > *Compresser*.
 
-```dotenv
-APP_NAME=DYM
-APP_ENV=production
-APP_DEBUG=false
-APP_KEY=base64:...
-APP_URL=https://dym.ci
+2. **Nouvelle base** : cPanel > *Bases de données MySQL* > créer une base
+   (ex. `c2586884c_vitrine`) et un utilisateur avec tous les privilèges. Ne pas
+   réutiliser la base de l'ancienne application : ses tables (`users`,
+   `migrations`…) entreraient en conflit avec les migrations du site.
 
-DB_CONNECTION=mysql
-DB_HOST=localhost
-DB_PORT=3306
-DB_DATABASE=COMPTE_BASE
-DB_USERNAME=COMPTE_UTILISATEUR
-DB_PASSWORD=mot-de-passe-fort
+3. **`.env`** : cPanel > *Gestionnaire de fichiers* > `public_html/dym-website/.env`
+   (afficher les fichiers cachés) > *Modifier*, remplacer tout le contenu par :
 
-DEPLOY_TOKEN=jeton-aleatoire
-```
+   ```dotenv
+   APP_NAME=DYM
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_KEY=base64:...
+   APP_URL=https://dym.ci
+   APP_LOCALE=fr
 
-Utiliser les valeurs de base de données affichées dans le panneau LWS. Générer
-le jeton avec :
+   LOG_CHANNEL=daily
+   LOG_LEVEL=error
 
-```bash
-php -r 'echo bin2hex(random_bytes(32));'
-```
+   DB_CONNECTION=mysql
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_DATABASE=c2586884c_vitrine
+   DB_USERNAME=c2586884c_vitrine
+   DB_PASSWORD=mot-de-passe-de-la-base
 
-Conserver la même valeur pour `DEPLOY_TOKEN` dans `.env` et le secret GitHub
-`DEPLOY_WEBHOOK_TOKEN`. Ne jamais commiter `.env`.
+   SESSION_DRIVER=database
+   CACHE_STORE=database
+   QUEUE_CONNECTION=sync
 
-## 2. Ajouter les secrets et variables GitHub
+   MAIL_MAILER=smtp
+   MAIL_HOST=mail.dym.ci
+   MAIL_PORT=465
+   MAIL_SCHEME=smtps
+   MAIL_USERNAME=info@dym.ci
+   MAIL_PASSWORD=mot-de-passe-de-la-boite
+   MAIL_FROM_ADDRESS=info@dym.ci
+   MAIL_FROM_NAME=DYM
 
-Dans **Settings > Secrets and variables > Actions**, ajouter :
+   DEPLOY_TOKEN=jeton-aleatoire
+   ```
+
+   `MAIL_HOST` : serveur SMTP affiché dans cPanel > *Comptes de messagerie*.
+   `APP_KEY` et `DEPLOY_TOKEN` se génèrent ainsi (sur n'importe quel poste avec PHP) :
+
+   ```bash
+   php -r 'echo "base64:".base64_encode(random_bytes(32)), PHP_EOL;'   # APP_KEY
+   php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'                   # DEPLOY_TOKEN
+   ```
+
+   Permissions du fichier : 600. `QUEUE_CONNECTION=sync` : pas de worker de queue sur
+   l'hébergement mutualisé.
+
+4. **PHP 8.4** : cPanel > *MultiPHP Manager* > `dym.ci` > PHP 8.4.
+5. **Secrets GitHub** (section 2), puis **Actions > Deploy via FTP (LWS) >
+   Run workflow**. Ce premier envoi (long : tout `vendor/`) supprime les caches
+   de l'ancienne application dans `bootstrap/cache/`, copie le site, puis
+   appelle `/api/deploy` qui crée les tables.
+6. **Contrôle** : `https://dym.ci/api/deploy/probe?token=LE_DEPLOY_TOKEN` doit
+   renvoyer `php_version` 8.4.x et `option1_git_reset_possible: true`.
+
+Au premier appel du miroir Git (section 3), le webhook rebranche lui-même le
+dépôt Git du dossier (`origin`) sur `DymDev-Team/website_dym` et retire les
+en-têtes d'authentification de l'ancien dépôt : aucun terminal n'est nécessaire.
+
+Le dépôt `DymDev-Team/dym-website` a son propre workflow qui appelle aussi
+`dym.ci` : le désactiver (GitHub > Actions > workflow > *Disable workflow*)
+pour qu'il ne tente plus de déployer ici.
+
+## 2. Secrets GitHub
+
+Dans **Settings > Secrets and variables > Actions** du dépôt `website_dym` :
 
 | Nom | Type | Valeur |
 | --- | --- | --- |
-| `DEPLOY_WEBHOOK_URL` | secret | `https://dym.ci/api/deploy` |
-| `DEPLOY_WEBHOOK_TOKEN` | secret | La même valeur que `DEPLOY_TOKEN` dans le `.env` LWS |
-| `FTP_SERVER` | secret | Hôte FTP fourni par LWS, pour le secours manuel |
-| `FTP_USERNAME` | secret | Identifiant FTP, pour le secours manuel |
-| `FTP_PASSWORD` | secret | Mot de passe FTP, pour le secours manuel |
-| `FTP_SERVER_DIR` | variable | `public_html/dym-website` (valeur par défaut du workflow) |
+| `DEPLOY_WEBHOOK_URL` | secret | `https://dym.ci/api/deploy` (exactement) |
+| `DEPLOY_WEBHOOK_TOKEN` | secret | la même valeur que `DEPLOY_TOKEN` dans le `.env` LWS |
+| `FTP_SERVER` | secret | `ftp.dym-manufacture.com` |
+| `FTP_USERNAME` | secret | `website@dym-manufacture.com` |
+| `FTP_PASSWORD` | secret | mot de passe de ce compte FTP |
 
-La clé `GITHUB_TOKEN` intégrée au workflow Git miroir doit conserver la
-permission d'écriture du contenu du dépôt. Pour le clone LWS, créer un token
-GitHub en lecture seule avec accès au dépôt `DymDev-Team/website_dym`.
+Ce compte FTP s'ouvre directement dans `public_html/dym-website` : le workflow
+envoie donc à la racine du compte (`./`). Ne définir la variable
+`FTP_SERVER_DIR` que pour un autre compte FTP (chemin relatif à sa racine).
+Connexion en FTPS explicite (port 21), certificat non vérifié (celui du
+serveur mutualisé ne porte pas le nom `ftp.dym-manufacture.com`).
 
-## 3. Déployer le webhook une première fois par FTP
-
-Depuis **Actions > Deploy via FTP (LWS) > Run workflow**, lancer le workflow
-FTP manuel. Il copie l'application dans `public_html/dym-website/` et appelle
-`/api/deploy` pour lancer les migrations et nettoyer les caches. Cette étape
-installe les routes du webhook sur LWS avant le premier miroir Git.
-
-## 4. Initialiser le dépôt Git sur LWS
-
-Dans le terminal LWS, se placer à la racine de l'application et du dépôt,
-`~/public_html/dym-website/`. Remplacer `LE_TOKEN` par le token
-GitHub, sans l'enregistrer dans un historique partagé :
-
-```bash
-cd ~/public_html/dym-website
-git init
-git remote add origin https://github.com/DymDev-Team/website_dym.git
-git config http.extraheader "Authorization: Basic $(printf 'x-access-token:%s' LE_TOKEN | base64 -w0)"
-git fetch origin
-```
-
-Ne configurez pas le token dans l'URL du remote. Il est stocké dans
-`.git/config`, hors du document root. Ne lancez pas `git clean` : il supprimerait
-les fichiers ignorés, dont le `.env` et les fichiers de `storage/`.
-
-## 5. Tester puis activer le miroir automatique
+## 3. Tester puis activer le miroir automatique
 
 Lancer **Actions > Deploy Git Mirror (LWS) > Run workflow** sur `main`. Le
 workflow construit l'application avec PHP 8.4 et Node 22, pousse les artefacts
@@ -116,17 +132,18 @@ et `queue:restart`. Le miroir remplace les fichiers suivis ; `.env` et
 
 ## Dépannage
 
-- **HTTP 403** : vérifier que `DEPLOY_TOKEN` sur LWS et
-  `DEPLOY_WEBHOOK_TOKEN` dans GitHub sont identiques et que le cache de config
-  Laravel a été vidé.
-- **`proc_open` indisponible** : le miroir Git ne peut pas fonctionner sur ce
-  plan LWS ; utiliser le workflow FTP manuel et lancer les commandes Artisan
-  depuis le terminal LWS.
-- **Git demande un identifiant GitHub** : vérifier le header `http.extraheader`
-  et rechercher les éventuelles clés HTTP configurées plusieurs fois avec
-  `git config --get-regexp "http\\..*\\.extraheader"`.
-- **Première installation** : le webhook doit d'abord être transféré par FTP,
-  et le remote Git doit être configuré avant le premier déploiement miroir.
+- **HTTP 404 sur `/api/deploy/git`** : `dym.ci` sert encore l'ancienne
+  application. Lancer le workflow FTP (étape 1.5).
+- **HTTP 403** : `DEPLOY_TOKEN` (LWS) et `DEPLOY_WEBHOOK_TOKEN` (GitHub)
+  diffèrent, ou un ancien cache de config est actif
+  (`rm -f bootstrap/cache/config.php` dans le terminal).
+- **HTTP 500 `git_fetch`** : le serveur ne joint pas GitHub ou le remote est
+  faux ; `git -C ~/public_html/dym-website remote -v` doit afficher
+  `https://github.com/DymDev-Team/website_dym.git`. La réponse du webhook
+  contient `git_remote`.
+- **Page blanche / erreur `platform_check`** : le domaine n'est pas en PHP 8.4.
+- **`proc_open` indisponible** : utiliser le workflow FTP manuel.
 
-Sauvegarder la base de données depuis le panneau LWS avant toute opération de
+Ne jamais lancer `git clean` dans le clone : il supprimerait `.env` et
+`storage/`. Sauvegarder la base depuis le panneau LWS avant toute opération de
 maintenance importante.

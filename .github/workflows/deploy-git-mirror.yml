@@ -101,5 +101,17 @@ jobs:
             -H "Accept: application/json" \
             --max-time 180 --retry 2 --retry-delay 5)
           echo "HTTP $HTTP_CODE"
-          cat /tmp/deploy_out.txt | python3 -m json.tool 2>/dev/null || cat /tmp/deploy_out.txt
+          python3 -m json.tool /tmp/deploy_out.txt 2>/dev/null || head -c 2000 /tmp/deploy_out.txt
+          if [ "$HTTP_CODE" = "404" ]; then
+            echo "::error::Route de déploiement introuvable : dym.ci sert encore l'ancienne application (bascule du dossier non faite) (voir dym/DEPLOYMENT.md, « Première installation »)."
+          fi
           [ "$HTTP_CODE" -lt 400 ] || { echo "Git-mirror webhook failed with HTTP $HTTP_CODE"; exit 1; }
+
+      - name: Check site
+        run: |
+          for i in 1 2 3 4 5 6; do
+            if curl -fsS -o /dev/null --max-time 20 https://dym.ci/up; then echo "https://dym.ci/up OK"; exit 0; fi
+            sleep 10
+          done
+          echo "::error::https://dym.ci/up ne répond pas après le déploiement."
+          exit 1

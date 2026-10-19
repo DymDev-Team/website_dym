@@ -1,6 +1,7 @@
 name: Deploy via FTP (LWS)
 
-# Secours manuel : le déploiement automatique passe par deploy-git-mirror.yml.
+# Secours manuel, et première installation : le déploiement automatique passe
+# par deploy-git-mirror.yml, dont le webhook doit d'abord exister sur le serveur.
 on:
   workflow_dispatch:
 
@@ -45,16 +46,37 @@ jobs:
           touch storage/framework/cache/data/.gitkeep
           touch storage/logs/.gitkeep
 
+      # Les caches Laravel restés sur le serveur (config, routes, paquets d'une
+      # version précédente ou de l'ancienne application) masqueraient le nouveau
+      # code : on les supprime avant l'envoi. Ils sont régénérés au besoin.
+      - name: Clear Laravel caches on LWS
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ vars.FTP_SERVER_DIR || '.' }}
+        run: |
+          sudo apt-get install -y -qq lftp >/dev/null
+          # Certificat FTPS de l'hébergement mutualisé émis pour le nom du serveur,
+          # pas pour ftp.dym-manufacture.com : chiffré, mais non vérifié.
+          lftp -u "$FTP_USERNAME,$FTP_PASSWORD" -e "
+            set ftp:ssl-force true; set ssl:verify-certificate no; set net:max-retries 2;
+            cd '$FTP_DIR/bootstrap/cache';
+            rm -f config.php routes-v7.php events.php packages.php services.php;
+            bye" "$FTP_SERVER" || echo "::warning::Nettoyage des caches impossible (dossier absent au premier envoi ?)."
+
       - name: Deploy to LWS via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
+          # Le compte FTP LWS s'ouvre directement dans public_html/dym-website.
+          protocol: ftps
+          security: loose
           port: 21
           local-dir: ./dym/
-          server-dir: ${{ vars.FTP_SERVER_DIR || 'public_html/dym-website' }}/
+          server-dir: ${{ vars.FTP_SERVER_DIR || '.' }}/
           exclude: |
             **/.git*
             **/.github/**
@@ -93,5 +115,8 @@ jobs:
             -H "Accept: application/json" \
             --max-time 180 --retry 2 --retry-delay 5)
           echo "HTTP $HTTP_CODE"
-          cat /tmp/deploy_out.txt | python3 -m json.tool 2>/dev/null || cat /tmp/deploy_out.txt
+          python3 -m json.tool /tmp/deploy_out.txt 2>/dev/null || head -c 2000 /tmp/deploy_out.txt
+          if [ "$HTTP_CODE" = "404" ]; then
+            echo "::error::Route de déploiement introuvable : dym.ci sert encore l'ancienne application (bascule du dossier non faite) (voir dym/DEPLOYMENT.md, « Première installation »)."
+          fi
           [ "$HTTP_CODE" -lt 400 ] || { echo "Post-deploy webhook failed with HTTP $HTTP_CODE"; exit 1; }
