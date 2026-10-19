@@ -13,6 +13,8 @@ const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 // Film d'atelier muet en boucle, monté à partir du film de présentation
 // (sans le logo ni les plans d'interview).
 const VIDEO_SRC = '/videos/hero-atelier.mp4';
+// Version 360p (~2,4 Mo au lieu de ~6 Mo) pour les petits écrans.
+const VIDEO_SRC_MOBILE = '/videos/hero-atelier-mobile.mp4';
 const VIDEO_POSTER = '/videos/hero-atelier.jpg';
 
 // Ne lit la vidéo que si elle est affichée (pas en display:none) et que le hero
@@ -68,7 +70,6 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
                 <div className="hx-fade absolute inset-0 -z-10 hidden lg:left-[30%] lg:block" style={delay(0.2)} aria-hidden>
                     <video
                         ref={videoRef}
-                        src={VIDEO_SRC}
                         poster={VIDEO_POSTER}
                         muted
                         loop
@@ -76,7 +77,11 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
                         preload="none"
                         disablePictureInPicture
                         className="size-full scale-[1.08] object-cover will-change-transform"
-                    />
+                    >
+                        {/* Un navigateur qui ignore « media » prend la première source (desktop). */}
+                        <source src={VIDEO_SRC} media="(min-width: 768px)" type="video/mp4" />
+                        <source src={VIDEO_SRC_MOBILE} type="video/mp4" />
+                    </video>
                 </div>
                 {/* Voile sombre sous le texte, transparent sur la photo */}
                 <div className="absolute inset-0 -z-10 hidden bg-linear-to-r from-ink from-35% via-ink/75 via-48% to-transparent to-62% lg:block" aria-hidden />

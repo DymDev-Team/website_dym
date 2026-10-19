@@ -106,7 +106,7 @@ export function Intro() {
                 >
                     <X className="size-5" />
                 </button>
-                <video ref={videoRef} src="/images/images/video.mp4" controls playsInline preload="none" className="aspect-video w-full bg-black" />
+                <video ref={videoRef} src="/videos/presentation.mp4" poster="/videos/presentation.jpg" controls playsInline preload="none" className="aspect-video w-full bg-black" />
             </dialog>
         </section>
     );
