@@ -15,6 +15,15 @@ type Props = {
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
+// « https://www.novamec.ci/ » → « novamec.ci »
+function hostname(url: string): string {
+    try {
+        return new URL(url).hostname.replace(/^www\./, '');
+    } catch {
+        return url;
+    }
+}
+
 export default function MarquesPage({ brands, activities, site }: Props) {
     const [ref, inView] = useInView<HTMLElement>(0.05, false);
     const t = useTexts();
@@ -52,25 +61,26 @@ export default function MarquesPage({ brands, activities, site }: Props) {
                             <ul className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
                                 {brands.map((brand, i) => (
                                     <li key={brand.id} className="hx-fade hx-hair group flex flex-col border bg-white/60 transition-[border-color,box-shadow] duration-500 hover:border-dym/40 hover:shadow-[0_18px_40px_rgb(20_20_20/0.08)]" style={delay(0.3 + i * 0.06)}>
-                                        <div className="grid aspect-[16/9] place-items-center bg-white p-8">
+                                        <div className="grid h-32 place-items-center border-b border-black/5 bg-white px-8 py-5">
                                             <img
                                                 src={brand.logo_url ?? undefined}
                                                 alt={brand.name}
                                                 loading="lazy"
-                                                className="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-105"
+                                                className="max-h-[88px] max-w-[70%] object-contain transition-transform duration-500 group-hover:scale-105"
                                             />
                                         </div>
                                         <div className="flex flex-1 flex-col px-6 pt-5 pb-6">
-                                            <h2 className="font-display text-[24px] leading-none uppercase">{brand.name}</h2>
-                                            {brand.description && <p className="mt-3 flex-1 text-sm leading-relaxed text-neutral-600">{brand.description}</p>}
+                                            <h2 className="font-display text-[22px] leading-none uppercase">{brand.name}</h2>
+                                            {brand.description && <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-neutral-600">{brand.description}</p>}
                                             {brand.website_url && (
                                                 <a
                                                     href={brand.website_url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="hx-mono mt-5 inline-flex items-center gap-2 self-start text-[10px] tracking-[0.1em] text-dym uppercase"
+                                                    className="group/link mt-5 inline-flex items-center gap-3 self-start border border-dym/30 px-4 py-2.5 text-dym transition-colors duration-300 hover:border-dym hover:bg-dym hover:text-white"
                                                 >
-                                                    {t('brands.header.link')}
+                                                    <span className="hx-mono text-[10px] tracking-[0.1em] uppercase">{t('brands.header.link')}</span>
+                                                    <span className="text-[13px] text-neutral-500 transition-colors duration-300 group-hover/link:text-white/80">{hostname(brand.website_url)}</span>
                                                     <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                                                 </a>
                                             )}
