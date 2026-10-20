@@ -9,6 +9,12 @@
     border-color: rgb(255 255 255 / 0.19);
 }
 
+/* Site public : les retours à la ligne saisis dans le panel (textes, descriptions)
+   s'affichent. Spécificité nulle (:where) : une classe whitespace-* l'emporte. */
+:where(.bg-paper) :where(p, li) {
+    white-space: pre-line;
+}
+
 /* Sections sur fond noir : nuance claire du logo, le taupe #766f65 y serait
    trop peu contrasté (3,7:1 contre 6,3:1) pour les petits libellés. */
 .hx-dark {
