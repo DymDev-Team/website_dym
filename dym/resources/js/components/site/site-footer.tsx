@@ -93,7 +93,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                         <ul className="space-y-2.5 text-sm">
                             {activities.map((a) => (
                                 <li key={a.id}>
-                                    <Link href="/#activites" className="transition-colors hover:text-ink">
+                                    <Link href="/activites" className="transition-colors hover:text-ink">
                                         {a.title}
                                     </Link>
                                 </li>

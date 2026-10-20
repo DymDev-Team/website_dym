@@ -4,6 +4,8 @@ import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
 import type { Project } from '@/types/admin';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
+import { Link } from '@inertiajs/react';
+import { realisations } from '@/routes';
 
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
@@ -79,10 +81,10 @@ export function Projects({ projects }: { projects: Project[] }) {
                     </div>
 
                     <div className="hx-fade flex items-center gap-6" style={delay(0.35)}>
-                        <a href="#realisations" className="hx-mono group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
+                        <Link href={realisations.url()} className="hx-mono group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
                             {t('home.projects.link')}
                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-                        </a>
+                        </Link>
                         <div className="flex gap-2">
                             {([-1, 1] as const).map((dir) => {
                                 const disabled = dir < 0 ? edges.start : edges.end;

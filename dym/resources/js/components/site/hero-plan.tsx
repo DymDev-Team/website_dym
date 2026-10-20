@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import { Link } from '@inertiajs/react';
 
 // Escalier en élévation : palier à gauche, volée de 10 marches vers la droite.
 const STEPS = 10;
@@ -154,10 +155,10 @@ export function HeroPlan() {
                         DYM Manufacture accompagne les entreprises et les particuliers dans la réalisation d’ouvrages métalliques robustes, esthétiques et de haute qualité.
                     </p>
 
-                    <a href="#activites" className="mt-9 inline-flex items-center gap-3 bg-dym px-7 py-4 text-[11px] font-semibold tracking-[0.16em] text-white uppercase transition-colors hover:bg-dym-dark">
+                    <Link href="/activites" className="mt-9 inline-flex items-center gap-3 bg-dym px-7 py-4 text-[11px] font-semibold tracking-[0.16em] text-white uppercase transition-colors hover:bg-dym-dark">
                         Découvrir nos activités
                         <ArrowRight className="size-4" />
-                    </a>
+                    </Link>
                 </div>
 
                 <div className="relative">

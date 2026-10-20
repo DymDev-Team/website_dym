@@ -6,6 +6,7 @@ import { SiteHeader } from '@/components/site/site-header';
 import { show } from '@/routes/careers';
 import type { Activity, JobOffer, SiteSettings } from '@/types/admin';
 import { renderTitle, useTexts } from '@/components/site/use-texts';
+import { ScrollLink } from '@/components/site/scroll-link';
 
 type Props = {
     offers: JobOffer[];
@@ -52,18 +53,18 @@ export default function CarrierePage({ offers, activities, site }: Props) {
                                 {t('careers.header.text')}
                             </p>
                             <div className="mt-6 flex flex-wrap gap-3">
-                                <a
-                                    href="#offres"
+                                <ScrollLink
+                                    target="offres"
                                     className="hd-cta relative inline-flex items-center gap-2 overflow-hidden bg-dym px-6 py-4 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark"
                                 >
                                     {t('careers.header.offers_button')} <ArrowRight className="hd-arrow size-3.5" />
-                                </a>
-                                <a
-                                    href="#candidature"
+                                </ScrollLink>
+                                <ScrollLink
+                                    target="candidature"
                                     className="inline-flex items-center gap-2 border border-ink/20 px-6 py-4 text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors hover:border-dym hover:text-dym"
                                 >
                                     {t('careers.header.application_button')}
-                                </a>
+                                </ScrollLink>
                             </div>
                         </div>
                     </div>
@@ -93,9 +94,9 @@ export default function CarrierePage({ offers, activities, site }: Props) {
                         {offers.length === 0 ? (
                             <p className="mt-8 max-w-[560px] border border-black/10 bg-white/60 p-6 text-neutral-600">
                                 {t('careers.offers.empty')}{' '}
-                                <a href="#candidature" className="font-semibold text-dym hover:underline">
+                                <ScrollLink target="candidature" className="font-semibold text-dym hover:underline">
                                     {t('careers.offers.empty_link')}
-                                </a>
+                                </ScrollLink>
                                 .
                             </p>
                         ) : (

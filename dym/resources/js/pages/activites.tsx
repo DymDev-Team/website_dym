@@ -56,7 +56,7 @@ function Products() {
                 <ul className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
                     {products.map((p, i) => (
                         <li key={p.image} className="hx-fade" style={delay(0.3 + i * 0.06)}>
-                            <a href="#contact" className="group relative block aspect-[4/3] overflow-hidden bg-white">
+                            <Link href={quoteCreate()} className="group relative block aspect-[4/3] overflow-hidden bg-white">
                                 <img
                                     src={p.image}
                                     alt={p.title}
@@ -70,7 +70,7 @@ function Products() {
                                         <ArrowRight className="size-4 -translate-x-2 opacity-0 transition-[opacity,transform] duration-500 group-hover:translate-x-0 group-hover:opacity-100" />
                                     </p>
                                 </div>
-                            </a>
+                            </Link>
                         </li>
                     ))}
                 </ul>

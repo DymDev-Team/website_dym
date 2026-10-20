@@ -6,6 +6,7 @@ import type { Draw } from '@/components/site/blueprints';
 import { useInView } from '@/components/site/use-in-view';
 import type { Equipment as EquipmentItem } from '@/types/admin';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
+import { ScrollLink } from '@/components/site/scroll-link';
 
 
 const ROTATE_MS = 4500;
@@ -120,13 +121,13 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
 
                     <div className="hx-fade" style={delay(0.35)}>
                         <p className="max-w-[400px] text-[15px] leading-[1.7] text-neutral-600">{t('home.equipment.text')}</p>
-                        <a
-                            href="#contact"
+                        <ScrollLink
+                            target="contact"
                             className="hd-cta relative mt-6 inline-flex items-center gap-3 overflow-hidden bg-dym px-6 py-3.5 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark"
                         >
                             {t('home.equipment.cta')}
                             <ArrowRight className="hd-arrow size-4" />
-                        </a>
+                        </ScrollLink>
                     </div>
                 </div>
 
