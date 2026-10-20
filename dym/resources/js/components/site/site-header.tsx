@@ -47,7 +47,7 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
-    // Place la barre orange sous le lien survolé, sinon sous la page active.
+    // Place la barre de couleur sous le lien survolé, sinon sous la page active.
     useLayoutEffect(() => {
         const measure = () => {
             const el = itemsRef.current[target];

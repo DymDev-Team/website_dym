@@ -389,7 +389,7 @@ export default function Texts({ pages }: { pages: TextPage[] }) {
     return (
         <AdminPage
             title="Textes du site"
-            description="Titres, paragraphes, boutons et photos des pages publiques. Un champ vidé reprend son texte d’origine. Sur les titres, chaque ligne s’affiche sur une nouvelle ligne ; un point final s’affiche en orange."
+            description="Titres, paragraphes, boutons et photos des pages publiques. Un champ vidé reprend son texte d’origine. Sur les titres, chaque ligne s’affiche sur une nouvelle ligne ; un point final s’affiche dans la couleur DYM."
         >
             <div className="grid items-start gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
                 <nav className="flex gap-1 overflow-x-auto lg:sticky lg:top-4 lg:flex-col">

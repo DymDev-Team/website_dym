@@ -15,7 +15,7 @@
 |
 */
 
-$title = 'Une ligne par ligne affichée ; un point final s’affiche en orange.';
+$title = 'Une ligne par ligne affichée ; un point final s’affiche dans la couleur DYM.';
 
 return [
 
@@ -125,7 +125,7 @@ return [
                 'label' => 'Témoignages',
                 'fields' => [
                     'eyebrow' => ['label' => 'Surtitre', 'default' => 'TÉMOIGNAGES'],
-                    'title' => ['label' => 'Titre', 'default' => 'Ils parlent de nous.', 'help' => 'Un point final s’affiche en orange.'],
+                    'title' => ['label' => 'Titre', 'default' => 'Ils parlent de nous.', 'help' => 'Un point final s’affiche dans la couleur DYM.'],
                 ],
             ],
 
@@ -133,7 +133,7 @@ return [
                 'label' => 'Actualités',
                 'fields' => [
                     'eyebrow' => ['label' => 'Surtitre', 'default' => 'NOS ACTUALITÉS'],
-                    'title' => ['label' => 'Titre', 'default' => 'Le métal en mouvement.', 'help' => 'Un point final s’affiche en orange.'],
+                    'title' => ['label' => 'Titre', 'default' => 'Le métal en mouvement.', 'help' => 'Un point final s’affiche dans la couleur DYM.'],
                     'link' => ['label' => 'Lien', 'default' => 'Voir toutes les actualités'],
                     'read_more' => ['label' => 'Lien des articles', 'default' => 'Lire la suite'],
                 ],
@@ -219,7 +219,7 @@ return [
                 'label' => 'Nos ouvrages',
                 'fields' => [
                     'eyebrow' => ['label' => 'Surtitre', 'default' => 'NOS OUVRAGES'],
-                    'title' => ['label' => 'Titre', 'default' => 'Fabriqués dans nos ateliers.', 'help' => 'Un point final s’affiche en orange.'],
+                    'title' => ['label' => 'Titre', 'default' => 'Fabriqués dans nos ateliers.', 'help' => 'Un point final s’affiche dans la couleur DYM.'],
                     'text' => ['label' => 'Paragraphe', 'default' => 'Pergolas, portails, garde-corps, grilles… Chaque ouvrage est dessiné, découpé et assemblé sur mesure, avec des motifs personnalisables.', 'multiline' => true],
                     'product_1' => ['label' => 'Ouvrage 1', 'default' => 'Pergola'],
                     'product_2' => ['label' => 'Ouvrage 2', 'default' => 'Marquise'],
@@ -235,7 +235,7 @@ return [
             'cta' => [
                 'label' => 'Bandeau devis',
                 'fields' => [
-                    'title' => ['label' => 'Titre', 'default' => 'Un projet sur mesure ?', 'help' => 'Un « ? » ou un point final s’affiche en orange.'],
+                    'title' => ['label' => 'Titre', 'default' => 'Un projet sur mesure ?', 'help' => 'Un « ? » ou un point final s’affiche dans la couleur DYM.'],
                     'button' => ['label' => 'Bouton', 'default' => 'Demander un devis'],
                 ],
             ],
@@ -258,7 +258,7 @@ return [
                 'label' => 'En-tête',
                 'fields' => [
                     'eyebrow' => ['label' => 'Surtitre', 'default' => 'NOS MARQUES'],
-                    'title' => ['label' => 'Titre', 'default' => 'Nos marques.', 'help' => 'Un point final s’affiche en orange.'],
+                    'title' => ['label' => 'Titre', 'default' => 'Nos marques.', 'help' => 'Un point final s’affiche dans la couleur DYM.'],
                     'text' => ['label' => 'Paragraphe', 'default' => 'Découvrez les marques portées par DYM Manufacture.', 'multiline' => true],
                     'empty' => ['label' => 'Message si aucune marque', 'default' => 'Aucune marque à afficher pour le moment.'],
                     'link' => ['label' => 'Lien vers le site d’une marque', 'default' => 'Visiter le site'],
@@ -283,7 +283,7 @@ return [
                 'label' => 'En-tête',
                 'fields' => [
                     'eyebrow' => ['label' => 'Surtitre', 'default' => 'NOS ACTUALITÉS'],
-                    'title' => ['label' => 'Titre', 'default' => 'Le métal en mouvement.', 'help' => 'Un point final s’affiche en orange.'],
+                    'title' => ['label' => 'Titre', 'default' => 'Le métal en mouvement.', 'help' => 'Un point final s’affiche dans la couleur DYM.'],
                     'text' => ['label' => 'Paragraphe', 'default' => 'Projets livrés, nouveaux équipements, vie de l’atelier : suivez ce qui se fabrique chez DYM Manufacture.', 'multiline' => true],
                 ],
             ],
@@ -307,7 +307,7 @@ return [
                 'fields' => [
                     'meta_title' => ['label' => 'Titre de la page', 'default' => '{titre} — DYM Manufacture', 'help' => '{titre} est remplacé par le titre de l’article.'],
                     'back' => ['label' => 'Lien de retour', 'default' => 'Toutes les actualités'],
-                    'related' => ['label' => 'Titre « à lire aussi »', 'default' => 'À lire aussi.', 'help' => 'Un point final s’affiche en orange.'],
+                    'related' => ['label' => 'Titre « à lire aussi »', 'default' => 'À lire aussi.', 'help' => 'Un point final s’affiche dans la couleur DYM.'],
                     'read_more' => ['label' => 'Lien des articles liés', 'default' => 'Lire la suite'],
                 ],
             ],
@@ -378,7 +378,7 @@ return [
                     'closes' => ['label' => 'Date limite', 'default' => 'Candidatures ouvertes jusqu’au {date}.', 'help' => '{date} est remplacé par la date limite.'],
                     'missions' => ['label' => 'Titre — missions', 'default' => 'Missions'],
                     'requirements' => ['label' => 'Titre — profil', 'default' => 'Profil recherché'],
-                    'apply' => ['label' => 'Titre du formulaire', 'default' => 'Postuler.', 'help' => 'Un point final s’affiche en orange.'],
+                    'apply' => ['label' => 'Titre du formulaire', 'default' => 'Postuler.', 'help' => 'Un point final s’affiche dans la couleur DYM.'],
                 ],
             ],
 

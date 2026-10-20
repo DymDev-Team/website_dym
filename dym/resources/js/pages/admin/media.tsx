@@ -103,7 +103,7 @@ export default function Media({ items }: { items: MediaItem[] }) {
     return (
         <AdminPage
             title="Médiathèque"
-            description="Toutes les images du serveur. Elles se choisissent depuis chaque champ image (bouton « Médiathèque »). Seules les images envoyées et non utilisées peuvent être supprimées ; une image en orange dépasse 1 Mo et ralentit le site."
+            description="Toutes les images du serveur. Elles se choisissent depuis chaque champ image (bouton « Médiathèque »). Seules les images envoyées et non utilisées peuvent être supprimées ; une image dont le poids est en couleur dépasse 1 Mo et ralentit le site."
         >
             <div className="mb-6 flex justify-end">
                 <UploadButton />

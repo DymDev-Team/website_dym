@@ -9,6 +9,13 @@
     border-color: rgb(255 255 255 / 0.19);
 }
 
+/* Sections sur fond noir : nuance claire du logo, le taupe #766f65 y serait
+   trop peu contrasté (3,7:1 contre 6,3:1) pour les petits libellés. */
+.hx-dark {
+    --color-dym: #999889;
+    --color-dym-dark: #b3b2a5;
+}
+
 .hx-mono {
     font-family:
         ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;

@@ -14,7 +14,7 @@ export function useTexts() {
 export const lines = (text: string): string[] =>
     text.split('\n').map((l) => l.trim()).filter(Boolean);
 
-// Titre sur plusieurs lignes (<br />) avec la ponctuation finale en orange.
+// Titre sur plusieurs lignes (<br />) avec la ponctuation finale dans la couleur DYM.
 export function renderTitle(text: string): ReactNode {
     const parts = lines(text);
 
@@ -26,7 +26,7 @@ export function renderTitle(text: string): ReactNode {
     ));
 }
 
-// Dernier « . », « ? » ou « ! » d'un titre affiché en orange (charte DYM).
+// Dernier « . », « ? » ou « ! » d'un titre affiché dans la couleur DYM (charte DYM).
 export function withDot(text: string): ReactNode {
     const last = text.at(-1);
 

@@ -1,5 +1,5 @@
 // Logo DYM de la barre latérale : logotype blanc quand elle est dépliée,
-// carré orange « D » quand elle est repliée en icônes.
+// carré couleur DYM « D » quand elle est repliée en icônes.
 export default function AppLogo() {
     return (
         <>

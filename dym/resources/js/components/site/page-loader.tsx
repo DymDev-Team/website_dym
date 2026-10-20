@@ -150,7 +150,7 @@ export function PageLoader() {
                 </div>
             </div>
 
-            {/* Liseré orange sous le rideau pendant qu'il remonte */}
+            {/* Liseré couleur DYM sous le rideau pendant qu'il remonte */}
             <div aria-hidden className="absolute inset-x-0 -bottom-1 h-1 bg-dym" />
         </div>
     );

@@ -21,7 +21,7 @@ function LogoSet({ partners, copy }: { partners: Partner[]; copy: number }) {
                     key={`${copy}-${r}-${p.id}`}
                     title={p.name}
                     aria-hidden={decorative || undefined}
-                    className="group grid size-16 shrink-0 place-items-center overflow-hidden rounded-full border border-ink/10 bg-white shadow-[0_4px_14px_rgb(20_20_20/0.08)] transition-[border-color,box-shadow] duration-300 hover:border-dym/40 hover:shadow-[0_6px_20px_rgb(241_90_34/0.15)] min-[420px]:size-20 sm:size-24"
+                    className="group grid size-16 shrink-0 place-items-center overflow-hidden rounded-full border border-ink/10 bg-white shadow-[0_4px_14px_rgb(20_20_20/0.08)] transition-[border-color,box-shadow] duration-300 hover:border-dym/40 hover:shadow-[0_6px_20px_rgb(118_111_101/0.15)] min-[420px]:size-20 sm:size-24"
                 >
                     <img
                         src={p.logo_url ?? undefined}

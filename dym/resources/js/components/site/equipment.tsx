@@ -46,7 +46,7 @@ function MachineBlueprint({ label }: { label: string }) {
                     FIG. / {label.toUpperCase()}
                 </text>
             </g>
-            {/* Repère orange */}
+            {/* Repère couleur DYM */}
             <g className="text-dym">
                 <circle cx={x} cy={y} r="3" fill="currentColor" />
                 <polyline points={`${x},${y} ${x + 43 * k},${y - 30} ${x + 93 * k},${y - 30}`} fill="none" stroke="currentColor" strokeWidth="0.8" />

@@ -21,8 +21,8 @@
 
     --font-display: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
 
-    --color-dym: #f15a22;
-    --color-dym-dark: #d94a14;
+    --color-dym: #766f65;
+    --color-dym-dark: #5e5850;
     --color-ink: #141414;
     --color-paper: #ffffff;
 
@@ -86,14 +86,14 @@
 }
 
 :root {
-    /* Charte DYM : papier, encre, orange. Barre latérale en encre. */
+    /* Charte DYM : papier, encre, taupe du logo (#766f65). Barre latérale en encre. */
     --background: #f4f1ea;
     --foreground: #141414;
     --card: #ffffff;
     --card-foreground: #141414;
     --popover: #ffffff;
     --popover-foreground: #141414;
-    --primary: #f15a22;
+    --primary: #766f65;
     --primary-foreground: #ffffff;
     --secondary: #ebe7de;
     --secondary-foreground: #141414;
@@ -105,7 +105,7 @@
     --destructive-foreground: oklch(0.577 0.245 27.325);
     --border: rgb(20 20 20 / 0.1);
     --input: rgb(20 20 20 / 0.18);
-    --ring: #f15a22;
+    --ring: #766f65;
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
@@ -114,12 +114,12 @@
     --radius: 0.125rem;
     --sidebar: #141414;
     --sidebar-foreground: #d9d5cc;
-    --sidebar-primary: #f15a22;
+    --sidebar-primary: #766f65;
     --sidebar-primary-foreground: #ffffff;
     --sidebar-accent: rgb(255 255 255 / 0.07);
     --sidebar-accent-foreground: #ffffff;
     --sidebar-border: rgb(255 255 255 / 0.08);
-    --sidebar-ring: #f15a22;
+    --sidebar-ring: #766f65;
 }
 
 .dark {
@@ -129,7 +129,7 @@
     --card-foreground: #f4f1ea;
     --popover: #1a1a1a;
     --popover-foreground: #f4f1ea;
-    --primary: #f15a22;
+    --primary: #999889;
     --primary-foreground: #ffffff;
     --secondary: #242424;
     --secondary-foreground: #f4f1ea;
@@ -141,7 +141,7 @@
     --destructive-foreground: oklch(0.637 0.237 25.331);
     --border: rgb(255 255 255 / 0.09);
     --input: rgb(255 255 255 / 0.14);
-    --ring: #f15a22;
+    --ring: #999889;
     --chart-1: oklch(0.488 0.243 264.376);
     --chart-2: oklch(0.696 0.17 162.48);
     --chart-3: oklch(0.769 0.188 70.08);
@@ -149,12 +149,12 @@
     --chart-5: oklch(0.645 0.246 16.439);
     --sidebar: #0a0a0a;
     --sidebar-foreground: #d9d5cc;
-    --sidebar-primary: #f15a22;
+    --sidebar-primary: #999889;
     --sidebar-primary-foreground: #ffffff;
     --sidebar-accent: rgb(255 255 255 / 0.07);
     --sidebar-accent-foreground: #ffffff;
     --sidebar-border: rgb(255 255 255 / 0.08);
-    --sidebar-ring: #f15a22;
+    --sidebar-ring: #999889;
 }
 
 @layer base {
@@ -168,7 +168,7 @@
 }
 
 /* Pages d'authentification : toujours en clair, aux couleurs du site DYM
-   (papier, encre, orange) et angles droits, quel que soit le thème choisi. */
+   (papier, encre, taupe du logo) et angles droits, quel que soit le thème choisi. */
 .dym-auth {
     --background: #f4f1ea;
     --foreground: #141414;
@@ -186,7 +186,7 @@
     --accent-foreground: #141414;
     --border: rgb(20 20 20 / 0.12);
     --input: rgb(20 20 20 / 0.18);
-    --ring: #f15a22;
+    --ring: #766f65;
     --radius: 0px;
     color-scheme: light;
 }

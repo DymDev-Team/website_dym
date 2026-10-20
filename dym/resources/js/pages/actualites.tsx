@@ -36,7 +36,7 @@ function Meta({ post }: { post: Post }) {
     );
 }
 
-// Soulignement orange qui se dessine au survol de la carte.
+// Soulignement couleur DYM qui se dessine au survol de la carte.
 function Underline({ children }: { children: string }) {
     return (
         <span className="bg-linear-to-r from-dym to-dym bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 group-hover:bg-[length:100%_1px]">
