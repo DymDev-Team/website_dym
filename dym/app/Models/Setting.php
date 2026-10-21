@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Key/value store for the editable site details (contact, social links...).
@@ -66,7 +67,7 @@ class Setting extends Model
         $values = [...self::DEFAULTS, ...array_intersect_key($stored, self::DEFAULTS)];
         $path = $values['logo_path'];
         $values['logo_url'] = filled($path)
-            ? (str_starts_with($path, '/') || str_starts_with($path, 'http') ? $path : Cache::rememberForever("site-logo-url:{$path}", fn () => \Illuminate\Support\Facades\Storage::disk('public')->url($path)))
+            ? (str_starts_with($path, '/') || str_starts_with($path, 'http') ? $path : Storage::disk('public')->url($path))
             : null;
         $values['section_colors'] = collect(self::DEFAULTS)
             ->filter(fn ($value, $key) => str_starts_with($key, 'section_color_'))

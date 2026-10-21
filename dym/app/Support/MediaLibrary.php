@@ -9,6 +9,7 @@ use App\Models\Partner;
 use App\Models\Post;
 use App\Models\Project;
 use App\Models\SiteText;
+use App\Models\Setting;
 use App\Models\Testimonial;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -97,6 +98,15 @@ class MediaLibrary
                 ->each(function ($record) use (&$usages, $column, $name, $label) {
                     $usages[$record->{$column}][] = "{$label} « {$record->{$name}} »";
                 });
+        }
+
+        Activity::query()->whereNotNull('detail_image')->get(['detail_image', 'title'])
+            ->each(fn ($activity) => $usages[$activity->detail_image][] = 'ActivitÃ© Â« '.$activity->title.' Â» (page dÃ©taillÃ©e)');
+
+        $logo = Setting::query()->whereKey('logo_path')->value('value');
+
+        if (filled($logo)) {
+            $usages[$logo][] = 'Logo du site';
         }
 
         // Photos des textes du site : valeur envoyée, sinon photo par défaut.

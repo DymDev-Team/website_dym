@@ -1,5 +1,13 @@
 <?php
 
+$publicStorageUrl = rtrim((string) env('ASSET_URL', env('APP_URL', 'http://localhost')), '/');
+
+// Les fichiers sont servis derriÃ¨re HTTPS en production. Certains proxys ou
+// anciens APP_URL gardent le schÃ©ma HTTP, que IIS refuse avec 403.4.
+if (env('APP_ENV') === 'production' && str_starts_with($publicStorageUrl, 'http://')) {
+    $publicStorageUrl = 'https://'.substr($publicStorageUrl, 7);
+}
+
 return [
 
     /*
@@ -41,7 +49,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim((string) env('APP_URL', 'http://localhost'), '/').'/storage',
+            'url' => $publicStorageUrl.'/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
