@@ -35,7 +35,12 @@ function UploadButton() {
 
                     const files = await Promise.all(selected.map(optimizeImage));
                     form.transform(() => ({ files }));
-                    form.post(store.url(), {
+                    const uploadUrl = new URL(store.url(), window.location.origin);
+                    if (import.meta.env.PROD) {
+                        uploadUrl.protocol = 'https:';
+                    }
+
+                    form.post(uploadUrl.href, {
                         preserveScroll: true,
                         forceFormData: true,
                         onFinish: () => {
