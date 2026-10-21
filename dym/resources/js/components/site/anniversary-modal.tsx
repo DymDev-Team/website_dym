@@ -1,10 +1,9 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ArrowRight, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useSiteLoaded } from '@/components/site/site-loaded';
 import { create as quoteCreate } from '@/routes/quotes';
-import type { SiteSettings } from '@/types/admin';
 
 const petals = Array.from({ length: 30 }, (_, index) => ({
     left: `${(index * 47 + 9) % 100}%`,
@@ -27,7 +26,6 @@ const confetti = Array.from({ length: 46 }, (_, index) => ({
 
 export function AnniversaryModal() {
     const loaded = useSiteLoaded();
-    const logo = usePage<{ siteSettings?: SiteSettings }>().props.siteSettings?.logo_url;
     const [open, setOpen] = useState(false);
     const [petalsVisible, setPetalsVisible] = useState(false);
     const closeRef = useRef<HTMLButtonElement>(null);
@@ -165,9 +163,13 @@ export function AnniversaryModal() {
                             <X className="size-5" />
                         </button>
 
-                        <div className="mx-auto mb-7 grid size-24 place-items-center rounded-full border border-dym/25 bg-white p-4 shadow-[0_8px_30px_rgb(20_20_20/0.08)]">
-                            <img src={logo || '/images/logo-dym-couleur.svg'} alt="DYM Manufacture" className="max-h-full w-full object-contain" />
-                        </div>
+                        <img
+                            src="/images/logo-dym-10-ans.jpeg"
+                            alt="DYM Manufacture — 10 ans"
+                            width={2560}
+                            height={2340}
+                            className="mx-auto mb-6 h-auto w-full max-w-[300px]"
+                        />
                         <p className="font-mono text-[10px] tracking-[0.22em] text-dym uppercase">Une décennie de savoir-faire</p>
                         <h2 id="anniversary-title" className="mt-3 font-display text-[clamp(52px,13vw,82px)] leading-[0.9] text-ink uppercase">
                             10 <span className="text-dym">ans</span>
