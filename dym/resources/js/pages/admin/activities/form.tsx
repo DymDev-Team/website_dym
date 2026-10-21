@@ -60,6 +60,32 @@ export default function ActivityForm({ activity, nextPosition = 1 }: Props) {
                             />
                         </Field>
 
+                        <Field
+                            id="detail_content"
+                            label="Contenu de la page détaillée"
+                            hint="Présentez cette activité en plusieurs paragraphes. Les retours à la ligne sont conservés."
+                            error={errors.detail_content}
+                        >
+                            <Textarea
+                                id="detail_content"
+                                name="detail_content"
+                                defaultValue={activity?.detail_content ?? ''}
+                                maxLength={20000}
+                                rows={10}
+                            />
+                        </Field>
+
+                        <ImageField
+                            name="detail_image"
+                            label="Image de la page détaillée"
+                            currentUrl={activity?.detail_image_url}
+                            error={errors.detail_image ?? errors.detail_image_media}
+                        />
+
+                        <Field id="detail_image_alt" label="Description de l’image détaillée" error={errors.detail_image_alt}>
+                            <Input id="detail_image_alt" name="detail_image_alt" defaultValue={activity?.detail_image_alt ?? ''} maxLength={255} />
+                        </Field>
+
                         <ImageField
                             name="image"
                             label="Photo"

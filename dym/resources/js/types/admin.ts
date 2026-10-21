@@ -16,6 +16,10 @@ export type Activity = Timestamps &
         image: string;
         image_alt: string | null;
         image_url: string | null;
+        detail_content: string | null;
+        detail_image: string | null;
+        detail_image_url: string | null;
+        detail_image_alt: string | null;
     };
 
 export type Project = Timestamps &

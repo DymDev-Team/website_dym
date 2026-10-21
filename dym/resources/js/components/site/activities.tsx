@@ -3,8 +3,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
-import { activities as activitiesPage } from '@/routes';
-import { create as quoteCreate } from '@/routes/quotes';
+import { activityShow } from '@/routes';
 import type { Activity } from '@/types/admin';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
 
@@ -21,7 +20,7 @@ const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 // « En savoir plus » : depuis l'accueil, mène à la page Activités ; sur cette
 // page, ouvre le formulaire de devis avec l'activité présélectionnée.
-export function Activities({ activities, linkToQuote = false }: { activities: Activity[]; linkToQuote?: boolean }) {
+export function Activities({ activities }: { activities: Activity[]; linkToQuote?: boolean }) {
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
     const trackRef = useRef<HTMLDivElement>(null);
     const t = useTexts();
@@ -120,7 +119,7 @@ export function Activities({ activities, linkToQuote = false }: { activities: Ac
                             <p className="mt-5 flex-1 text-sm leading-relaxed text-white/70">{a.description}</p>
 
                             <Link
-                                href={linkToQuote ? quoteCreate({ query: { activite: a.title } }) : activitiesPage()}
+                                href={activityShow(a.id)}
                                 className="hx-mono mt-5 inline-flex items-center gap-2 self-start text-[10px] tracking-[0.1em] text-dym uppercase"
                             >
                                 {t.c('home.activities.link')}

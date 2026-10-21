@@ -41,9 +41,10 @@ class ActivityController extends Controller
     public function store(SaveActivityRequest $request): RedirectResponse
     {
         Activity::query()->create([
-            ...$request->safe()->except(['image', 'image_media']),
+            ...$request->safe()->except(['image', 'image_media', 'detail_image', 'detail_image_media']),
             'position' => $request->integer('position', (int) Activity::query()->max('position') + 1),
             'image' => $this->storeUpload($request, 'image', 'activities'),
+            'detail_image' => $this->storeUpload($request, 'detail_image', 'activities'),
         ]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Activité créée.']);
@@ -67,9 +68,10 @@ class ActivityController extends Controller
     public function update(SaveActivityRequest $request, Activity $activity): RedirectResponse
     {
         $activity->update([
-            ...$request->safe()->except(['image', 'image_media']),
+            ...$request->safe()->except(['image', 'image_media', 'detail_image', 'detail_image_media']),
             'position' => $request->integer('position', $activity->position),
             'image' => $this->storeUpload($request, 'image', 'activities', $activity->image),
+            'detail_image' => $this->storeUpload($request, 'detail_image', 'activities', $activity->detail_image),
         ]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Activité mise à jour.']);

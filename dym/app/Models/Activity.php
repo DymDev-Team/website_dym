@@ -24,8 +24,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read string|null $image_url
  */
-#[Fillable(['title', 'description', 'image', 'image_alt', 'position', 'is_published'])]
-#[Appends(['image_url'])]
+#[Fillable(['title', 'description', 'image', 'image_alt', 'detail_content', 'detail_image', 'detail_image_alt', 'position', 'is_published'])]
+#[Appends(['image_url', 'detail_image_url'])]
 class Activity extends Model
 {
     /** @use HasFactory<ActivityFactory> */
@@ -37,5 +37,10 @@ class Activity extends Model
     protected function imageUrl(): Attribute
     {
         return Attribute::get(fn () => $this->mediaUrl($this->image));
+    }
+
+    protected function detailImageUrl(): Attribute
+    {
+        return Attribute::get(fn () => $this->mediaUrl($this->detail_image));
     }
 }
