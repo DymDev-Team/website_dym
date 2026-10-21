@@ -92,15 +92,16 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
         >
             {/* Photos des machines, fondues dans le fond clair vers la gauche */}
             <div className="hx-fade absolute inset-y-0 right-0 -z-10 hidden w-[42%] lg:block" style={delay(0.2)} aria-hidden>
-                {equipments.map((e, i) => (
+                {equipments[active] && (
                     <img
-                        key={e.id}
-                        src={e.image_url ?? undefined}
+                        key={equipments[active].id}
+                        src={equipments[active].image_url ?? undefined}
                         alt=""
                         loading="lazy"
-                        className={`absolute inset-0 size-full object-cover transition-[opacity,transform] duration-1000 ease-out ${i === active ? 'scale-100 opacity-100' : 'scale-105 opacity-0'}`}
+                        decoding="async"
+                        className="absolute inset-0 size-full object-cover"
                     />
-                ))}
+                )}
                 <div className="absolute inset-0 bg-linear-to-r from-paper via-paper/55 via-35% to-transparent to-70%" />
             </div>
 
@@ -181,15 +182,16 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
 
                 {/* Photo sur mobile */}
                 <div className="relative mt-10 aspect-video overflow-hidden lg:hidden">
-                    {equipments.map((e, i) => (
+                    {equipments[active] && (
                         <img
-                            key={e.id}
-                            src={e.image_url ?? undefined}
-                            alt={e.name}
+                            key={equipments[active].id}
+                            src={equipments[active].image_url ?? undefined}
+                            alt={equipments[active].name}
                             loading="lazy"
-                            className={`absolute inset-0 size-full object-cover transition-opacity duration-700 ${i === active ? 'opacity-100' : 'opacity-0'}`}
+                            decoding="async"
+                            className="absolute inset-0 size-full object-cover"
                         />
-                    ))}
+                    )}
                 </div>
             </div>
         </section>
