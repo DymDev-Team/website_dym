@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
+import { useSectionColor } from '@/components/site/use-section-color';
 import { show as activityShow } from '@/routes/activities';
 import type { Activity } from '@/types/admin';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
@@ -21,6 +22,7 @@ const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 // « En savoir plus » : depuis l'accueil, mène à la page Activités ; sur cette
 // page, ouvre le formulaire de devis avec l'activité présélectionnée.
 export function Activities({ activities }: { activities: Activity[]; linkToQuote?: boolean }) {
+    const sectionStyle = useSectionColor('activities');
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
     const trackRef = useRef<HTMLDivElement>(null);
     const t = useTexts();
@@ -44,7 +46,7 @@ export function Activities({ activities }: { activities: Activity[]; linkToQuote
     }
 
     return (
-        <section ref={ref} id="activites" aria-labelledby="activites-title" className={`hx-root hx-dark relative bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
+        <section ref={ref} style={sectionStyle} id="activites" aria-labelledby="activites-title" className={`hx-root hx-dark relative bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
             <div className="mx-auto max-w-[1720px] pt-16 pb-14 lg:pt-20 lg:pb-16">
                 {/* En-tête */}
                 <div className="grid items-end gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] lg:gap-10 lg:pl-[clamp(22px,3vw,52px)]">

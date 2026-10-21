@@ -33,6 +33,18 @@ class Setting extends Model
         'whatsapp_url' => 'https://wa.me/2250789303000',
         'instagram_url' => null,
         'youtube_url' => null,
+        'logo_path' => '/images/logo-dym-couleur.svg',
+        'section_color_header' => '#ffffff',
+        'section_color_hero' => '#ffffff',
+        'section_color_intro' => '#ffffff',
+        'section_color_activities' => '#141414',
+        'section_color_projects' => '#141414',
+        'section_color_equipment' => '#ffffff',
+        'section_color_process' => '#ffffff',
+        'section_color_testimonials' => '#ffffff',
+        'section_color_news' => '#141414',
+        'section_color_partners' => '#ffffff',
+        'section_color_footer' => '#ffffff',
     ];
 
     protected $primaryKey = 'key';
@@ -44,14 +56,24 @@ class Setting extends Model
     /**
      * Every setting, defaults included.
      *
-     * @return array<string, string|null>
+     * @return array<string, mixed>
      */
     public static function values(): array
     {
         // Only stored rows are cached, so changing a default in code applies at once.
         $stored = Cache::rememberForever(self::CACHE_KEY, fn () => static::query()->pluck('value', 'key')->all());
 
-        return [...self::DEFAULTS, ...array_intersect_key($stored, self::DEFAULTS)];
+        $values = [...self::DEFAULTS, ...array_intersect_key($stored, self::DEFAULTS)];
+        $path = $values['logo_path'];
+        $values['logo_url'] = filled($path)
+            ? (str_starts_with($path, '/') || str_starts_with($path, 'http') ? $path : Cache::rememberForever("site-logo-url:{$path}", fn () => \Illuminate\Support\Facades\Storage::disk('public')->url($path)))
+            : null;
+        $values['section_colors'] = collect(self::DEFAULTS)
+            ->filter(fn ($value, $key) => str_starts_with($key, 'section_color_'))
+            ->mapWithKeys(fn ($value, $key) => [substr($key, 14) => $values[$key]])
+            ->all();
+
+        return $values;
     }
 
     /**

@@ -8,6 +8,7 @@ import { FacebookIcon, InstagramIcon, LinkedInIcon, WhatsAppIcon, YouTubeIcon } 
 import { show as showLegal } from '@/routes/legal';
 import type { Activity, SiteSettings } from '@/types/admin';
 import { useTexts } from '@/components/site/use-texts';
+import { useSectionColor } from '@/components/site/use-section-color';
 
 type FooterActivity = Pick<Activity, 'id' | 'title'>;
 
@@ -32,6 +33,7 @@ function ColumnTitle({ children }: { children: ReactNode }) {
 }
 
 export function SiteFooter({ activities, site }: { activities: FooterActivity[]; site: SiteSettings }) {
+    const sectionStyle = useSectionColor('footer');
     const t = useTexts();
     // Coordonnées et réseaux saisis dans Admin › Paramètres ; les entrées vides sont masquées.
     const contact = [
@@ -51,7 +53,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
     const socials = socialLinks.filter((s) => site[s.key]).map((s) => ({ ...s, href: site[s.key] as string }));
 
     return (
-        <footer id="contact" className="bg-paper px-5 text-neutral-600 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+        <footer id="contact" style={sectionStyle} className="bg-paper px-5 text-neutral-600 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
             <div className="mx-auto max-w-[1720px] lg:pl-[clamp(22px,3vw,52px)]">
                 <div className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1.1fr_1.2fr] lg:gap-0 lg:py-16">
                     {/* Marque */}

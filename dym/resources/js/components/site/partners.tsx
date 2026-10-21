@@ -2,6 +2,7 @@ import type { SyntheticEvent } from 'react';
 
 import type { Partner } from '@/types/admin';
 import { useTexts } from '@/components/site/use-texts';
+import { useSectionColor } from '@/components/site/use-section-color';
 
 // Chaque moitié de la piste répète les logos pour dépasser la largeur d'un
 // grand écran ; la piste entière est doublée pour boucler sans à-coup (-50 %).
@@ -37,6 +38,7 @@ function LogoSet({ partners, copy }: { partners: Partner[]; copy: number }) {
 }
 
 export function Partners({ partners }: { partners: Partner[] }) {
+    const sectionStyle = useSectionColor('partners');
     const t = useTexts();
 
     if (partners.length === 0) {
@@ -44,7 +46,7 @@ export function Partners({ partners }: { partners: Partner[] }) {
     }
 
     return (
-        <section id="references" className="border-t border-ink/10 bg-white py-9">
+        <section id="references" style={sectionStyle} className="border-t border-ink/10 bg-white py-9">
             <p className="mb-5 text-center text-[11px] font-bold tracking-[0.18em] text-ink/60 uppercase">{t.c('home.partners.title')}</p>
             <div className="overflow-hidden mask-[linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
                 <div className="flex w-max animate-partners items-center gap-4 hover:paused motion-reduce:animate-none sm:gap-6">

@@ -84,6 +84,9 @@ export type Post = Timestamps & {
 };
 
 export type SiteSettings = {
+    logo_path?: string | null;
+    logo_url: string | null;
+    section_colors: Record<string, string>;
     tagline: string | null;
     phone: string | null;
     email: string | null;

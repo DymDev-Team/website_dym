@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight, Factory, HardHat, PencilRuler } from 'lucide-rea
 import { Fragment, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
+import { useSectionColor } from '@/components/site/use-section-color';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
 
 // Textes et photos des étapes : home.process.step_N_{title,text,alt,image} (/admin/texts).
@@ -14,6 +15,7 @@ const steps = [
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 export function Process() {
+    const sectionStyle = useSectionColor('process');
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
     const trackRef = useRef<HTMLOListElement>(null);
     const [current, setCurrent] = useState(0);
@@ -54,7 +56,7 @@ export function Process() {
     };
 
     return (
-        <section ref={ref} id="approche" aria-labelledby="approche-title" className={`hx-root hx-hair relative border-t bg-paper px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
+        <section ref={ref} style={sectionStyle} id="approche" aria-labelledby="approche-title" className={`hx-root hx-hair relative border-t bg-paper px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
             <div className="mx-auto max-w-[1720px] pt-16 pb-16 lg:pt-20 lg:pb-20">
                 {/* En-tête */}
                 <div className="grid items-end gap-6 lg:grid-cols-2 lg:gap-10 lg:pl-[clamp(22px,3vw,52px)]">

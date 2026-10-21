@@ -7,7 +7,7 @@ import { show as activityShow } from '@/routes/activities';
 import { create as quoteCreate } from '@/routes/quotes';
 import type { Activity, SiteSettings } from '@/types/admin';
 
-type Props = { activity: Activity; activities: Pick<Activity, 'id' | 'title' | 'image' | 'image_alt'>[]; site: SiteSettings };
+type Props = { activity: Activity; activities: Activity[]; site: SiteSettings };
 
 export default function Activite({ activity, activities, site }: Props) {
     return (
@@ -48,7 +48,7 @@ export default function Activite({ activity, activities, site }: Props) {
                     </section>
                     {activities.length > 1 && <section className="border-t border-neutral-200 px-5 py-14 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]"><div className="mx-auto max-w-[1500px]"><h2 className="font-display text-4xl uppercase">Nos autres activités</h2><div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{activities.filter(item => item.id !== activity.id).map(item => <Link key={item.id} href={activityShow(item.id)} className="group"><img src={item.image_url ?? undefined} alt={item.image_alt ?? item.title} className="aspect-[4/3] w-full object-cover" /><span className="mt-3 flex items-center justify-between font-display text-xl uppercase">{item.title}<ArrowRight className="size-4 text-dym transition-transform group-hover:translate-x-1" /></span></Link>)}</div></div></section>}
                 </main>
-                <SiteFooter activities={activities as Activity[]} site={site} />
+                <SiteFooter activities={activities} site={site} />
             </div>
         </>
     );

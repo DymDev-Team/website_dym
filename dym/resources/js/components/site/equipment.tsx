@@ -4,6 +4,7 @@ import type { CSSProperties } from 'react';
 import { blueprintFor } from '@/components/site/blueprints';
 import type { Draw } from '@/components/site/blueprints';
 import { useInView } from '@/components/site/use-in-view';
+import { useSectionColor } from '@/components/site/use-section-color';
 import type { Equipment as EquipmentItem } from '@/types/admin';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
 import { ScrollLink } from '@/components/site/scroll-link';
@@ -59,6 +60,7 @@ function MachineBlueprint({ label }: { label: string }) {
 }
 
 export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[] }) {
+    const sectionStyle = useSectionColor('equipment');
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
     const t = useTexts();
     const titleLines = lines(t('home.equipment.title'));
@@ -82,6 +84,7 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
 
     return (
         <section
+            style={sectionStyle}
             ref={ref}
             id="equipements"
             aria-labelledby="equipements-title"

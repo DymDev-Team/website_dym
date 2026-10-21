@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
+import { useSectionColor } from '@/components/site/use-section-color';
 import TestimonialCard from '@/components/ui/card-08';
 import type { Testimonial } from '@/types/admin';
 import { useTexts, withDot } from '@/components/site/use-texts';
@@ -9,6 +10,7 @@ import { useTexts, withDot } from '@/components/site/use-texts';
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) {
+    const sectionStyle = useSectionColor('testimonials');
     const [ref, inView] = useInView<HTMLElement>(0.2, false);
     const trackRef = useRef<HTMLDivElement>(null);
     const t = useTexts();
@@ -30,7 +32,7 @@ export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) 
     }
 
     return (
-        <section ref={ref} id="temoignages" aria-labelledby="temoignages-title" className={`hx-root hx-hair relative border-t bg-paper px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
+        <section ref={ref} style={sectionStyle} id="temoignages" aria-labelledby="temoignages-title" className={`hx-root hx-hair relative border-t bg-paper px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
             <div className="mx-auto max-w-[1720px] py-14 lg:py-16 lg:pl-[clamp(22px,3vw,52px)]">
                 {/* En-tête compact */}
                 <div className="flex flex-wrap items-end justify-between gap-5">

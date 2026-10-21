@@ -3,6 +3,7 @@ import type { CSSProperties, RefObject } from 'react';
 import { useSiteLoaded } from '@/components/site/site-loaded';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
 import { useInView } from '@/components/site/use-in-view';
+import { useSectionColor } from '@/components/site/use-section-color';
 import { useParallax } from '@/components/site/use-parallax';
 
 // Hero inspiré de « linea terra/linea-hero-v2 » : texte, engagements et
@@ -45,6 +46,7 @@ function useAutoplay(video: RefObject<HTMLVideoElement | null>, active: boolean)
 }
 
 export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
+    const sectionStyle = useSectionColor('hero');
     // Animations rejouées à chaque retour dans l'écran + photo en parallaxe légère.
     const [ref, inView] = useInView<HTMLElement>(0.2, false);
     // Attend la levée de l'écran de chargement avant de jouer l'entrée.
@@ -59,7 +61,7 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
     useAutoplay(mobileVideoRef, inView);
 
     return (
-        <section ref={ref} id="accueil" aria-labelledby="hero-title" className={`hx-root relative isolate overflow-hidden bg-paper px-3 text-ink sm:px-5 lg:px-[clamp(24px,3.15vw,58px)] ${ready ? 'is-ready' : ''}`}>
+        <section ref={ref} style={sectionStyle} id="accueil" aria-labelledby="hero-title" className={`hx-root relative isolate overflow-hidden bg-paper px-3 text-ink sm:px-5 lg:px-[clamp(24px,3.15vw,58px)] ${ready ? 'is-ready' : ''}`}>
             <div className="hx-mono hx-fade mx-auto flex h-11 max-w-[1720px] items-center justify-between gap-2 text-[9px] tracking-[0.07em] text-neutral-500" style={delay(0.1)} aria-hidden>
                 <span>{t.c('home.hero.top_left')}</span>
                 <span className="hidden sm:inline">{t.c('home.hero.top_right')}</span>

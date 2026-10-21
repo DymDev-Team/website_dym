@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
+import { useSectionColor } from '@/components/site/use-section-color';
 import type { Project } from '@/types/admin';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
 import { Link } from '@inertiajs/react';
@@ -11,6 +12,7 @@ import { realisations } from '@/routes';
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 export function Projects({ projects }: { projects: Project[] }) {
+    const sectionStyle = useSectionColor('projects');
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
     const trackRef = useRef<HTMLDivElement>(null);
     const [progress, setProgress] = useState(0);
@@ -61,7 +63,7 @@ export function Projects({ projects }: { projects: Project[] }) {
     }
 
     return (
-        <section ref={ref} id="realisations" aria-labelledby="realisations-title" className={`hx-root hx-dark hx-hair relative overflow-hidden border-t border-white/15 bg-ink text-white ${inView ? 'is-ready' : ''}`}>
+        <section ref={ref} style={sectionStyle} id="realisations" aria-labelledby="realisations-title" className={`hx-root hx-dark hx-hair relative overflow-hidden border-t border-white/15 bg-ink text-white ${inView ? 'is-ready' : ''}`}>
             {/* En-tête */}
             <div className="px-5 pt-16 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] lg:pt-20">
                 <div className="mx-auto flex max-w-[1720px] flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:pl-[clamp(22px,3vw,52px)]">

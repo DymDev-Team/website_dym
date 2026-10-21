@@ -1,12 +1,14 @@
 import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
+import { useSectionColor } from '@/components/site/use-section-color';
 import { useParallax } from '@/components/site/use-parallax';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 export function Intro() {
+    const sectionStyle = useSectionColor('intro');
     const [ref, inView] = useInView<HTMLElement>(0.2, false);
     const t = useTexts();
     const titleLines = lines(t('home.intro.title'));
@@ -16,7 +18,7 @@ export function Intro() {
     useParallax(ref, photoRef);
 
     return (
-        <section ref={ref} id="a-propos" aria-labelledby="intro-title" className={`hx-root relative isolate overflow-hidden bg-paper px-5 text-ink sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
+        <section ref={ref} style={sectionStyle} id="a-propos" aria-labelledby="intro-title" className={`hx-root relative isolate overflow-hidden bg-paper px-5 text-ink sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
             {/* Photo découpe laser, fondue dans le noir vers la gauche */}
             <div className="hx-fade absolute inset-0 -z-10 lg:left-[34%]" style={delay(0.1)} aria-hidden>
                 <img ref={photoRef} src="/images/images/16.jpg" alt="" width={1470} height={754} loading="lazy" className="size-full scale-[1.15] object-cover object-[60%_center] will-change-transform" />

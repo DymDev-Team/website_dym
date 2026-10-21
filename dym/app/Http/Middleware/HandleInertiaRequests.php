@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\SiteText;
 use App\Models\SiteTextColor;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -51,6 +52,7 @@ class HandleInertiaRequests extends Middleware
             // Textes du site public, modifiables dans /admin/texts.
             'texts' => fn () => SiteText::values(),
             'textColors' => fn () => SiteTextColor::values(),
+            'siteSettings' => fn () => Setting::values(),
         ];
     }
 }

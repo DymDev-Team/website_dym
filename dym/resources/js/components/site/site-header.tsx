@@ -1,10 +1,12 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { ArrowRight, Menu, X } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { create as quoteCreate } from '@/routes/quotes';
 import { brands, realisations } from '@/routes';
 import { useTexts } from '@/components/site/use-texts';
+import { useSectionColor } from '@/components/site/use-section-color';
+import type { SiteSettings } from '@/types/admin';
 
 export const siteNav = [
     // `label` identifie l'entrée (prop `active` des pages) ; le texte affiché
@@ -19,15 +21,19 @@ export const siteNav = [
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
-export function SiteLogo({ light = false, className = 'h-12' }: { light?: boolean; className?: string }) {
+export function SiteLogo({ light = false, className = 'h-12', src }: { light?: boolean; className?: string; src?: string | null }) {
+    const configuredLogo = usePage<{ siteSettings?: SiteSettings }>().props.siteSettings?.logo_url;
+
     return (
         <Link href="/" className="block shrink-0" aria-label="DYM Manufacture — accueil">
-            <img src={light ? '/images/logo-dym-blanc.svg' : '/images/logo-dym-couleur.svg'} alt="DYM Manufacture" width={177} height={100} className={`w-auto transition-[height] duration-300 ${className}`} />
+            <img src={src || configuredLogo || (light ? '/images/logo-dym-blanc.svg' : '/images/logo-dym-couleur.svg')} alt="DYM Manufacture" width={177} height={100} className={`w-auto transition-[height] duration-300 ${className}`} />
         </Link>
     );
 }
 
 export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
+    const siteSettings = usePage<{ siteSettings?: SiteSettings }>().props.siteSettings;
+    const sectionStyle = useSectionColor('header');
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [hovered, setHovered] = useState<number | null>(null);
@@ -64,20 +70,21 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
 
     return (
         <header
+            style={sectionStyle}
             className={`hd-enter sticky top-0 z-40 border-b bg-paper/95 backdrop-blur transition-[box-shadow,border-color] duration-300 ${
                 scrolled ? 'border-black/5 shadow-[0_8px_30px_rgb(20_20_20/0.08)]' : 'border-black/10'
             }`}
         >
             <div className={`mx-auto flex max-w-330 items-center justify-between gap-6 px-5 transition-[height] duration-300 lg:px-10 ${scrolled ? 'h-15' : 'h-18'}`}>
                 <div className="hd-item" style={delay(0.15)}>
-                    <SiteLogo className={scrolled ? 'h-10' : 'h-12'} />
+                    <SiteLogo className={scrolled ? 'h-10' : 'h-12'} src={siteSettings?.logo_url} />
                 </div>
 
                 <nav className="relative hidden h-full items-stretch lg:flex" onMouseLeave={() => setHovered(null)}>
                     {siteNav.map((item, i) => (
                         <Link
                             key={item.label}
-                            ref={(el) => {
+                            ref={(el: HTMLAnchorElement | null) => {
                                 itemsRef.current[i] = el;
                             }}
                             href={item.href}

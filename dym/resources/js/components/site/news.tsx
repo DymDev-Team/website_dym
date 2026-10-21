@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
+import { useSectionColor } from '@/components/site/use-section-color';
 import { show } from '@/routes/posts';
 import type { Post } from '@/types/admin';
 import { useTexts, withDot } from '@/components/site/use-texts';
@@ -10,6 +11,7 @@ import { useTexts, withDot } from '@/components/site/use-texts';
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 export function News({ posts: news }: { posts: Post[] }) {
+    const sectionStyle = useSectionColor('news');
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
     const trackRef = useRef<HTMLDivElement>(null);
     const t = useTexts();
@@ -31,7 +33,7 @@ export function News({ posts: news }: { posts: Post[] }) {
     }
 
     return (
-        <section ref={ref} id="actualites" aria-labelledby="actualites-title" className={`hx-root hx-dark hx-hair relative border-t border-white/15 bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
+        <section ref={ref} style={sectionStyle} id="actualites" aria-labelledby="actualites-title" className={`hx-root hx-dark hx-hair relative border-t border-white/15 bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
             <div className="mx-auto max-w-[1720px] py-14 lg:py-16 lg:pl-[clamp(22px,3vw,52px)]">
                 {/* En-tête */}
                 <div className="flex flex-wrap items-end justify-between gap-5">

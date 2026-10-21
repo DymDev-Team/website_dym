@@ -3,13 +3,16 @@ import AdminPage from '@/components/admin/admin-page';
 import Field from '@/components/admin/field';
 import { FormActions } from '@/components/admin/form-parts';
 import Heading from '@/components/heading';
+import ImageField from '@/components/admin/image-field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { dashboard } from '@/routes/admin';
 import { edit, update } from '@/routes/admin/settings';
 import type { SiteSettings } from '@/types/admin';
 
-const socials: { key: keyof SiteSettings; label: string }[] = [
+type SocialKey = 'whatsapp_url' | 'facebook_url' | 'linkedin_url' | 'instagram_url' | 'youtube_url';
+
+const socials: { key: SocialKey; label: string }[] = [
     { key: 'whatsapp_url', label: 'WhatsApp' },
     { key: 'facebook_url', label: 'Facebook' },
     { key: 'linkedin_url', label: 'LinkedIn' },
@@ -25,11 +28,30 @@ export default function Settings({ settings }: { settings: SiteSettings }) {
         >
             <Form
                 {...update.form()}
+                encType="multipart/form-data"
                 className="max-w-2xl space-y-6"
                 options={{ preserveScroll: true }}
             >
                 {({ errors, processing }) => (
                     <>
+                        <Heading variant="small" title="Logo du site" description="Choisissez le logo affiché dans l’en-tête sur toutes les pages publiques." />
+                        <ImageField name="logo" label="Logo" currentUrl={settings.logo_url} error={errors.logo ?? errors.logo_media} />
+
+                        <div className="space-y-5 border-t pt-6">
+                            <Heading variant="small" title="Couleur des sections" description="Choisissez la couleur de fond de chaque section de la page d’accueil." />
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                {[
+                                    ['header', 'En-tête'], ['hero', 'Bannière principale'], ['intro', 'Présentation'], ['activities', 'Activités'],
+                                    ['projects', 'Réalisations'], ['equipment', 'Équipements'], ['process', 'Notre approche'],
+                                    ['testimonials', 'Témoignages'], ['news', 'Actualités'], ['partners', 'Partenaires'], ['footer', 'Pied de page'],
+                                ].map(([key, label]) => {
+                                    const field = `section_color_${key}` as keyof SiteSettings;
+                                    return <Field key={key} id={field} label={label} error={errors[field]}><Input id={field} name={field} type="color" defaultValue={settings.section_colors[key] ?? '#ffffff'} className="h-11 w-full cursor-pointer p-1" /></Field>;
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="border-t pt-6" />
                         <Field
                             id="tagline"
                             label="Présentation courte"
