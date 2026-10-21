@@ -7,6 +7,7 @@ import { useInView } from '@/components/site/use-in-view';
 import { show } from '@/routes/posts';
 import type { Activity, Paginated, Post, SiteSettings } from '@/types/admin';
 import { useTexts, withDot } from '@/components/site/use-texts';
+import { useSectionColor } from '@/components/site/use-section-color';
 
 type Props = {
     posts: Paginated<Post>;
@@ -68,6 +69,7 @@ function PageLink({ url, dir }: { url: string | null; dir: 1 | -1 }) {
 export default function ActualitesPage({ posts, categories, category, activities, site }: Props) {
     const [ref, inView] = useInView<HTMLElement>(0.05, false);
     const t = useTexts();
+    const listStyle = useSectionColor('news_page_list');
 
     // À la une : l'article le plus récent, en première page uniquement.
     const featured = posts.current_page === 1 ? posts.data[0] : undefined;
@@ -82,7 +84,7 @@ export default function ActualitesPage({ posts, categories, category, activities
             <div className="bg-paper text-ink">
                 <SiteHeader active="Actualités" />
 
-                <section ref={ref} aria-labelledby="actualites-title" className={`hx-root px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
+                    <section ref={ref} style={listStyle} aria-labelledby="actualites-title" className={`hx-root px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
                     <div className="mx-auto max-w-[1720px] pt-14 pb-16 lg:pt-16 lg:pb-24">
                         {/* En-tête */}
                         <div className="flex flex-wrap items-end justify-between gap-6 lg:pl-[clamp(22px,3vw,52px)]">

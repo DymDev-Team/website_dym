@@ -20,6 +20,24 @@ const socials: { key: SocialKey; label: string }[] = [
     { key: 'youtube_url', label: 'YouTube' },
 ];
 
+const colorGroups = [
+    { title: 'Page d’accueil', fields: [
+        ['header', 'En-tête'], ['hero', 'Bannière principale'], ['intro', 'Présentation'], ['activities', 'Activités'],
+        ['projects', 'Réalisations'], ['equipment', 'Équipements'], ['process', 'Notre approche'],
+        ['testimonials', 'Témoignages'], ['news', 'Actualités'], ['partners', 'Partenaires'], ['footer', 'Pied de page'],
+    ] },
+    { title: 'Page Activités', fields: [['activities_page_cards', 'Cartes des activités'], ['activities_page_products', 'Ouvrages fabriqués'], ['activities_page_cta', 'Bandeau de contact']] },
+    { title: 'Pages détail activité', fields: [['activity_page_hero', 'Présentation de l’activité'], ['activity_page_details', 'Savoir-faire'], ['activity_page_related', 'Autres activités']] },
+    { title: 'Page Réalisations', fields: [['projects_page_list', 'Liste des réalisations']] },
+    { title: 'Page Actualités', fields: [['news_page_list', 'Liste des actualités']] },
+    { title: 'Page Article', fields: [['post_page_content', 'Article'], ['post_page_related', 'Articles associés']] },
+    { title: 'Page Marques', fields: [['brands_page_list', 'Liste des marques']] },
+    { title: 'Page Carrière', fields: [['career_page_intro', 'Présentation'], ['career_page_values', 'Nos engagements'], ['career_page_jobs', 'Offres d’emploi'], ['career_page_application', 'Candidature']] },
+    { title: 'Page Offre d’emploi', fields: [['job_page_intro', 'Présentation de l’offre'], ['job_page_details', 'Détails et candidature']] },
+    { title: 'Page Demande de devis', fields: [['quote_page_form', 'Formulaire de devis']] },
+    { title: 'Pages légales', fields: [['legal_page_heading', 'Titre de la page'], ['legal_page_content', 'Contenu']] },
+].map((group) => ({ ...group, fields: group.fields as [string, string][] }));
+
 export default function Settings({ settings }: { settings: SiteSettings }) {
     return (
         <AdminPage
@@ -38,16 +56,19 @@ export default function Settings({ settings }: { settings: SiteSettings }) {
                         <ImageField name="logo" label="Logo" currentUrl={settings.logo_url} error={errors.logo ?? errors.logo_media} />
 
                         <div className="space-y-5 border-t pt-6">
-                            <Heading variant="small" title="Couleur des sections" description="Choisissez la couleur de fond de chaque section de la page d’accueil." />
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                {[
-                                    ['header', 'En-tête'], ['hero', 'Bannière principale'], ['intro', 'Présentation'], ['activities', 'Activités'],
-                                    ['projects', 'Réalisations'], ['equipment', 'Équipements'], ['process', 'Notre approche'],
-                                    ['testimonials', 'Témoignages'], ['news', 'Actualités'], ['partners', 'Partenaires'], ['footer', 'Pied de page'],
-                                ].map(([key, label]) => {
-                                    const field = `section_color_${key}` as keyof SiteSettings;
-                                    return <Field key={key} id={field} label={label} error={errors[field]}><Input id={field} name={field} type="color" defaultValue={settings.section_colors[key] ?? '#ffffff'} className="h-11 w-full cursor-pointer p-1" /></Field>;
-                                })}
+                            <Heading variant="small" title="Couleur des sections" description="Choisissez la couleur de fond de chaque section, sur toutes les pages du site. Les pages détail activité, article et offre partagent leur réglage." />
+                            <div className="space-y-6">
+                                {colorGroups.map((group) => (
+                                    <div key={group.title}>
+                                        <h3 className="mb-3 text-sm font-semibold">{group.title}</h3>
+                                        <div className="grid gap-4 sm:grid-cols-2">
+                                            {group.fields.map(([key, label]) => {
+                                                const field = `section_color_${key}` as keyof SiteSettings;
+                                                return <Field key={key} id={field} label={label} error={errors[field]}><Input id={field} name={field} type="color" defaultValue={settings.section_colors[key] ?? '#ffffff'} className="h-11 w-full cursor-pointer p-1" /></Field>;
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 

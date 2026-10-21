@@ -8,6 +8,7 @@ import { useInView } from '@/components/site/use-in-view';
 import { create as quoteCreate } from '@/routes/quotes';
 import type { Activity, SiteSettings } from '@/types/admin';
 import { useTexts, withDot } from '@/components/site/use-texts';
+import { useSectionColor } from '@/components/site/use-section-color';
 
 type Props = {
     activities: Activity[];
@@ -29,6 +30,7 @@ const productImages = [
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 function Products() {
+    const sectionStyle = useSectionColor('activities_page_products');
     const [ref, inView] = useInView<HTMLElement>(0.1, false);
     const t = useTexts();
     const products = productImages.map((image, i) => ({
@@ -38,7 +40,7 @@ function Products() {
     }));
 
     return (
-        <section ref={ref} id="ouvrages" aria-labelledby="ouvrages-title" className={`hx-root px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
+        <section ref={ref} style={sectionStyle} id="ouvrages" aria-labelledby="ouvrages-title" className={`hx-root px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
             <div className="mx-auto max-w-[1720px] pt-14 pb-16 lg:pt-16 lg:pb-24">
                 <div className="flex flex-wrap items-end justify-between gap-6 lg:pl-[clamp(22px,3vw,52px)]">
                     <div>
@@ -82,6 +84,7 @@ function Products() {
 
 export default function ActivitesPage({ activities, site }: Props) {
     const t = useTexts();
+    const ctaStyle = useSectionColor('activities_page_cta');
 
     return (
         <>
@@ -93,12 +96,12 @@ export default function ActivitesPage({ activities, site }: Props) {
                 <SiteHeader active="Activités" />
 
                 <div className="hx-hair border-t">
-                    <Activities activities={activities} linkToQuote />
+                    <Activities activities={activities} linkToQuote colorKey="activities_page_cards" />
                 </div>
 
                 <Products />
 
-                <section className="hx-hair border-b border-white/10 bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                <section style={ctaStyle} className="hx-hair border-b border-white/10 bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto flex max-w-[1720px] flex-wrap items-center justify-between gap-6 py-14 lg:pl-[clamp(22px,3vw,52px)]">
                         <h2 className="font-display text-[clamp(30px,4vw,48px)] leading-none uppercase">
                             {t.c('activities.cta.title', withDot(t('activities.cta.title')))}

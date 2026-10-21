@@ -6,10 +6,14 @@ import { activities as activitiesIndex } from '@/routes';
 import { show as activityShow } from '@/routes/activities';
 import { create as quoteCreate } from '@/routes/quotes';
 import type { Activity, SiteSettings } from '@/types/admin';
+import { useSectionColor } from '@/components/site/use-section-color';
 
 type Props = { activity: Activity; activities: Activity[]; site: SiteSettings };
 
 export default function Activite({ activity, activities, site }: Props) {
+    const heroStyle = useSectionColor('activity_page_hero');
+    const detailsStyle = useSectionColor('activity_page_details');
+    const relatedStyle = useSectionColor('activity_page_related');
     return (
         <>
             <Head title={`${activity.title} | DYM Manufacture`}>
@@ -18,7 +22,7 @@ export default function Activite({ activity, activities, site }: Props) {
             <div className="bg-paper text-ink">
                 <SiteHeader active="Activités" />
                 <main>
-                    <section className="bg-ink px-5 py-14 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] lg:py-20">
+                    <section style={heroStyle} className="bg-ink px-5 py-14 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] lg:py-20">
                         <div className="mx-auto max-w-[1500px]">
                             <Link href={activitiesIndex()} className="mb-10 inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-white/65 hover:text-white"><ArrowLeft className="size-4" /> Toutes nos activités</Link>
                             <div className="grid items-end gap-10 lg:grid-cols-[1fr_0.9fr]">
@@ -31,7 +35,7 @@ export default function Activite({ activity, activities, site }: Props) {
                             </div>
                         </div>
                     </section>
-                    <section className="px-5 py-16 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] lg:py-24">
+                    <section style={detailsStyle} className="px-5 py-16 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] lg:py-24">
                         <div className="mx-auto grid max-w-[1300px] gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
                             <div>
                                 <span className="font-mono text-xs tracking-widest text-dym">NOTRE SAVOIR-FAIRE</span>
@@ -46,7 +50,7 @@ export default function Activite({ activity, activities, site }: Props) {
                             </div>
                         </div>
                     </section>
-                    {activities.length > 1 && <section className="border-t border-neutral-200 px-5 py-14 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]"><div className="mx-auto max-w-[1500px]"><h2 className="font-display text-4xl uppercase">Nos autres activités</h2><div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{activities.filter(item => item.id !== activity.id).map(item => <Link key={item.id} href={activityShow(item.id)} className="group"><img src={item.image_url ?? undefined} alt={item.image_alt ?? item.title} className="aspect-[4/3] w-full object-cover" /><span className="mt-3 flex items-center justify-between font-display text-xl uppercase">{item.title}<ArrowRight className="size-4 text-dym transition-transform group-hover:translate-x-1" /></span></Link>)}</div></div></section>}
+                    {activities.length > 1 && <section style={relatedStyle} className="border-t border-neutral-200 px-5 py-14 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]"><div className="mx-auto max-w-[1500px]"><h2 className="font-display text-4xl uppercase">Nos autres activités</h2><div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{activities.filter(item => item.id !== activity.id).map(item => <Link key={item.id} href={activityShow(item.id)} className="group"><img src={item.image_url ?? undefined} alt={item.image_alt ?? item.title} className="aspect-[4/3] w-full object-cover" /><span className="mt-3 flex items-center justify-between font-display text-xl uppercase">{item.title}<ArrowRight className="size-4 text-dym transition-transform group-hover:translate-x-1" /></span></Link>)}</div></div></section>}
                 </main>
                 <SiteFooter activities={activities} site={site} />
             </div>

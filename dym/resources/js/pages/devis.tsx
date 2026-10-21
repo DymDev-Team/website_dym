@@ -6,6 +6,7 @@ import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import type { Activity, SiteSettings } from '@/types/admin';
 import { renderTitle, useTexts } from '@/components/site/use-texts';
+import { useSectionColor } from '@/components/site/use-section-color';
 
 type Props = {
     preset: string | null;
@@ -27,6 +28,7 @@ function Eyebrow({ children }: { children: ReactNode }) {
 export default function DevisPage({ preset, activities, site }: Props) {
     const titles = activities.map((a) => a.title);
     const t = useTexts();
+    const formStyle = useSectionColor('quote_page_form');
 
     const contact = [
         site.phone && { icon: Phone, label: site.phone, href: `tel:${site.phone.replace(/[^+\d]/g, '')}` },
@@ -43,7 +45,7 @@ export default function DevisPage({ preset, activities, site }: Props) {
             <div className="bg-paper text-ink">
                 <SiteHeader active="" />
 
-                <section className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                <section style={formStyle} className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto grid max-w-[1720px] gap-12 pt-14 pb-16 lg:grid-cols-[1fr_1.35fr] lg:gap-16 lg:pt-20 lg:pb-24 lg:pl-[clamp(22px,3vw,52px)]">
                         {/* Colonne d'introduction */}
                         <div>

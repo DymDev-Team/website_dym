@@ -5,6 +5,7 @@ import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import type { Activity, Project, SiteSettings } from '@/types/admin';
 import { useTexts, withDot } from '@/components/site/use-texts';
+import { useSectionColor } from '@/components/site/use-section-color';
 
 type Props = {
     projects: Project[];
@@ -16,6 +17,7 @@ const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 export default function RealisationsPage({ projects, activities, site }: Props) {
     const t = useTexts();
+    const listStyle = useSectionColor('projects_page_list');
 
     return (
         <>
@@ -24,7 +26,7 @@ export default function RealisationsPage({ projects, activities, site }: Props) 
             <div className="bg-paper text-ink">
                 <SiteHeader active="Réalisations" />
 
-                <main className="hx-root px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                <main style={listStyle} className="hx-root px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto max-w-[1720px] pt-16 pb-20 lg:pt-20 lg:pb-28">
                         <header className="lg:pl-[clamp(22px,3vw,52px)]">
                             <div className="hx-mono mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500">

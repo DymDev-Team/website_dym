@@ -46,6 +46,27 @@ class Setting extends Model
         'section_color_news' => '#141414',
         'section_color_partners' => '#ffffff',
         'section_color_footer' => '#ffffff',
+        // Couleurs propres aux pages internes (les couleurs d'accueil restent indépendantes).
+        'section_color_activities_page_cards' => '#141414',
+        'section_color_activities_page_products' => '#ffffff',
+        'section_color_activities_page_cta' => '#141414',
+        'section_color_activity_page_hero' => '#141414',
+        'section_color_activity_page_details' => '#ffffff',
+        'section_color_activity_page_related' => '#ffffff',
+        'section_color_projects_page_list' => '#ffffff',
+        'section_color_news_page_list' => '#ffffff',
+        'section_color_post_page_content' => '#ffffff',
+        'section_color_post_page_related' => '#ffffff',
+        'section_color_brands_page_list' => '#ffffff',
+        'section_color_career_page_intro' => '#ffffff',
+        'section_color_career_page_values' => '#141414',
+        'section_color_career_page_jobs' => '#ffffff',
+        'section_color_career_page_application' => '#ffffff',
+        'section_color_job_page_intro' => '#ffffff',
+        'section_color_job_page_details' => '#ffffff',
+        'section_color_quote_page_form' => '#ffffff',
+        'section_color_legal_page_heading' => '#ffffff',
+        'section_color_legal_page_content' => '#ffffff',
     ];
 
     protected $primaryKey = 'key';

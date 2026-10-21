@@ -8,6 +8,7 @@ import { show } from '@/routes/careers';
 import type { Activity, JobOffer, SiteSettings } from '@/types/admin';
 import { renderTitle, useTexts } from '@/components/site/use-texts';
 import { ScrollLink } from '@/components/site/scroll-link';
+import { useSectionColor } from '@/components/site/use-section-color';
 
 type Props = {
     offers: JobOffer[];
@@ -30,6 +31,10 @@ function Eyebrow({ children }: { children: ReactNode }) {
 
 export default function CarrierePage({ offers, activities, site }: Props) {
     const t = useTexts();
+    const introStyle = useSectionColor('career_page_intro');
+    const valuesStyle = useSectionColor('career_page_values');
+    const jobsStyle = useSectionColor('career_page_jobs');
+    const applicationStyle = useSectionColor('career_page_application');
 
     return (
         <>
@@ -41,7 +46,7 @@ export default function CarrierePage({ offers, activities, site }: Props) {
                 <SiteHeader active="Carrière" />
 
                 {/* En-tête */}
-                <section className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                <section style={introStyle} className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto grid max-w-[1720px] items-end gap-8 pt-14 pb-12 lg:grid-cols-2 lg:pt-20 lg:pb-16 lg:pl-[clamp(22px,3vw,52px)]">
                         <div>
                             <Eyebrow>{t.c('careers.header.eyebrow')}</Eyebrow>
@@ -72,7 +77,7 @@ export default function CarrierePage({ offers, activities, site }: Props) {
                 </section>
 
                 {/* Pourquoi nous rejoindre */}
-                <section className="hx-hair border-y bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                <section style={valuesStyle} className="hx-hair border-y bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <ul className="mx-auto grid max-w-[1720px] lg:grid-cols-3 lg:pl-[clamp(22px,3vw,52px)]">
                         {reasonIcons.map((Icon, i) => (
                             <li key={i} className={`py-10 lg:px-10 lg:py-14 ${i > 0 ? 'border-t border-white/10 lg:border-t-0 lg:border-l' : 'lg:pl-0'}`}>
@@ -85,7 +90,7 @@ export default function CarrierePage({ offers, activities, site }: Props) {
                 </section>
 
                 {/* Offres */}
-                <section id="offres" className="scroll-mt-24 px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                <section id="offres" style={jobsStyle} className="scroll-mt-24 px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto max-w-[1720px] py-14 lg:py-20 lg:pl-[clamp(22px,3vw,52px)]">
                         <Eyebrow>{`${t.c('careers.offers.eyebrow')} — ${String(offers.length).padStart(2, '0')}`}</Eyebrow>
                         <h2 className="font-display text-[clamp(34px,7vw,44px)] leading-[0.95] uppercase lg:text-[clamp(36px,2.8vw,50px)]">
@@ -128,7 +133,7 @@ export default function CarrierePage({ offers, activities, site }: Props) {
                 </section>
 
                 {/* Candidature spontanée */}
-                <section id="candidature" className="hx-hair scroll-mt-24 border-t px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                <section id="candidature" style={applicationStyle} className="hx-hair scroll-mt-24 border-t px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto grid max-w-[1720px] gap-10 py-14 lg:grid-cols-[1fr_1.3fr] lg:py-20 lg:pl-[clamp(22px,3vw,52px)]">
                         <div>
                             <Eyebrow>{t.c('careers.application.eyebrow')}</Eyebrow>

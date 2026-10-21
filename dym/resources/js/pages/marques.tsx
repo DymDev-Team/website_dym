@@ -6,6 +6,7 @@ import { SiteHeader } from '@/components/site/site-header';
 import { useInView } from '@/components/site/use-in-view';
 import type { Activity, Brand, SiteSettings } from '@/types/admin';
 import { useTexts, withDot } from '@/components/site/use-texts';
+import { useSectionColor } from '@/components/site/use-section-color';
 
 type Props = {
     brands: Brand[];
@@ -27,6 +28,7 @@ function hostname(url: string): string {
 export default function MarquesPage({ brands, activities, site }: Props) {
     const [ref, inView] = useInView<HTMLElement>(0.05, false);
     const t = useTexts();
+    const listStyle = useSectionColor('brands_page_list');
 
     return (
         <>
@@ -37,7 +39,7 @@ export default function MarquesPage({ brands, activities, site }: Props) {
             <div className="bg-paper text-ink">
                 <SiteHeader active="Marques" />
 
-                <section ref={ref} aria-labelledby="marques-title" className={`hx-root px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
+                <section ref={ref} style={listStyle} aria-labelledby="marques-title" className={`hx-root px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
                     <div className="mx-auto max-w-[1720px] pt-14 pb-16 lg:pt-16 lg:pb-24">
                         {/* En-tête */}
                         <div className="flex flex-wrap items-end justify-between gap-6 lg:pl-[clamp(22px,3vw,52px)]">

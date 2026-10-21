@@ -7,6 +7,7 @@ import { SiteHeader } from '@/components/site/site-header';
 import { index } from '@/routes/careers';
 import type { Activity, JobOffer, SiteSettings } from '@/types/admin';
 import { useTexts, withDot } from '@/components/site/use-texts';
+import { useSectionColor } from '@/components/site/use-section-color';
 
 type Props = {
     offer: JobOffer;
@@ -41,6 +42,8 @@ export default function OffrePage({ offer, activities, site }: Props) {
     const requirements = lines(offer.requirements);
 
     const t = useTexts();
+    const introStyle = useSectionColor('job_page_intro');
+    const detailsStyle = useSectionColor('job_page_details');
 
     return (
         <>
@@ -49,7 +52,7 @@ export default function OffrePage({ offer, activities, site }: Props) {
             <div className="bg-paper text-ink">
                 <SiteHeader active="Carrière" />
 
-                <section className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                <section style={introStyle} className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto max-w-[1200px] pt-12 pb-10 lg:pt-16">
                         <Link href={index()} className="hx-mono inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-neutral-500 uppercase transition-colors hover:text-dym">
                             <ArrowLeft className="size-3.5" /> {t.c('careers.offer.back')}
@@ -69,7 +72,7 @@ export default function OffrePage({ offer, activities, site }: Props) {
                     </div>
                 </section>
 
-                <section className="hx-hair border-t px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                <section style={detailsStyle} className="hx-hair border-t px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto grid max-w-[1200px] gap-12 py-12 lg:grid-cols-[1fr_440px] lg:py-16">
                         <div className="space-y-10">
                             {missions.length > 0 && (

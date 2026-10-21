@@ -5,6 +5,7 @@ import { SiteHeader } from '@/components/site/site-header';
 import { show } from '@/routes/posts';
 import type { Activity, Post, SiteSettings } from '@/types/admin';
 import { useTexts, withDot } from '@/components/site/use-texts';
+import { useSectionColor } from '@/components/site/use-section-color';
 
 type Props = {
     post: Post;
@@ -17,6 +18,8 @@ const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' });
 
 export default function PostPage({ post, related, activities, site }: Props) {
     const t = useTexts();
+    const contentStyle = useSectionColor('post_page_content');
+    const relatedStyle = useSectionColor('post_page_related');
     const paragraphs = (post.body ?? '')
         .split(/\n\s*\n/)
         .map((p) => p.trim())
@@ -33,7 +36,7 @@ export default function PostPage({ post, related, activities, site }: Props) {
             <div className="bg-paper text-ink">
                 <SiteHeader active="Actualités" />
 
-                <article className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                <article style={contentStyle} className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto max-w-[860px] py-12 lg:py-16">
                         <a
                             href="/actualites"
@@ -92,7 +95,7 @@ export default function PostPage({ post, related, activities, site }: Props) {
                 </article>
 
                 {related.length > 0 && (
-                    <section className="hx-hair border-t px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                    <section style={relatedStyle} className="hx-hair border-t px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                         <div className="mx-auto max-w-[1200px] py-12 lg:py-16">
                             <h2 className="font-display text-[clamp(28px,4vw,40px)] uppercase">
                                 {t.c('news.post.related', withDot(t('news.post.related')))}

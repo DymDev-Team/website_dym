@@ -5,6 +5,7 @@ import { SiteHeader } from '@/components/site/site-header';
 import { show } from '@/routes/legal';
 import type { Activity, SiteSettings } from '@/types/admin';
 import { useTexts } from '@/components/site/use-texts';
+import { useSectionColor } from '@/components/site/use-section-color';
 
 type Props = {
     page: { title: string; body: string; updated_at: string | null };
@@ -18,6 +19,8 @@ const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' });
 
 export default function LegalPage({ page, legalPages, current, activities, site }: Props) {
     const t = useTexts();
+    const headingStyle = useSectionColor('legal_page_heading');
+    const contentStyle = useSectionColor('legal_page_content');
 
     return (
         <>
@@ -26,7 +29,7 @@ export default function LegalPage({ page, legalPages, current, activities, site 
             <div className="bg-paper text-ink">
                 <SiteHeader active="" />
 
-                <section className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                <section style={headingStyle} className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto max-w-[1200px] pt-12 pb-10 lg:pt-16">
                         <div className="hx-mono mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500">
                             <span className="inline-block size-[5px] bg-dym" /> {t.c('legal.page.eyebrow')}
@@ -39,7 +42,7 @@ export default function LegalPage({ page, legalPages, current, activities, site 
                     </div>
                 </section>
 
-                <section className="hx-hair border-t px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
+                <section style={contentStyle} className="hx-hair border-t px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto grid max-w-[1200px] gap-10 py-12 lg:grid-cols-[240px_1fr] lg:gap-16 lg:py-16">
                         <nav aria-label="Pages légales" className="lg:sticky lg:top-28 lg:self-start">
                             <ul className="hx-hair flex flex-wrap gap-2 lg:flex-col lg:gap-0 lg:border-l">

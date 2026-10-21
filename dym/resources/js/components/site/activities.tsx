@@ -21,8 +21,8 @@ const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 // « En savoir plus » : depuis l'accueil, mène à la page Activités ; sur cette
 // page, ouvre le formulaire de devis avec l'activité présélectionnée.
-export function Activities({ activities }: { activities: Activity[]; linkToQuote?: boolean }) {
-    const sectionStyle = useSectionColor('activities');
+export function Activities({ activities, colorKey = 'activities' }: { activities: Activity[]; linkToQuote?: boolean; colorKey?: string }) {
+    const sectionStyle = useSectionColor(colorKey);
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
     const trackRef = useRef<HTMLDivElement>(null);
     const t = useTexts();
