@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
-import { activityShow } from '@/routes';
+import { show as activityShow } from '@/routes/activities';
 import type { Activity } from '@/types/admin';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
 

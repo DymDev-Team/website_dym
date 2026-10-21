@@ -2,7 +2,8 @@ import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
-import { activityShow, activities as activitiesIndex } from '@/routes';
+import { activities as activitiesIndex } from '@/routes';
+import { show as activityShow } from '@/routes/activities';
 import { create as quoteCreate } from '@/routes/quotes';
 import type { Activity, SiteSettings } from '@/types/admin';
 
