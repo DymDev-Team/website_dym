@@ -9,6 +9,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { dashboard } from '@/routes/admin';
 import { destroy, index, store } from '@/routes/admin/media';
 import type { MediaItem } from '@/types/admin';
+import { optimizeImage } from '@/lib/optimize-image';
 
 function UploadButton() {
     const input = useRef<HTMLInputElement>(null);
@@ -24,20 +25,22 @@ function UploadButton() {
                 accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
                 multiple
                 hidden
-                onChange={(e) => {
-                    const files = Array.from(e.target.files ?? []);
+                onChange={async (e) => {
+                    const target = e.currentTarget;
+                    const selected = Array.from(target.files ?? []);
 
-                    if (files.length === 0) {
+                    if (selected.length === 0) {
                         return;
                     }
 
+                    const files = await Promise.all(selected.map(optimizeImage));
                     form.transform(() => ({ files }));
                     form.post(store.url(), {
                         preserveScroll: true,
                         forceFormData: true,
                         onFinish: () => {
-                            if (input.current) {
-                                input.current.value = '';
+                            if (target) {
+                                target.value = '';
                             }
                         },
                     });

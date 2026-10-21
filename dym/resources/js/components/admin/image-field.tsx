@@ -5,6 +5,7 @@ import Field from '@/components/admin/field';
 import MediaPicker from '@/components/admin/media-picker';
 import { Input } from '@/components/ui/input';
 import type { MediaItem } from '@/types/admin';
+import { optimizeImage } from '@/lib/optimize-image';
 
 type Props = {
     name: string;
@@ -39,13 +40,20 @@ export default function ImageField({
         };
     }, [preview]);
 
-    const onChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        setPreview(file ? URL.createObjectURL(file) : null);
+    const onChange = async (event: ChangeEvent<HTMLInputElement>) => {
+        const input = event.currentTarget;
+        const file = input.files?.[0];
+        if (!file) return;
 
-        if (file) {
-            setMedia(null);
+        const optimized = await optimizeImage(file);
+        if (optimized !== file) {
+            const transfer = new DataTransfer();
+            transfer.items.add(optimized);
+            input.files = transfer.files;
         }
+        setPreview(URL.createObjectURL(optimized));
+
+        setMedia(null);
     };
 
     const pick = (item: MediaItem) => {
