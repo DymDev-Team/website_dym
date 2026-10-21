@@ -6,13 +6,23 @@ import { useSiteLoaded } from '@/components/site/site-loaded';
 import { create as quoteCreate } from '@/routes/quotes';
 import type { SiteSettings } from '@/types/admin';
 
-const petals = Array.from({ length: 22 }, (_, index) => ({
+const petals = Array.from({ length: 30 }, (_, index) => ({
     left: `${(index * 47 + 9) % 100}%`,
-    delay: `${-((index * 1.73) % 8)}s`,
+    delay: `${-((index * 1.73) % 9)}s`,
     duration: `${7 + (index % 5)}s`,
-    drift: `${((index % 7) - 3) * 34}px`,
-    color: ['#766f65', '#b6a78d', '#d9c8a8', '#eee4d3'][index % 4],
-    size: 8 + (index % 5) * 2,
+    drift: `${((index % 7) - 3) * 38}px`,
+    top: `${(index * 37 + 8) % 90}%`,
+    color: ['#c99e54', '#e6bd70', '#f1dfbd', '#d28b73', '#fff0d2'][index % 5],
+    size: 10 + (index % 5) * 2,
+}));
+
+const confetti = Array.from({ length: 46 }, (_, index) => ({
+    left: `${(index * 61 + 13) % 100}%`,
+    delay: `${-((index * 1.37) % 5)}s`,
+    duration: `${3.8 + (index % 5) * 0.55}s`,
+    drift: `${((index % 9) - 4) * 22}px`,
+    color: ['#d9ae64', '#f0d8a8', '#d28b73', '#ffffff'][index % 4],
+    rotate: `${(index * 53) % 360}deg`,
 }));
 
 export function AnniversaryModal() {
@@ -67,21 +77,44 @@ export function AnniversaryModal() {
 
     function close() {
         setOpen(false);
-        window.setTimeout(() => setPetalsVisible(false), 6500);
+        window.setTimeout(() => setPetalsVisible(false), 9500);
     }
 
     if (!open && !petalsVisible) return null;
 
     return (
         <div className="pointer-events-none fixed inset-0 z-[110] overflow-hidden" aria-hidden={!open}>
+            {open && (
+                <button
+                    type="button"
+                    aria-label="Fermer la fenêtre anniversaire"
+                    className="pointer-events-auto absolute inset-0 z-0 cursor-default bg-ink/50 backdrop-blur-[3px]"
+                    onClick={close}
+                />
+            )}
             {petalsVisible && (
-                <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+                <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden" aria-hidden="true">
+                    {confetti.map((piece, index) => (
+                        <span
+                            key={`confetti-${index}`}
+                            className="dym-anniversary-confetti absolute -top-4 h-3 w-1.5 rounded-sm opacity-0"
+                            style={{
+                                left: piece.left,
+                                backgroundColor: piece.color,
+                                animationDelay: piece.delay,
+                                animationDuration: piece.duration,
+                                '--confetti-drift': piece.drift,
+                                '--confetti-rotate': piece.rotate,
+                            } as CSSProperties}
+                        />
+                    ))}
                     {petals.map((petal, index) => (
                         <span
-                            key={index}
-                            className="dym-anniversary-petal absolute -top-5 rounded-[85%_0_85%_0] opacity-0 shadow-sm"
+                            key={`petal-${index}`}
+                            className="dym-anniversary-petal absolute rounded-[85%_0_85%_0] opacity-0 shadow-sm"
                             style={{
                                 left: petal.left,
+                                top: petal.top,
                                 width: petal.size,
                                 height: petal.size * 1.65,
                                 backgroundColor: petal.color,
@@ -96,7 +129,7 @@ export function AnniversaryModal() {
 
             {open && (
                 <div
-                    className="pointer-events-auto absolute inset-0 grid place-items-center bg-ink/65 px-5 py-8 backdrop-blur-sm"
+                    className="pointer-events-none absolute inset-0 z-20 grid place-items-center px-4 py-4 sm:px-6 sm:py-8"
                     onMouseDown={(event) => {
                         if (event.target === event.currentTarget) close();
                     }}
@@ -105,7 +138,7 @@ export function AnniversaryModal() {
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="anniversary-title"
-                        className="relative w-full max-w-xl overflow-hidden border border-dym/30 bg-paper px-7 py-12 text-center shadow-2xl sm:px-14 sm:py-16"
+                        className="dym-anniversary-card pointer-events-auto relative max-h-[calc(100dvh-2rem)] w-full max-w-xl overflow-y-auto border border-dym/30 bg-paper px-6 py-9 text-center shadow-2xl sm:px-14 sm:py-14"
                         onKeyDown={(event) => {
                             if (event.key !== 'Tab') return;
 
