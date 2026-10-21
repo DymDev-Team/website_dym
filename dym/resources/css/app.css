@@ -7,6 +7,36 @@
 @import './hero.css';
 @import './header.css';
 
+@keyframes dym-anniversary-petal-fall {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, -5vh, 0) rotate(0deg);
+    }
+    12% {
+        opacity: 0.8;
+    }
+    88% {
+        opacity: 0.75;
+    }
+    100% {
+        opacity: 0;
+        transform: translate3d(var(--petal-drift), 110vh, 0) rotate(620deg);
+    }
+}
+
+.dym-anniversary-petal {
+    animation-name: dym-anniversary-petal-fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dym-anniversary-petal {
+        animation: none;
+        opacity: 0.45;
+    }
+}
+
 @source '../js';
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

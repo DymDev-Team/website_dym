@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { Activities } from '@/components/site/activities';
+import { AnniversaryModal } from '@/components/site/anniversary-modal';
 import { Equipment } from '@/components/site/equipment';
 import { Hero } from '@/components/site/hero';
 import { Intro } from '@/components/site/intro';
@@ -51,6 +52,7 @@ export default function Welcome({
 
             <div className="bg-paper text-ink">
                 <PageLoader />
+                <AnniversaryModal />
                 <SiteHeader />
                 <Hero whatsappUrl={site.whatsapp_url} />
 
