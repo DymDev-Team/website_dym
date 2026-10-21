@@ -137,12 +137,12 @@ export function CookieConsentBanner() {
                     <span className="inline-block size-[5px] bg-dym" /> Cookies
                 </div>
                 <h2 id="cookie-consent-title" className="font-display text-[22px] leading-none uppercase">
-                    {t('layout.cookies.title')}
+                    {t.c('layout.cookies.title')}
                 </h2>
                 <p id="cookie-consent-text" className="mt-3 text-sm leading-relaxed text-neutral-600">
-                    {t('layout.cookies.text')}{' '}
+                    {t.c('layout.cookies.text')}{' '}
                     <Link href={showLegal('cookies')} className="text-ink underline decoration-dym underline-offset-4 hover:text-dym">
-                        {t('layout.cookies.policy_link')}
+                        {t.c('layout.cookies.policy_link')}
                     </Link>
                 </p>
 
@@ -154,8 +154,8 @@ export function CookieConsentBanner() {
                             return (
                                 <li key={key} className="flex items-start justify-between gap-4 py-3">
                                     <div>
-                                        <p className="text-sm font-semibold">{t(`layout.cookies.${key}_title`)}</p>
-                                        <p className="mt-1 text-xs leading-relaxed text-neutral-500">{t(`layout.cookies.${key}_text`)}</p>
+                                        <p className="text-sm font-semibold">{t.c(`layout.cookies.${key}_title`)}</p>
+                                        <p className="mt-1 text-xs leading-relaxed text-neutral-500">{t.c(`layout.cookies.${key}_text`)}</p>
                                     </div>
                                     <button
                                         type="button"
@@ -177,11 +177,11 @@ export function CookieConsentBanner() {
                 <div className="mt-5 flex flex-wrap gap-2">
                     {customizing ? (
                         <button type="button" onClick={() => decide(choices)} className="hx-mono flex-1 bg-ink px-4 py-3 text-[10px] tracking-[0.1em] text-white uppercase transition-colors hover:bg-dym">
-                            {t('layout.cookies.save')}
+                            {t.c('layout.cookies.save')}
                         </button>
                     ) : (
                         <button type="button" onClick={() => setCustomizing(true)} className="hx-mono px-1 py-3 text-[10px] tracking-[0.1em] text-neutral-600 uppercase underline underline-offset-4 hover:text-ink">
-                            {t('layout.cookies.customize')}
+                            {t.c('layout.cookies.customize')}
                         </button>
                     )}
                     <button
@@ -189,14 +189,14 @@ export function CookieConsentBanner() {
                         onClick={() => decide({ analytics: false, marketing: false })}
                         className="hx-mono flex-1 border border-ink/20 px-4 py-3 text-[10px] tracking-[0.1em] uppercase transition-colors hover:border-ink"
                     >
-                        {t('layout.cookies.reject')}
+                        {t.c('layout.cookies.reject')}
                     </button>
                     <button
                         type="button"
                         onClick={() => decide({ analytics: true, marketing: true })}
                         className="hx-mono flex-1 bg-dym px-4 py-3 text-[10px] tracking-[0.1em] text-white uppercase transition-colors hover:bg-ink"
                     >
-                        {t('layout.cookies.accept')}
+                        {t.c('layout.cookies.accept')}
                     </button>
                 </div>
             </div>

@@ -33,21 +33,21 @@ export function Intro() {
 
                 <div className="w-full max-w-[620px] lg:pl-[clamp(22px,3vw,52px)]">
                     <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.15)}>
-                        <span className="inline-block size-[5px] bg-dym" /> {t('home.intro.eyebrow')}
+                        <span className="inline-block size-[5px] bg-dym" /> {t.c('home.intro.eyebrow')}
                     </div>
 
                     <h2 id="intro-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] uppercase lg:text-[clamp(44px,3.8vw,68px)]">
                         {titleLines.map((line, i) => (
                             <span key={line} className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
                                 <span style={delay(0.25 + i * 0.12)}>
-                                    {i === titleLines.length - 1 ? withDot(line) : line}
+                                    {t.c('home.intro.title', i === titleLines.length - 1 ? withDot(line) : line)}
                                 </span>
                             </span>
                         ))}
                     </h2>
 
                     <p className="hx-fade mt-6 max-w-[460px] text-[15px] leading-[1.7] text-neutral-600" style={delay(0.55)}>
-                        {t('home.intro.text')}
+                        {t.c('home.intro.text')}
                     </p>
                 </div>
 
@@ -56,7 +56,7 @@ export function Intro() {
                     {values.map((v, i) => (
                         <li key={v} className="hx-fade flex items-center gap-3" style={delay(0.8 + i * 0.08)}>
                             <span className="h-px w-5 bg-dym" aria-hidden />
-                            {v}
+                            {t.c('home.intro.values', v)}
                         </li>
                     ))}
                 </ul>

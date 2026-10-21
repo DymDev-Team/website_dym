@@ -90,7 +90,7 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
                                 i === target ? 'text-ink' : 'text-neutral-600 hover:text-ink'
                             }`}
                         >
-                            {item.navLabel ?? t(`layout.header.nav_${item.key}`)}
+                            {t.c(`layout.header.nav_${item.key}`, item.navLabel ?? t(`layout.header.nav_${item.key}`))}
                         </Link>
                     ))}
                     <span
@@ -108,7 +108,7 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
                         href={quoteCreate()}
                         className="hd-cta relative hidden items-center gap-2 overflow-hidden bg-dym px-5 py-3 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark sm:inline-flex"
                     >
-                        {t('layout.header.cta')}
+                        {t.c('layout.header.cta')}
                         <ArrowRight className="hd-arrow size-3.5" />
                     </Link>
                     <button type="button" onClick={() => setOpen(!open)} className="hd-burger grid size-10 place-items-center border border-black/15 lg:hidden" aria-label="Menu" aria-expanded={open}>
@@ -127,7 +127,7 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
                             style={delay(0.05 + i * 0.05)}
                             className={`block border-b border-black/10 py-3 text-xs font-semibold tracking-[0.14em] uppercase ${item.label === active ? 'text-dym' : ''}`}
                         >
-                            {item.navLabel ?? t(`layout.header.nav_${item.key}`)}
+                            {t.c(`layout.header.nav_${item.key}`, item.navLabel ?? t(`layout.header.nav_${item.key}`))}
                         </Link>
                     ))}
                     <Link
@@ -136,7 +136,7 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
                         style={delay(0.05 + siteNav.length * 0.05)}
                         className="hd-cta relative mt-5 inline-flex items-center gap-2 overflow-hidden bg-dym px-5 py-3 text-xs font-semibold tracking-[0.14em] text-white uppercase"
                     >
-                        {t('layout.header.cta')} <ArrowRight className="hd-arrow size-3.5" />
+                        {t.c('layout.header.cta')} <ArrowRight className="hd-arrow size-3.5" />
                     </Link>
                 </nav>
             )}

@@ -43,16 +43,16 @@ export default function MarquesPage({ brands, activities, site }: Props) {
                         <div className="flex flex-wrap items-end justify-between gap-6 lg:pl-[clamp(22px,3vw,52px)]">
                             <div>
                                 <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
-                                    <span className="inline-block size-[5px] bg-dym" /> {t('brands.header.eyebrow')}
+                                    <span className="inline-block size-[5px] bg-dym" /> {t.c('brands.header.eyebrow')}
                                 </div>
                                 <h1 id="marques-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] text-ink uppercase lg:text-[clamp(44px,3.8vw,68px)]">
                                     <span className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
-                                        <span style={delay(0.12)}>{withDot(t('brands.header.title'))}</span>
+                                        <span style={delay(0.12)}>{t.c('brands.header.title', withDot(t('brands.header.title')))}</span>
                                     </span>
                                 </h1>
                             </div>
                             <p className="hx-fade max-w-[440px] text-[15px] leading-[1.7] text-neutral-600" style={delay(0.25)}>
-                                {t('brands.header.text')}
+                                {t.c('brands.header.text')}
                             </p>
                         </div>
 
@@ -79,7 +79,7 @@ export default function MarquesPage({ brands, activities, site }: Props) {
                                                     rel="noopener noreferrer"
                                                     className="group/link mt-5 inline-flex items-center gap-3 self-start border border-dym/30 px-4 py-2.5 text-dym transition-colors duration-300 hover:border-dym hover:bg-dym hover:text-white"
                                                 >
-                                                    <span className="hx-mono text-[10px] tracking-[0.1em] uppercase">{t('brands.header.link')}</span>
+                                                    <span className="hx-mono text-[10px] tracking-[0.1em] uppercase">{t.c('brands.header.link')}</span>
                                                     <span className="text-[13px] text-neutral-500 transition-colors duration-300 group-hover/link:text-white/80">{hostname(brand.website_url)}</span>
                                                     <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                                                 </a>
@@ -89,7 +89,7 @@ export default function MarquesPage({ brands, activities, site }: Props) {
                                 ))}
                             </ul>
                         ) : (
-                            <p className="mt-12 text-neutral-600 lg:pl-[clamp(22px,3vw,52px)]">{t('brands.header.empty')}</p>
+                            <p className="mt-12 text-neutral-600 lg:pl-[clamp(22px,3vw,52px)]">{t.c('brands.header.empty')}</p>
                         )}
                     </div>
                 </section>

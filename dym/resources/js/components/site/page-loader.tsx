@@ -138,9 +138,9 @@ export function PageLoader() {
                 {/* Bas : signature + compteur */}
                 <div>
                     <div className="hx-mono mb-3 flex items-end justify-between text-[10px] tracking-[0.12em] text-white/50">
-                        <span>{t('home.loader.signature')}</span>
+                        <span>{t.c('home.loader.signature')}</span>
                         <span>
-                            {t('home.loader.loading')} <span className="font-display text-3xl tracking-normal text-white tabular-nums sm:text-4xl">{String(pct).padStart(3, '0')}</span>
+                            {t.c('home.loader.loading')} <span className="font-display text-3xl tracking-normal text-white tabular-nums sm:text-4xl">{String(pct).padStart(3, '0')}</span>
                             <span className="text-dym"> %</span>
                         </span>
                     </div>

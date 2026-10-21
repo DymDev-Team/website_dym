@@ -28,10 +28,10 @@ export default function RealisationsPage({ projects, activities, site }: Props) 
                     <div className="mx-auto max-w-[1720px] pt-16 pb-20 lg:pt-20 lg:pb-28">
                         <header className="lg:pl-[clamp(22px,3vw,52px)]">
                             <div className="hx-mono mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500">
-                                <span className="inline-block size-[5px] bg-dym" /> {t('home.projects.eyebrow')}
+                                <span className="inline-block size-[5px] bg-dym" /> {t.c('home.projects.eyebrow')}
                             </div>
                             <h1 className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] uppercase lg:text-[clamp(44px,3.8vw,68px)]">
-                                {withDot(t('home.projects.title'))}
+                                {t.c('home.projects.title', withDot(t('home.projects.title')))}
                             </h1>
                         </header>
 

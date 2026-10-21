@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\SiteText;
+use App\Models\SiteTextColor;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -49,6 +50,7 @@ class HandleInertiaRequests extends Middleware
             'teams' => fn () => $user?->toUserTeams(includeCurrent: true) ?? [],
             // Textes du site public, modifiables dans /admin/texts.
             'texts' => fn () => SiteText::values(),
+            'textColors' => fn () => SiteTextColor::values(),
         ];
     }
 }

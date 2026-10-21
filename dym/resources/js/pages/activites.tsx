@@ -33,6 +33,7 @@ function Products() {
     const t = useTexts();
     const products = productImages.map((image, i) => ({
         image,
+        key: `activities.products.product_${i + 1}`,
         title: t(`activities.products.product_${i + 1}`),
     }));
 
@@ -42,14 +43,14 @@ function Products() {
                 <div className="flex flex-wrap items-end justify-between gap-6 lg:pl-[clamp(22px,3vw,52px)]">
                     <div>
                         <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
-                            <span className="inline-block size-[5px] bg-dym" /> {t('activities.products.eyebrow')}
+                            <span className="inline-block size-[5px] bg-dym" /> {t.c('activities.products.eyebrow')}
                         </div>
                         <h2 id="ouvrages-title" className="hx-fade font-display text-[clamp(36px,7vw,52px)] leading-[0.95] text-ink uppercase lg:text-[clamp(40px,3.2vw,60px)]" style={delay(0.12)}>
-                            {withDot(t('activities.products.title'))}
+                            {t.c('activities.products.title', withDot(t('activities.products.title')))}
                         </h2>
                     </div>
                     <p className="hx-fade max-w-[440px] text-[15px] leading-[1.7] text-neutral-600" style={delay(0.25)}>
-                        {t('activities.products.text')}
+                        {t.c('activities.products.text')}
                     </p>
                 </div>
 
@@ -64,9 +65,9 @@ function Products() {
                                     className="size-full object-contain p-6 transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                                 />
                                 <div className="absolute inset-x-0 bottom-0 translate-y-full bg-neutral-100/95 px-6 py-5 transition-transform duration-500 ease-out group-hover:translate-y-0 group-focus-visible:translate-y-0 [@media(hover:none)]:translate-y-0">
-                                    <h3 className="text-[17px] font-bold tracking-[0.12em] text-ink uppercase">{p.title}</h3>
+                                    <h3 className="text-[17px] font-bold tracking-[0.12em] text-ink uppercase">{t.c(p.key, p.title)}</h3>
                                     <p className="mt-1.5 flex items-center justify-between text-[13px] font-semibold tracking-[0.1em] text-dym">
-                                        {t('activities.products.signature')}
+                                        {t.c('activities.products.signature')}
                                         <ArrowRight className="size-4 -translate-x-2 opacity-0 transition-[opacity,transform] duration-500 group-hover:translate-x-0 group-hover:opacity-100" />
                                     </p>
                                 </div>
@@ -100,13 +101,13 @@ export default function ActivitesPage({ activities, site }: Props) {
                 <section className="hx-hair border-b border-white/10 bg-ink px-5 text-white sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto flex max-w-[1720px] flex-wrap items-center justify-between gap-6 py-14 lg:pl-[clamp(22px,3vw,52px)]">
                         <h2 className="font-display text-[clamp(30px,4vw,48px)] leading-none uppercase">
-                            {withDot(t('activities.cta.title'))}
+                            {t.c('activities.cta.title', withDot(t('activities.cta.title')))}
                         </h2>
                         <Link
                             href={quoteCreate()}
                             className="hd-cta relative inline-flex items-center gap-2 overflow-hidden bg-dym px-6 py-4 text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors hover:bg-dym-dark"
                         >
-                            {t('activities.cta.button')} <ArrowRight className="hd-arrow size-3.5" />
+                            {t.c('activities.cta.button')} <ArrowRight className="hd-arrow size-3.5" />
                         </Link>
                     </div>
                 </section>

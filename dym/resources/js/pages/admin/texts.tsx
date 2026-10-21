@@ -20,6 +20,7 @@ type TextField = {
     multiline: boolean;
     default: string;
     value: string;
+    color: string | null;
 };
 
 type TextPage = {
@@ -30,8 +31,107 @@ type TextPage = {
 
 const fieldsOf = (page: TextPage) => page.sections.flatMap((s) => s.fields);
 
+// Couleurs de la charte DYM proposées en un clic (logo, fonds et textes du site).
+const palette = [
+    { value: '#766f65', label: 'Taupe DYM' },
+    { value: '#5e5850', label: 'Taupe foncé' },
+    { value: '#999889', label: 'Vert-gris du logo' },
+    { value: '#141414', label: 'Noir' },
+    { value: '#525252', label: 'Gris' },
+    { value: '#a3a3a3', label: 'Gris clair' },
+    { value: '#ffffff', label: 'Blanc' },
+];
+
+// Couleur d'un texte : pastilles de la charte, couleur libre, ou retour au design.
+function ColorControl({
+    id,
+    value,
+    onChange,
+}: {
+    id: string;
+    value: string;
+    onChange: (color: string) => void;
+}) {
+    return (
+        <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted-foreground">Couleur</span>
+            {palette.map((c) => (
+                <button
+                    key={c.value}
+                    type="button"
+                    title={c.label}
+                    aria-label={c.label}
+                    aria-pressed={value === c.value}
+                    onClick={() => onChange(c.value)}
+                    className={`size-5 cursor-pointer rounded-full border border-black/15 transition-shadow ${
+                        value === c.value
+                            ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background'
+                            : 'hover:ring-2 hover:ring-muted-foreground/40'
+                    }`}
+                    style={{ backgroundColor: c.value }}
+                />
+            ))}
+            <label
+                title="Autre couleur"
+                className="relative inline-flex cursor-pointer items-center gap-1.5 border px-2 py-0.5 text-xs text-muted-foreground hover:text-foreground"
+            >
+                <span
+                    className="size-3 rounded-full border border-black/15"
+                    style={{
+                        background:
+                            value && !palette.some((c) => c.value === value)
+                                ? value
+                                : 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)',
+                    }}
+                />
+                Autre
+                <input
+                    id={`${id}-color`}
+                    type="color"
+                    value={value || '#766f65'}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="absolute inset-0 cursor-pointer opacity-0"
+                />
+            </label>
+            {value && (
+                // Aperçu sur fond clair et sombre : le site alterne les deux.
+                <span className="inline-flex overflow-hidden border text-xs font-semibold">
+                    <span
+                        className="bg-white px-1.5 py-0.5"
+                        style={{ color: value }}
+                    >
+                        Aa
+                    </span>
+                    <span
+                        className="bg-[#141414] px-1.5 py-0.5"
+                        style={{ color: value }}
+                    >
+                        Aa
+                    </span>
+                </span>
+            )}
+            {value ? (
+                <button
+                    type="button"
+                    onClick={() => onChange('')}
+                    className="inline-flex cursor-pointer items-center gap-1 text-xs text-muted-foreground hover:text-dym"
+                >
+                    <RotateCcw className="size-3" />
+                    Couleur d’origine
+                </button>
+            ) : (
+                <span className="text-xs text-muted-foreground">
+                    (couleur d’origine)
+                </span>
+            )}
+        </div>
+    );
+}
+
 type TextsForm = {
     values: Record<string, string>;
+    // Couleur choisie par texte ('' = couleur prévue par le design).
+    colors: Record<string, string>;
     images: Record<string, File>;
     // Image choisie dans la médiathèque, par clé de champ.
     media: Record<string, { path: string; url: string }>;
@@ -131,6 +231,9 @@ function PageForm({ page }: { page: TextPage }) {
     const imageFields = fields.filter((f) => f.type === 'image');
     const form = useForm<TextsForm>({
         values: Object.fromEntries(textFields.map((f) => [f.key, f.value])),
+        colors: Object.fromEntries(
+            textFields.map((f) => [f.key, f.color ?? '']),
+        ),
         images: {},
         media: {},
         resets: [],
@@ -138,6 +241,9 @@ function PageForm({ page }: { page: TextPage }) {
 
     const set = (key: string, value: string) =>
         form.setData('values', { ...form.data.values, [key]: value });
+
+    const setColor = (key: string, color: string) =>
+        form.setData('colors', { ...form.data.colors, [key]: color });
 
     // Ordre d'envoi des photos, pour relier les erreurs « images.N.file ».
     const sentImages = imageFields
@@ -202,6 +308,7 @@ function PageForm({ page }: { page: TextPage }) {
             texts: textFields.map((f) => ({
                 key: f.key,
                 value: data.values[f.key],
+                color: data.colors[f.key] || null,
             })),
             images: sentImages.map((key) => ({
                 key,
@@ -351,6 +458,15 @@ function PageForm({ page }: { page: TextPage }) {
                                         }
                                         placeholder={field.default}
                                     />
+                                    <ColorControl
+                                        id={field.key}
+                                        value={
+                                            form.data.colors[field.key] ?? ''
+                                        }
+                                        onChange={(color) =>
+                                            setColor(field.key, color)
+                                        }
+                                    />
                                     {field.help && (
                                         <p className="text-xs text-muted-foreground">
                                             {field.help}
@@ -395,7 +511,7 @@ export default function Texts({ pages }: { pages: TextPage[] }) {
                 <nav className="flex gap-1 overflow-x-auto lg:sticky lg:top-4 lg:flex-col">
                     {pages.map((p) => {
                         const count = fieldsOf(p).filter(
-                            (f) => f.value !== f.default,
+                            (f) => f.value !== f.default || f.color,
                         ).length;
 
                         return (

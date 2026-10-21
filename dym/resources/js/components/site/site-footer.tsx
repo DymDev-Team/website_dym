@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { Fragment } from 'react';
+import type { ReactNode } from 'react';
 import { CookieConsentBanner, openCookieSettings } from '@/components/site/cookie-consent';
 import { SiteLogo, siteNav } from '@/components/site/site-header';
 import { FacebookIcon, InstagramIcon, LinkedInIcon, WhatsAppIcon, YouTubeIcon } from '@/components/site/social-icons';
@@ -26,7 +27,7 @@ const legalLinks = [
 
 const CREDIT_URL = 'https://ci.linkedin.com/in/yann-morel-effobi-brou-5474782a1';
 
-function ColumnTitle({ children }: { children: string }) {
+function ColumnTitle({ children }: { children: ReactNode }) {
     return <p className="hx-mono mb-5 text-[10px] tracking-[0.14em] text-ink uppercase">{children}</p>;
 }
 
@@ -75,12 +76,12 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
 
                     {/* Navigation */}
                     <div className="lg:border-l lg:border-ink/10 lg:px-10">
-                        <ColumnTitle>{t('layout.footer.nav_title')}</ColumnTitle>
+                        <ColumnTitle>{t.c('layout.footer.nav_title')}</ColumnTitle>
                         <ul className="space-y-2.5 text-sm">
                             {siteNav.map((n) => (
                                 <li key={n.label}>
                                     <Link href={n.href} className="transition-colors hover:text-ink">
-                                        {n.navLabel ?? t(`layout.header.nav_${n.key}`)}
+                                        {t.c(`layout.header.nav_${n.key}`, n.navLabel ?? t(`layout.header.nav_${n.key}`))}
                                     </Link>
                                 </li>
                             ))}
@@ -89,7 +90,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
 
                     {/* Activités */}
                     <div className="lg:border-l lg:border-ink/10 lg:px-10">
-                        <ColumnTitle>{t('layout.footer.activities_title')}</ColumnTitle>
+                        <ColumnTitle>{t.c('layout.footer.activities_title')}</ColumnTitle>
                         <ul className="space-y-2.5 text-sm">
                             {activities.map((a) => (
                                 <li key={a.id}>
@@ -103,7 +104,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
 
                     {/* Contact */}
                     <div className="lg:border-l lg:border-ink/10 lg:pl-10">
-                        <ColumnTitle>{t('layout.footer.contact_title')}</ColumnTitle>
+                        <ColumnTitle>{t.c('layout.footer.contact_title')}</ColumnTitle>
                         <ul className="space-y-4 text-sm">
                             {contact.map(({ icon: Icon, label, href }) => {
                                 const content = (
@@ -132,7 +133,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                 {/* Barre basse */}
                 <div className="flex flex-col gap-3 border-t border-ink/10 py-6 text-xs sm:flex-row sm:items-center sm:justify-between">
                     <p>
-                        {t('layout.footer.copyright').replace('{année}', String(new Date().getFullYear()))} {t('layout.footer.credit')}{' '}
+                        {t.c('layout.footer.copyright', t('layout.footer.copyright').replace('{année}', String(new Date().getFullYear())))} {t.c('layout.footer.credit')}{' '}
                         <a href={CREDIT_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-ink underline decoration-dym decoration-1 underline-offset-4 transition-colors hover:text-dym">
                             DYM DEV
                         </a>
@@ -143,13 +144,13 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                             <Fragment key={l.slug}>
                                 {i > 0 && <span className="text-ink/20">|</span>}
                                 <Link href={showLegal(l.slug)} className="transition-colors hover:text-ink">
-                                    {t(`layout.footer.${l.key}`)}
+                                    {t.c(`layout.footer.${l.key}`)}
                                 </Link>
                             </Fragment>
                         ))}
                         <span className="text-ink/20">|</span>
                         <button type="button" onClick={openCookieSettings} className="transition-colors hover:text-ink">
-                            {t('layout.footer.cookie_settings')}
+                            {t.c('layout.footer.cookie_settings')}
                         </button>
                     </p>
                 </div>

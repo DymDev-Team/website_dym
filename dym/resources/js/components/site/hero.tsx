@@ -61,8 +61,8 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
     return (
         <section ref={ref} id="accueil" aria-labelledby="hero-title" className={`hx-root relative isolate overflow-hidden bg-paper px-3 text-ink sm:px-5 lg:px-[clamp(24px,3.15vw,58px)] ${ready ? 'is-ready' : ''}`}>
             <div className="hx-mono hx-fade mx-auto flex h-11 max-w-[1720px] items-center justify-between gap-2 text-[9px] tracking-[0.07em] text-neutral-500" style={delay(0.1)} aria-hidden>
-                <span>{t('home.hero.top_left')}</span>
-                <span className="hidden sm:inline">{t('home.hero.top_right')}</span>
+                <span>{t.c('home.hero.top_left')}</span>
+                <span className="hidden sm:inline">{t.c('home.hero.top_right')}</span>
             </div>
 
             <div className="hx-hair relative isolate mx-auto flex max-w-[1720px] overflow-hidden border-y lg:min-h-[min(640px,calc(100svh-186px))]">
@@ -86,27 +86,27 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
                 {/* Voile blanc sous le texte, transparent sur la photo */}
                 <div className="absolute inset-0 -z-10 hidden bg-linear-to-r from-paper from-35% via-paper/75 via-48% to-transparent to-62% lg:block" aria-hidden />
                 <span className="hx-mono hx-fade absolute right-5 bottom-5 hidden items-center gap-2 bg-paper/90 px-2.5 py-2 text-[9px] tracking-[0.06em] text-ink lg:flex" style={delay(1.15)}>
-                    <span className="size-[5px] bg-dym" /> {t('home.hero.caption')}
+                    <span className="size-[5px] bg-dym" /> {t.c('home.hero.caption')}
                 </span>
 
                 {/* Texte */}
                 <div className="relative flex w-full min-w-0 flex-col justify-between lg:w-[58%]">
                     <div className="hx-mono hx-hair hx-fade flex h-10 items-center justify-between gap-2.5 border-b px-3.5 text-[8px] tracking-[0.04em] text-neutral-500 sm:px-6 sm:text-[9px]" style={delay(0.23)}>
                         <span className="flex items-center gap-2.5">
-                            <i className="block h-px w-4 bg-dym" /> {t('home.hero.step')}
+                            <i className="block h-px w-4 bg-dym" /> {t.c('home.hero.step')}
                         </span>
-                        <span className="text-right lg:hidden">{t('home.hero.mobile_tagline')}</span>
+                        <span className="text-right lg:hidden">{t.c('home.hero.mobile_tagline')}</span>
                     </div>
 
                     <div className="flex min-h-0 flex-1 flex-col justify-center px-[17px] pt-11 pb-12 sm:px-7 lg:px-[clamp(22px,3vw,52px)] lg:pt-[clamp(20px,2.5vw,40px)] lg:pb-7">
                         <div className="hx-mono hx-fade mb-6 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500 lg:mb-[clamp(18px,3vh,32px)]" style={delay(0.35)}>
-                            <span className="inline-block size-[5px] bg-dym" /> {t('home.hero.eyebrow')}
+                            <span className="inline-block size-[5px] bg-dym" /> {t.c('home.hero.eyebrow')}
                         </div>
 
                         <h1 id="hero-title" className="mb-5 font-display text-[clamp(48px,11vw,72px)] leading-[0.95] text-ink uppercase lg:mb-[clamp(16px,2.5vh,32px)] lg:text-[clamp(48px,4.4vw,80px)]">
                             {titleLines.map((line, i) => (
                                 <span key={line} className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
-                                    <span style={delay(0.42 + i * 0.12)}>{i === titleLines.length - 1 ? withDot(line) : line}</span>
+                                    <span style={delay(0.42 + i * 0.12)}>{t.c('home.hero.title', i === titleLines.length - 1 ? withDot(line) : line)}</span>
                                 </span>
                             ))}
                         </h1>
@@ -115,7 +115,7 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
 
                         <div className="hx-fade my-7 lg:my-[clamp(18px,2.8vh,30px)]" style={delay(0.88)}>
                             <p className="max-w-[430px] text-sm leading-[1.67] text-neutral-600 lg:text-[clamp(13px,1.03vw,17px)]">
-                                {t('home.hero.intro')}
+                                {t.c('home.hero.intro')}
                             </p>
                         </div>
 
@@ -148,7 +148,7 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
                             className="size-full object-cover"
                         />
                         <figcaption className="hx-mono absolute bottom-3 left-3 flex items-center gap-2 bg-paper/90 px-2.5 py-1.5 text-[9px] tracking-[0.06em] text-ink">
-                            <span className="size-[5px] bg-dym" /> {t('home.hero.caption')}
+                            <span className="size-[5px] bg-dym" /> {t.c('home.hero.caption')}
                         </figcaption>
                     </figure>
 
@@ -156,14 +156,14 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
             </div>
 
             <div className="hx-mono hx-fade mx-auto flex h-11 max-w-[1720px] items-center justify-between gap-4 text-[8px] tracking-[0.05em] text-neutral-500 sm:text-[9px]" style={delay(1.15)}>
-                <span>{t('home.hero.bottom_left')}</span>
+                <span>{t.c('home.hero.bottom_left')}</span>
                 <span className="flex items-center gap-3">
-                    {t('home.hero.scroll')}{' '}
+                    {t.c('home.hero.scroll')}{' '}
                     <span className="hx-scroll-arrow text-[17px] text-dym" aria-hidden>
                         ↓
                     </span>
                 </span>
-                <span className="hidden sm:inline">{t('home.hero.bottom_right')}</span>
+                <span className="hidden sm:inline">{t.c('home.hero.bottom_right')}</span>
             </div>
         </section>
     );

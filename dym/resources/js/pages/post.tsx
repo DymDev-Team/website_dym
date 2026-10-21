@@ -40,7 +40,7 @@ export default function PostPage({ post, related, activities, site }: Props) {
                             className="hx-mono inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-neutral-500 uppercase transition-colors hover:text-dym"
                         >
                             <ArrowLeft className="size-3.5" />{' '}
-                            {t('news.post.back')}
+                            {t.c('news.post.back')}
                         </a>
 
                         <p className="hx-mono mt-8 flex items-center gap-3 text-[10px] tracking-[0.1em] text-neutral-500 uppercase">
@@ -95,7 +95,7 @@ export default function PostPage({ post, related, activities, site }: Props) {
                     <section className="hx-hair border-t px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                         <div className="mx-auto max-w-[1200px] py-12 lg:py-16">
                             <h2 className="font-display text-[clamp(28px,4vw,40px)] uppercase">
-                                {withDot(t('news.post.related'))}
+                                {t.c('news.post.related', withDot(t('news.post.related')))}
                             </h2>
                             <div className="mt-8 grid gap-8 sm:grid-cols-3">
                                 {related.map((r) => (
@@ -119,7 +119,7 @@ export default function PostPage({ post, related, activities, site }: Props) {
                                             {r.title}
                                         </h3>
                                         <span className="hx-mono mt-3 inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
-                                            {t('news.post.read_more')}{' '}
+                                            {t.c('news.post.read_more')}{' '}
                                             <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
                                         </span>
                                     </Link>

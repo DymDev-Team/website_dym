@@ -45,7 +45,7 @@ export function Partners({ partners }: { partners: Partner[] }) {
 
     return (
         <section id="references" className="border-t border-ink/10 bg-white py-9">
-            <p className="mb-5 text-center text-[11px] font-bold tracking-[0.18em] text-ink/60 uppercase">{t('home.partners.title')}</p>
+            <p className="mb-5 text-center text-[11px] font-bold tracking-[0.18em] text-ink/60 uppercase">{t.c('home.partners.title')}</p>
             <div className="overflow-hidden mask-[linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
                 <div className="flex w-max animate-partners items-center gap-4 hover:paused motion-reduce:animate-none sm:gap-6">
                     <LogoSet partners={partners} copy={0} />

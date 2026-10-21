@@ -29,10 +29,10 @@ export function ApplicationForm({ offerId }: { offerId?: number }) {
             <div className="flex items-start gap-4 border border-black/10 bg-white p-6 sm:p-8">
                 <CheckCircle2 className="size-6 shrink-0 text-dym" />
                 <div>
-                    <p className="text-lg font-semibold text-ink">{t('careers.form.success_title')}</p>
-                    <p className="mt-2 text-neutral-600">{t('careers.form.success_text')}</p>
+                    <p className="text-lg font-semibold text-ink">{t.c('careers.form.success_title')}</p>
+                    <p className="mt-2 text-neutral-600">{t.c('careers.form.success_text')}</p>
                     <button type="button" onClick={() => setSent(false)} className="hx-mono mt-5 text-[10px] tracking-[0.1em] text-dym uppercase hover:underline">
-                        {t('careers.form.success_again')}
+                        {t.c('careers.form.success_again')}
                     </button>
                 </div>
             </div>
@@ -77,7 +77,7 @@ export function ApplicationForm({ offerId }: { offerId?: number }) {
                     <SiteField label={t('careers.form.cv')} error={errors.cv}>
                         <span className={`${inputClass} flex cursor-pointer items-center gap-3 ${errors.cv ? 'border-red-500' : ''}`}>
                             <Paperclip className="size-4 shrink-0 text-dym" />
-                            <span className={`truncate ${fileName ? 'text-ink' : 'text-neutral-400'}`}>{fileName ?? t('careers.form.cv_placeholder')}</span>
+                            <span className={`truncate ${fileName ? 'text-ink' : 'text-neutral-400'}`}>{fileName ?? t.c('careers.form.cv_placeholder')}</span>
                             <input
                                 name="cv"
                                 type="file"
@@ -92,9 +92,9 @@ export function ApplicationForm({ offerId }: { offerId?: number }) {
                     <label className="flex items-start gap-3 text-sm text-neutral-600">
                         <input type="checkbox" name="consent" value="1" required className="mt-1 size-4 accent-dym" />
                         <span>
-                            {t('careers.form.consent')} (
+                            {t.c('careers.form.consent')} (
                             <a href={showLegal('politique-de-confidentialite').url} target="_blank" rel="noreferrer" className="text-dym underline underline-offset-2">
-                                {t('careers.form.consent_link')}
+                                {t.c('careers.form.consent_link')}
                             </a>
                             ).
                         </span>
@@ -107,7 +107,7 @@ export function ApplicationForm({ offerId }: { offerId?: number }) {
                         disabled={processing}
                         className="hd-cta relative inline-flex items-center gap-2 overflow-hidden bg-dym px-6 py-4 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark disabled:opacity-60"
                     >
-                        {processing ? t('careers.form.sending') : t('careers.form.submit')}
+                        {processing ? t.c('careers.form.sending') : t.c('careers.form.submit')}
                         <ArrowRight className="hd-arrow size-3.5" />
                     </button>
                 </>

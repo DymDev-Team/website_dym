@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { ApplicationForm } from '@/components/site/application-form';
 import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
@@ -27,7 +28,7 @@ const lines = (text: string | null) =>
         .map((l) => l.replace(/^[-•*]\s*/, '').trim())
         .filter(Boolean);
 
-function Heading({ children }: { children: string }) {
+function Heading({ children }: { children: ReactNode }) {
     return (
         <h2 className="hx-mono mb-4 flex items-center gap-3 text-[10px] tracking-[0.1em] text-neutral-500 uppercase">
             <span className="size-[5px] bg-dym" /> {children}
@@ -51,7 +52,7 @@ export default function OffrePage({ offer, activities, site }: Props) {
                 <section className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto max-w-[1200px] pt-12 pb-10 lg:pt-16">
                         <Link href={index()} className="hx-mono inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-neutral-500 uppercase transition-colors hover:text-dym">
-                            <ArrowLeft className="size-3.5" /> {t('careers.offer.back')}
+                            <ArrowLeft className="size-3.5" /> {t.c('careers.offer.back')}
                         </Link>
 
                         <p className="hx-mono mt-8 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] tracking-[0.1em] text-neutral-500 uppercase">
@@ -64,7 +65,7 @@ export default function OffrePage({ offer, activities, site }: Props) {
                             <span className="text-dym">.</span>
                         </h1>
                         {offer.summary && <p className="mt-6 max-w-[760px] text-lg leading-relaxed text-neutral-600">{offer.summary}</p>}
-                        {offer.closes_at && <p className="mt-4 text-sm text-neutral-500">{t('careers.offer.closes').replace('{date}', dateFormat.format(new Date(offer.closes_at)))}</p>}
+                        {offer.closes_at && <p className="mt-4 text-sm text-neutral-500">{t.c('careers.offer.closes', t('careers.offer.closes').replace('{date}', dateFormat.format(new Date(offer.closes_at))))}</p>}
                     </div>
                 </section>
 
@@ -73,7 +74,7 @@ export default function OffrePage({ offer, activities, site }: Props) {
                         <div className="space-y-10">
                             {missions.length > 0 && (
                                 <div>
-                                    <Heading>{t('careers.offer.missions')}</Heading>
+                                    <Heading>{t.c('careers.offer.missions')}</Heading>
                                     <div className="space-y-4 text-[16px] leading-[1.8] text-neutral-700">
                                         {missions.map((p, i) => (
                                             <p key={i} className="whitespace-pre-line">
@@ -86,7 +87,7 @@ export default function OffrePage({ offer, activities, site }: Props) {
 
                             {requirements.length > 0 && (
                                 <div>
-                                    <Heading>{t('careers.offer.requirements')}</Heading>
+                                    <Heading>{t.c('careers.offer.requirements')}</Heading>
                                     <ul className="space-y-2.5">
                                         {requirements.map((r) => (
                                             <li key={r} className="flex gap-3 text-[16px] leading-[1.6] text-neutral-700">
@@ -102,7 +103,7 @@ export default function OffrePage({ offer, activities, site }: Props) {
                         <div id="postuler" className="scroll-mt-24 lg:sticky lg:top-28 lg:self-start">
                             <div className="border border-black/10 bg-white/60 p-6 sm:p-8">
                                 <p className="mb-6 font-display text-[28px] leading-none uppercase">
-                                    {withDot(t('careers.offer.apply'))}
+                                    {t.c('careers.offer.apply', withDot(t('careers.offer.apply')))}
                                 </p>
                                 <ApplicationForm offerId={offer.id} />
                             </div>

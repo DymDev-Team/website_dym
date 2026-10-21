@@ -16,6 +16,7 @@ declare module '@inertiajs/core' {
             currentTeam: Team | null;
             teams: Team[];
             texts: Record<string, string>;
+            textColors: Record<string, string>;
             [key: string]: unknown;
         };
     }

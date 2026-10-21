@@ -29,13 +29,13 @@ export default function LegalPage({ page, legalPages, current, activities, site 
                 <section className="px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto max-w-[1200px] pt-12 pb-10 lg:pt-16">
                         <div className="hx-mono mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500">
-                            <span className="inline-block size-[5px] bg-dym" /> {t('legal.page.eyebrow')}
+                            <span className="inline-block size-[5px] bg-dym" /> {t.c('legal.page.eyebrow')}
                         </div>
                         <h1 className="font-display text-[clamp(38px,6vw,64px)] leading-[0.98] uppercase">
                             {page.title}
                             <span className="text-dym">.</span>
                         </h1>
-                        {page.updated_at && <p className="mt-4 text-sm text-neutral-500">{t('legal.page.updated').replace('{date}', dateFormat.format(new Date(page.updated_at)))}</p>}
+                        {page.updated_at && <p className="mt-4 text-sm text-neutral-500">{t.c('legal.page.updated', t('legal.page.updated').replace('{date}', dateFormat.format(new Date(page.updated_at))))}</p>}
                     </div>
                 </section>
 

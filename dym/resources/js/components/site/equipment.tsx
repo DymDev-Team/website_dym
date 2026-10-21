@@ -106,13 +106,13 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
                 <div className="grid gap-6 lg:w-[72%] lg:grid-cols-[auto_1fr] lg:items-end lg:gap-14">
                     <div>
                         <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
-                            <span className="inline-block size-[5px] bg-dym" /> {t('home.equipment.eyebrow')}
+                            <span className="inline-block size-[5px] bg-dym" /> {t.c('home.equipment.eyebrow')}
                         </div>
                         <h2 id="equipements-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] uppercase lg:text-[clamp(40px,3.2vw,60px)] lg:whitespace-nowrap">
                             {titleLines.map((line, i) => (
                                 <span key={line} className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
                                     <span style={delay(0.12 + i * 0.12)}>
-                                        {i === titleLines.length - 1 ? withDot(line) : line}
+                                        {t.c('home.equipment.title', i === titleLines.length - 1 ? withDot(line) : line)}
                                     </span>
                                 </span>
                             ))}
@@ -120,12 +120,12 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
                     </div>
 
                     <div className="hx-fade" style={delay(0.35)}>
-                        <p className="max-w-[400px] text-[15px] leading-[1.7] text-neutral-600">{t('home.equipment.text')}</p>
+                        <p className="max-w-[400px] text-[15px] leading-[1.7] text-neutral-600">{t.c('home.equipment.text')}</p>
                         <ScrollLink
                             target="contact"
                             className="hd-cta relative mt-6 inline-flex items-center gap-3 overflow-hidden bg-dym px-6 py-3.5 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark"
                         >
-                            {t('home.equipment.cta')}
+                            {t.c('home.equipment.cta')}
                             <ArrowRight className="hd-arrow size-4" />
                         </ScrollLink>
                     </div>

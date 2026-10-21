@@ -36,11 +36,11 @@ export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) 
                 <div className="flex flex-wrap items-end justify-between gap-5">
                     <div>
                         <div className="hx-mono hx-fade mb-4 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
-                            <span className="inline-block size-[5px] bg-dym" /> {t('home.testimonials.eyebrow')}
+                            <span className="inline-block size-[5px] bg-dym" /> {t.c('home.testimonials.eyebrow')}
                         </div>
                         <h2 id="temoignages-title" className="font-display text-[clamp(34px,7vw,44px)] leading-[0.95] text-ink uppercase lg:text-[clamp(36px,2.8vw,50px)]">
                             <span className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
-                                <span style={delay(0.12)}>{withDot(t('home.testimonials.title'))}</span>
+                                <span style={delay(0.12)}>{t.c('home.testimonials.title', withDot(t('home.testimonials.title')))}</span>
                             </span>
                         </h2>
                     </div>

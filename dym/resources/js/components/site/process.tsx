@@ -60,13 +60,13 @@ export function Process() {
                 <div className="grid items-end gap-6 lg:grid-cols-2 lg:gap-10 lg:pl-[clamp(22px,3vw,52px)]">
                     <div>
                         <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
-                            <span className="inline-block size-[5px] bg-dym" /> {t('home.process.eyebrow')}
+                            <span className="inline-block size-[5px] bg-dym" /> {t.c('home.process.eyebrow')}
                         </div>
                         <h2 id="approche-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] text-ink uppercase lg:text-[clamp(44px,3.8vw,68px)]">
                             {titleLines.map((line, i) => (
                                 <span key={line} className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
                                     <span style={delay(0.12 + i * 0.12)}>
-                                        {i === titleLines.length - 1 ? withDot(line) : line}
+                                        {t.c('home.process.title', i === titleLines.length - 1 ? withDot(line) : line)}
                                     </span>
                                 </span>
                             ))}
@@ -74,7 +74,7 @@ export function Process() {
                     </div>
 
                     <p className="hx-fade max-w-[460px] text-[15px] leading-[1.7] text-neutral-600" style={delay(0.35)}>
-                        {t('home.process.text')}
+                        {t.c('home.process.text')}
                     </p>
                 </div>
 
@@ -104,7 +104,7 @@ export function Process() {
                                             <h3 className="hx-mono text-[11px] leading-snug tracking-[0.08em] text-ink uppercase">
                                                 {lines(t(`${step}_title`)).map((part, j) => (
                                                     <span key={j} className="block">
-                                                        {part}
+                                                        {t.c(`${step}_title`, part)}
                                                     </span>
                                                 ))}
                                             </h3>
@@ -114,12 +114,12 @@ export function Process() {
                                     <div className="hx-hair relative mt-5 aspect-[4/3] overflow-hidden border bg-neutral-100">
                                         <img src={t(`${step}_image`)} alt={t(`${step}_alt`)} width={1100} height={735} loading="lazy" className="hx-wipe size-full object-cover" style={delay(0.5 + i * 0.35)} />
                                         <span className="hx-mono absolute right-2 bottom-2 bg-paper/90 px-2 py-1 text-[9px] tracking-[0.06em] text-ink" aria-hidden>
-                                            {t('home.process.step_label')} {String(i + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
+                                            {t.c('home.process.step_label')} {String(i + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
                                         </span>
                                     </div>
 
                                     <p className="hx-fade mt-4 text-sm leading-relaxed text-neutral-600" style={delay(0.6 + i * 0.35)}>
-                                        {t(`${step}_text`)}
+                                        {t.c(`${step}_text`)}
                                     </p>
                                 </li>
                             </Fragment>
@@ -135,7 +135,7 @@ export function Process() {
                                 key={s.id}
                                 type="button"
                                 onClick={() => goTo(i)}
-                                aria-label={`${t('home.process.step_label')} ${i + 1}`}
+                                aria-label={`${t.c('home.process.step_label')} ${i + 1}`}
                                 aria-current={i === current}
                                 className={`h-1 cursor-pointer transition-all duration-500 ${i === current ? 'w-10 bg-dym' : 'w-4 bg-ink/15'}`}
                             />

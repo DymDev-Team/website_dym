@@ -32,16 +32,16 @@ export function QuoteForm({ activities, defaultActivity }: { activities: string[
             <div className="flex items-start gap-4 border border-black/10 bg-white p-6 sm:p-8">
                 <CheckCircle2 className="size-6 shrink-0 text-dym" />
                 <div>
-                    <p className="text-lg font-semibold text-ink">{t('quote.form.success_title')}</p>
+                    <p className="text-lg font-semibold text-ink">{t.c('quote.form.success_title')}</p>
                     <p className="mt-2 text-neutral-600">
-                        {t('quote.form.success_text')}
+                        {t.c('quote.form.success_text')}
                     </p>
                     <button
                         type="button"
                         onClick={() => setSent(false)}
                         className="hx-mono mt-5 text-[10px] tracking-[0.1em] text-dym uppercase hover:underline"
                     >
-                        {t('quote.form.success_again')}
+                        {t.c('quote.form.success_again')}
                     </button>
                 </div>
             </div>
@@ -86,18 +86,18 @@ export function QuoteForm({ activities, defaultActivity }: { activities: string[
                     <div className="grid gap-5 sm:grid-cols-2">
                         <SiteField label={t('quote.form.activity')} error={errors.activity}>
                             <select name="activity" defaultValue={defaultActivity ?? ''} className={inputClass}>
-                                <option value="">{t('quote.form.choose')}</option>
+                                <option value="">{t.c('quote.form.choose')}</option>
                                 {activities.map((a) => (
                                     <option key={a} value={a}>
                                         {a}
                                     </option>
                                 ))}
-                                <option value={t('quote.form.other')}>{t('quote.form.other')}</option>
+                                <option value={t('quote.form.other')}>{t.c('quote.form.other')}</option>
                             </select>
                         </SiteField>
                         <SiteField label={t('quote.form.deadline')} error={errors.deadline}>
                             <select name="deadline" defaultValue="" className={inputClass}>
-                                <option value="">{t('quote.form.choose')}</option>
+                                <option value="">{t.c('quote.form.choose')}</option>
                                 {deadlines.map((d) => (
                                     <option key={d} value={d}>
                                         {d}
@@ -122,7 +122,7 @@ export function QuoteForm({ activities, defaultActivity }: { activities: string[
                     <SiteField label={t('quote.form.attachment')} error={errors.attachment}>
                         <span className={`${inputClass} flex cursor-pointer items-center gap-3 ${errors.attachment ? 'border-red-500' : ''}`}>
                             <Paperclip className="size-4 shrink-0 text-dym" />
-                            <span className={`truncate ${fileName ? 'text-ink' : 'text-neutral-400'}`}>{fileName ?? t('quote.form.attachment_placeholder')}</span>
+                            <span className={`truncate ${fileName ? 'text-ink' : 'text-neutral-400'}`}>{fileName ?? t.c('quote.form.attachment_placeholder')}</span>
                             <input
                                 name="attachment"
                                 type="file"
@@ -136,14 +136,14 @@ export function QuoteForm({ activities, defaultActivity }: { activities: string[
                     <label className="flex items-start gap-3 text-sm text-neutral-600">
                         <input type="checkbox" name="consent" value="1" required className="mt-1 size-4 accent-dym" />
                         <span>
-                            {t('quote.form.consent')} (
+                            {t.c('quote.form.consent')} (
                             <a
                                 href={showLegal('politique-de-confidentialite').url}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="text-dym underline underline-offset-2"
                             >
-                                {t('quote.form.consent_link')}
+                                {t.c('quote.form.consent_link')}
                             </a>
                             ).
                         </span>
@@ -155,7 +155,7 @@ export function QuoteForm({ activities, defaultActivity }: { activities: string[
                         disabled={processing}
                         className="hd-cta relative inline-flex items-center gap-2 overflow-hidden bg-dym px-6 py-4 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark disabled:opacity-60"
                     >
-                        {processing ? t('quote.form.sending') : t('quote.form.submit')}
+                        {processing ? t.c('quote.form.sending') : t.c('quote.form.submit')}
                         <ArrowRight className="hd-arrow size-3.5" />
                     </button>
                 </>

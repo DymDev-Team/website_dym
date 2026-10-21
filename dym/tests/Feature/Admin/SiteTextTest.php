@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\SiteText;
+use App\Models\SiteTextColor;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -139,4 +140,39 @@ test('an image field cannot be overwritten through the texts list', function () 
         ]]);
 
     expect(SiteText::values()['home.process.step_1_image'])->toBe('/images/process/01-bureau-etudes.jpg');
+});
+
+test('a text color can be chosen and reset', function () {
+    $this->actingAs($this->admin)
+        ->put(route('admin.texts.update'), ['texts' => [
+            ['key' => 'news.header.title', 'value' => 'Le métal en mouvement.', 'color' => '#766F65'],
+        ]])
+        ->assertRedirect();
+
+    expect(SiteTextColor::values())->toBe(['news.header.title' => '#766f65'])
+        ->and(SiteText::query()->count())->toBe(0);
+
+    $this->actingAs($this->admin)
+        ->put(route('admin.texts.update'), ['texts' => [
+            ['key' => 'news.header.title', 'value' => 'Le métal en mouvement.', 'color' => null],
+        ]]);
+
+    expect(SiteTextColor::values())->toBe([]);
+});
+
+test('an invalid text color is rejected', function () {
+    $this->actingAs($this->admin)
+        ->put(route('admin.texts.update'), ['texts' => [
+            ['key' => 'news.header.title', 'value' => 'Titre', 'color' => 'red; background:url(x)'],
+        ]])
+        ->assertSessionHasErrors('texts.0.color');
+});
+
+test('public pages receive the text colors', function () {
+    SiteTextColor::store(['news.header.title' => '#141414', 'home.hero.inexistant' => '#ffffff']);
+
+    $this->get(route('posts.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('textColors', ['news.header.title' => '#141414']),
+        );
 });

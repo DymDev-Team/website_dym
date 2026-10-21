@@ -37,18 +37,18 @@ export function News({ posts: news }: { posts: Post[] }) {
                 <div className="flex flex-wrap items-end justify-between gap-5">
                     <div>
                         <div className="hx-mono hx-fade mb-4 flex items-center gap-3 text-[10px] tracking-[0.075em] text-white/55" style={delay(0.05)}>
-                            <span className="inline-block size-[5px] bg-dym" /> {t('home.news.eyebrow')}
+                            <span className="inline-block size-[5px] bg-dym" /> {t.c('home.news.eyebrow')}
                         </div>
                         <h2 id="actualites-title" className="font-display text-[clamp(34px,7vw,44px)] leading-[0.95] text-white uppercase lg:text-[clamp(36px,2.8vw,50px)]">
                             <span className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
-                                <span style={delay(0.12)}>{withDot(t('home.news.title'))}</span>
+                                <span style={delay(0.12)}>{t.c('home.news.title', withDot(t('home.news.title')))}</span>
                             </span>
                         </h2>
                     </div>
 
                     <div className="hx-fade flex items-center gap-6" style={delay(0.3)}>
                         <a href="/actualites" className="hx-mono group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
-                            {t('home.news.link')}
+                            {t.c('home.news.link')}
                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                         </a>
                         <div className="flex gap-2">
@@ -84,7 +84,7 @@ export function News({ posts: news }: { posts: Post[] }) {
                                     </span>
                                 </h3>
                                 <span className="hx-mono mt-4 inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
-                                    {t('home.news.read_more')}
+                                    {t.c('home.news.read_more')}
                                     <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                                 </span>
                             </Link>

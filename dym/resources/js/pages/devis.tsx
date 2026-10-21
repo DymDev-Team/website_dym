@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { Clock, FileText, Mail, MapPin, Phone, Ruler } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { QuoteForm } from '@/components/site/quote-form';
 import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
@@ -15,7 +16,7 @@ type Props = {
 // Textes : quote.steps.step_N_{title,text} (/admin/texts).
 const stepIcons = [FileText, Ruler, Clock];
 
-function Eyebrow({ children }: { children: string }) {
+function Eyebrow({ children }: { children: ReactNode }) {
     return (
         <div className="hx-mono mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500">
             <span className="inline-block size-[5px] bg-dym" /> {children}
@@ -46,12 +47,12 @@ export default function DevisPage({ preset, activities, site }: Props) {
                     <div className="mx-auto grid max-w-[1720px] gap-12 pt-14 pb-16 lg:grid-cols-[1fr_1.35fr] lg:gap-16 lg:pt-20 lg:pb-24 lg:pl-[clamp(22px,3vw,52px)]">
                         {/* Colonne d'introduction */}
                         <div>
-                            <Eyebrow>{t('quote.header.eyebrow')}</Eyebrow>
+                            <Eyebrow>{t.c('quote.header.eyebrow')}</Eyebrow>
                             <h1 className="font-display text-[clamp(44px,9vw,64px)] leading-[0.95] uppercase lg:text-[clamp(52px,4.4vw,80px)]">
-                                {renderTitle(t('quote.header.title'))}
+                                {t.c('quote.header.title', renderTitle(t('quote.header.title')))}
                             </h1>
                             <p className="mt-6 max-w-[440px] text-[15px] leading-[1.7] text-neutral-600">
-                                {t('quote.header.text')}
+                                {t.c('quote.header.text')}
                             </p>
 
                             <ol className="hx-hair mt-10 border-t">
@@ -62,8 +63,8 @@ export default function DevisPage({ preset, activities, site }: Props) {
                                         </span>
                                         <span>
                                             <span className="hx-mono block text-[10px] text-dym">{String(i + 1).padStart(2, '0')}</span>
-                                            <span className="block font-semibold">{t(`quote.steps.step_${i + 1}_title`)}</span>
-                                            <span className="mt-0.5 block text-sm text-neutral-600">{t(`quote.steps.step_${i + 1}_text`)}</span>
+                                            <span className="block font-semibold">{t.c(`quote.steps.step_${i + 1}_title`)}</span>
+                                            <span className="mt-0.5 block text-sm text-neutral-600">{t.c(`quote.steps.step_${i + 1}_text`)}</span>
                                         </span>
                                     </li>
                                 ))}
@@ -71,7 +72,7 @@ export default function DevisPage({ preset, activities, site }: Props) {
 
                             {contact.length > 0 && (
                                 <div className="mt-10">
-                                    <p className="hx-mono mb-4 text-[10px] tracking-[0.1em] text-neutral-500 uppercase">{t('quote.header.call')}</p>
+                                    <p className="hx-mono mb-4 text-[10px] tracking-[0.1em] text-neutral-500 uppercase">{t.c('quote.header.call')}</p>
                                     <ul className="space-y-3 text-sm">
                                         {contact.map(({ icon: Icon, label, href }) => (
                                             <li key={label}>

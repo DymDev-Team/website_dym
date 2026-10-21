@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\Concerns\StoresUploads;
 use App\Http\Controllers\Controller;
 use App\Models\SiteText;
+use App\Models\SiteTextColor;
 use App\Rules\ExistingMedia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class SiteTextController extends Controller
     public function edit(): Response
     {
         $values = SiteText::values();
+        $colors = SiteTextColor::values();
 
         $pages = collect(config('site-texts'))->map(fn (array $page, string $pageKey) => [
             'key' => $pageKey,
@@ -29,7 +31,7 @@ class SiteTextController extends Controller
             'sections' => collect($page['sections'])->map(fn (array $section, string $sectionKey) => [
                 'key' => $sectionKey,
                 'label' => $section['label'],
-                'fields' => collect($section['fields'])->map(function (array $field, string $fieldKey) use ($pageKey, $sectionKey, $values) {
+                'fields' => collect($section['fields'])->map(function (array $field, string $fieldKey) use ($pageKey, $sectionKey, $values, $colors) {
                     $key = "{$pageKey}.{$sectionKey}.{$fieldKey}";
 
                     return [
@@ -40,6 +42,7 @@ class SiteTextController extends Controller
                         'multiline' => $field['multiline'] ?? false,
                         'default' => $field['default'],
                         'value' => $values[$key],
+                        'color' => $colors[$key] ?? null,
                     ];
                 })->values(),
             ])->values(),
@@ -61,6 +64,7 @@ class SiteTextController extends Controller
             'texts' => ['sometimes', 'array'],
             'texts.*.key' => ['required', 'string', 'max:120'],
             'texts.*.value' => ['nullable', 'string', 'max:2000'],
+            'texts.*.color' => ['nullable', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
             'images' => ['sometimes', 'array'],
             'images.*.key' => ['required', 'string', Rule::in($imageKeys)],
             'images.*.file' => ['required', 'image', 'max:5120'],
@@ -72,6 +76,7 @@ class SiteTextController extends Controller
         ]);
 
         SiteText::store(collect($validated['texts'] ?? [])->pluck('value', 'key')->all());
+        SiteTextColor::store(collect($validated['texts'] ?? [])->filter(fn (array $text) => array_key_exists('color', $text))->pluck('color', 'key')->all());
 
         // Ancien fichier supprimé après la mise à jour, et seulement s'il ne sert plus.
         $replace = function (string $key, ?string $path): void {

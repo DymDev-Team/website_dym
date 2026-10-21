@@ -88,18 +88,18 @@ export default function ActualitesPage({ posts, categories, category, activities
                         <div className="flex flex-wrap items-end justify-between gap-6 lg:pl-[clamp(22px,3vw,52px)]">
                             <div>
                                 <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
-                                    <span className="inline-block size-[5px] bg-dym" /> {t('news.header.eyebrow')}
+                                    <span className="inline-block size-[5px] bg-dym" /> {t.c('news.header.eyebrow')}
                                 </div>
                                 <h1 id="actualites-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] text-ink uppercase lg:text-[clamp(44px,3.8vw,68px)]">
                                     <span className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
                                         <span style={delay(0.12)}>
-                                            {withDot(t('news.header.title'))}
+                                            {t.c('news.header.title', withDot(t('news.header.title')))}
                                         </span>
                                     </span>
                                 </h1>
                             </div>
                             <p className="hx-fade max-w-[440px] text-[15px] leading-[1.7] text-neutral-600" style={delay(0.25)}>
-                                {t('news.header.text')}
+                                {t.c('news.header.text')}
                             </p>
                         </div>
 
@@ -116,13 +116,13 @@ export default function ActualitesPage({ posts, categories, category, activities
                                             c === category ? 'border-dym bg-dym text-white' : 'border-black/15 text-neutral-600 hover:border-ink hover:text-ink'
                                         }`}
                                     >
-                                        {c ?? t('news.list.all')}
+                                        {c ?? t.c('news.list.all')}
                                     </Link>
                                 ))}
                             </nav>
                         )}
 
-                        {posts.data.length === 0 && <p className="mt-16 text-neutral-500 lg:pl-[clamp(22px,3vw,52px)]">{t('news.list.empty')}</p>}
+                        {posts.data.length === 0 && <p className="mt-16 text-neutral-500 lg:pl-[clamp(22px,3vw,52px)]">{t.c('news.list.empty')}</p>}
 
                         {/* À la une */}
                         {featured && (
@@ -132,7 +132,7 @@ export default function ActualitesPage({ posts, categories, category, activities
                                         <img src={featured.image_url ?? undefined} alt="" className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                                     </div>
                                     <div className="lg:pr-[clamp(22px,3vw,52px)]">
-                                        <span className="hx-mono text-[10px] text-dym">{t('news.list.featured')}</span>
+                                        <span className="hx-mono text-[10px] text-dym">{t.c('news.list.featured')}</span>
                                         <div className="mt-4">
                                             <Meta post={featured} />
                                         </div>
@@ -141,7 +141,7 @@ export default function ActualitesPage({ posts, categories, category, activities
                                         </h2>
                                         {featured.excerpt && <p className="mt-5 line-clamp-4 text-[15px] leading-[1.7] text-neutral-600">{featured.excerpt}</p>}
                                         <span className="hx-mono mt-6 inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
-                                            {t('news.list.read_article')}
+                                            {t.c('news.list.read_article')}
                                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                                         </span>
                                     </div>
@@ -166,7 +166,7 @@ export default function ActualitesPage({ posts, categories, category, activities
                                             </h3>
                                             {p.excerpt && <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-neutral-600">{p.excerpt}</p>}
                                             <span className="hx-mono mt-4 inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
-                                                {t('news.list.read_more')}
+                                                {t.c('news.list.read_more')}
                                                 <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                                             </span>
                                         </Link>
@@ -180,7 +180,7 @@ export default function ActualitesPage({ posts, categories, category, activities
                             <nav aria-label="Pagination" className="hx-hair mt-16 flex items-center justify-between border-t pt-6">
                                 <PageLink url={posts.prev_page_url} dir={-1} />
                                 <span className="hx-mono text-[10px] tracking-[0.1em] text-neutral-500">
-                                    {t('news.list.page')} {posts.current_page} / {posts.last_page}
+                                    {t.c('news.list.page')} {posts.current_page} / {posts.last_page}
                                 </span>
                                 <PageLink url={posts.next_page_url} dir={1} />
                             </nav>

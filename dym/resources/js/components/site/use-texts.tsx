@@ -2,12 +2,27 @@ import { usePage } from '@inertiajs/react';
 import { Fragment } from 'react';
 import type { ReactNode } from 'react';
 
-// Textes du site modifiables dans /admin/texts (config/site-texts.php).
-// `t('home.hero.title')` renvoie le texte personnalisé ou celui par défaut.
-export function useTexts() {
-    const { texts } = usePage().props;
+type Texts = {
+    (key: string): string;
+    // Texte (ou rendu fourni) dans la couleur choisie dans /admin/texts ;
+    // sans couleur personnalisée, le rendu est inchangé.
+    c: (key: string, node?: ReactNode) => ReactNode;
+};
 
-    return (key: string): string => texts?.[key] ?? '';
+// Textes du site modifiables dans /admin/texts (config/site-texts.php).
+// `t('home.hero.title')` renvoie le texte personnalisé ou celui par défaut,
+// `t.c('home.hero.title')` l'affiche avec sa couleur personnalisée.
+export function useTexts(): Texts {
+    const { texts, textColors } = usePage().props;
+    const t = (key: string): string => texts?.[key] ?? '';
+
+    return Object.assign(t, {
+        c: (key: string, node: ReactNode = t(key)) => {
+            const color = textColors?.[key];
+
+            return color ? <span style={{ color }}>{node}</span> : node;
+        },
+    });
 }
 
 // Un texte saisi sur plusieurs lignes → une entrée par ligne.
