@@ -1,4 +1,5 @@
 import { Form } from '@inertiajs/react';
+import { useState } from 'react';
 import AdminPage from '@/components/admin/admin-page';
 import Field from '@/components/admin/field';
 import { FormActions } from '@/components/admin/form-parts';
@@ -38,6 +39,43 @@ const colorGroups = [
     { title: 'Pages légales', fields: [['legal_page_heading', 'Titre de la page'], ['legal_page_content', 'Contenu']] },
 ].map((group) => ({ ...group, fields: group.fields as [string, string][] }));
 
+function SectionColorField({
+    id,
+    name,
+    value,
+}: {
+    id: string;
+    name: string;
+    value: string;
+}) {
+    const [color, setColor] = useState(value);
+    const pickerValue = /^#[0-9a-fA-F]{6}$/.test(color) ? color : '#ffffff';
+
+    return (
+        <div className="flex gap-2">
+            <Input
+                aria-label={`Sélecteur de couleur pour ${name}`}
+                type="color"
+                value={pickerValue}
+                onChange={(event) => setColor(event.target.value)}
+                className="h-11 w-14 cursor-pointer p-1"
+            />
+            <Input
+                id={id}
+                name={id}
+                type="text"
+                value={color}
+                onChange={(event) => setColor(event.target.value)}
+                placeholder="#ffffff"
+                maxLength={7}
+                autoComplete="off"
+                aria-label={`Code couleur hexadécimal pour ${name}`}
+                className="font-mono uppercase"
+            />
+        </div>
+    );
+}
+
 export default function Settings({ settings }: { settings: SiteSettings }) {
     return (
         <AdminPage
@@ -64,7 +102,7 @@ export default function Settings({ settings }: { settings: SiteSettings }) {
                                         <div className="grid gap-4 sm:grid-cols-2">
                                             {group.fields.map(([key, label]) => {
                                                 const field = `section_color_${key}` as keyof SiteSettings;
-                                                return <Field key={key} id={field} label={label} error={errors[field]}><Input id={field} name={field} type="color" defaultValue={settings.section_colors[key] ?? '#ffffff'} className="h-11 w-full cursor-pointer p-1" /></Field>;
+                                                return <Field key={key} id={field} label={label} error={errors[field]}><SectionColorField id={field} name={label} value={settings.section_colors[key] ?? '#ffffff'} /></Field>;
                                             })}
                                         </div>
                                     </div>
