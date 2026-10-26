@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { CookieConsentBanner, openCookieSettings } from '@/components/site/cookie-consent';
 import { SiteLogo, siteNav } from '@/components/site/site-header';
 import { FacebookIcon, InstagramIcon, LinkedInIcon, WhatsAppIcon, YouTubeIcon } from '@/components/site/social-icons';
+import { show as activityShow } from '@/routes/activities';
 import { show as showLegal } from '@/routes/legal';
 import type { Activity, SiteSettings } from '@/types/admin';
 import { useTexts } from '@/components/site/use-texts';
@@ -31,6 +32,9 @@ const CREDIT_URL = 'https://ci.linkedin.com/in/yann-morel-effobi-brou-5474782a1'
 function ColumnTitle({ children }: { children: ReactNode }) {
     return <p className="hx-mono mb-5 text-[10px] tracking-[0.14em] text-ink uppercase">{children}</p>;
 }
+
+// Liens du pied de page : soulignés en permanence, soulignement coloré au survol.
+const footerLink = 'underline decoration-ink/25 decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-dym';
 
 export function SiteFooter({ activities, site }: { activities: FooterActivity[]; site: SiteSettings }) {
     const sectionStyle = useSectionColor('footer');
@@ -82,7 +86,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                         <ul className="space-y-2.5 text-sm">
                             {siteNav.map((n) => (
                                 <li key={n.label}>
-                                    <Link href={n.href} className="transition-colors hover:text-ink">
+                                    <Link href={n.href} className={footerLink}>
                                         {t.c(`layout.header.nav_${n.key}`, n.navLabel ?? t(`layout.header.nav_${n.key}`))}
                                     </Link>
                                 </li>
@@ -96,7 +100,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                         <ul className="space-y-2.5 text-sm">
                             {activities.map((a) => (
                                 <li key={a.id}>
-                                    <Link href="/activites" className="transition-colors hover:text-ink">
+                                    <Link href={activityShow(a.id)} className={footerLink}>
                                         {a.title}
                                     </Link>
                                 </li>
@@ -119,7 +123,7 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                                 return (
                                     <li key={label}>
                                         {href ? (
-                                            <a href={href} className="flex items-start gap-3 text-ink/85 transition-colors hover:text-ink">
+                                            <a href={href} className="flex items-start gap-3 text-ink/85 underline decoration-ink/25 decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-dym">
                                                 {content}
                                             </a>
                                         ) : (
@@ -145,13 +149,13 @@ export function SiteFooter({ activities, site }: { activities: FooterActivity[];
                         {legalLinks.map((l, i) => (
                             <Fragment key={l.slug}>
                                 {i > 0 && <span className="text-ink/20">|</span>}
-                                <Link href={showLegal(l.slug)} className="transition-colors hover:text-ink">
+                                <Link href={showLegal(l.slug)} className={footerLink}>
                                     {t.c(`layout.footer.${l.key}`)}
                                 </Link>
                             </Fragment>
                         ))}
                         <span className="text-ink/20">|</span>
-                        <button type="button" onClick={openCookieSettings} className="transition-colors hover:text-ink">
+                        <button type="button" onClick={openCookieSettings} className={`cursor-pointer ${footerLink}`}>
                             {t.c('layout.footer.cookie_settings')}
                         </button>
                     </p>
