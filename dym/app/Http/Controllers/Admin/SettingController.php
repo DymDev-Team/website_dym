@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\Admin\Concerns\StoresUploads;
-use App\Rules\ExistingMedia;
+use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Rules\ExistingMedia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,6 +14,7 @@ use Inertia\Response;
 class SettingController extends Controller
 {
     use StoresUploads;
+
     /**
      * Show the site details form.
      */
@@ -41,6 +42,7 @@ class SettingController extends Controller
             'whatsapp_url' => ['nullable', 'url', 'max:255'],
             'instagram_url' => ['nullable', 'url', 'max:255'],
             'youtube_url' => ['nullable', 'url', 'max:255'],
+            'label_color' => ['nullable', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
             ...collect(Setting::DEFAULTS)->keys()->filter(fn (string $key) => str_starts_with($key, 'section_color_'))->mapWithKeys(fn (string $key) => [$key => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/']])->all(),
         ]);
 

@@ -44,7 +44,7 @@ function Products() {
             <div className="mx-auto max-w-[1720px] pt-14 pb-16 lg:pt-16 lg:pb-24">
                 <div className="flex flex-wrap items-end justify-between gap-6 lg:pl-[clamp(22px,3vw,52px)]">
                     <div>
-                        <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
+                        <div className="hx-mono hx-label hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
                             <span className="inline-block size-[5px] bg-dym" /> {t.c('activities.products.eyebrow')}
                         </div>
                         <h2 id="ouvrages-title" className="hx-fade font-display text-[clamp(36px,7vw,52px)] leading-[0.95] text-ink uppercase lg:text-[clamp(40px,3.2vw,60px)]" style={delay(0.12)}>

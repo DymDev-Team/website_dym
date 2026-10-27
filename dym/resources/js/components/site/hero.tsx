@@ -101,7 +101,7 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
                     </div>
 
                     <div className="flex min-h-0 flex-1 flex-col justify-center px-[17px] pt-11 pb-12 sm:px-7 lg:px-[clamp(22px,3vw,52px)] lg:pt-[clamp(20px,2.5vw,40px)] lg:pb-7">
-                        <div className="hx-mono hx-fade mb-6 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500 lg:mb-[clamp(18px,3vh,32px)]" style={delay(0.35)}>
+                        <div className="hx-mono hx-label hx-fade mb-6 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500 lg:mb-[clamp(18px,3vh,32px)]" style={delay(0.35)}>
                             <span className="inline-block size-[5px] bg-dym" /> {t.c('home.hero.eyebrow')}
                         </div>
 

@@ -35,6 +35,8 @@ class Setting extends Model
         'instagram_url' => null,
         'youtube_url' => null,
         'logo_path' => '/images/logo-dym-couleur.svg',
+        // Couleur unique des libellés et liens « En savoir plus » ; vide = couleurs d'origine.
+        'label_color' => null,
         'section_color_header' => '#ffffff',
         'section_color_hero' => '#ffffff',
         'section_color_intro' => '#ffffff',

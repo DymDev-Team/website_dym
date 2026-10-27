@@ -29,7 +29,7 @@ export default function RealisationsPage({ projects, activities, site }: Props) 
                 <main style={listStyle} className="hx-root px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto max-w-[1720px] pt-16 pb-20 lg:pt-20 lg:pb-28">
                         <header className="lg:pl-[clamp(22px,3vw,52px)]">
-                            <div className="hx-mono mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500">
+                            <div className="hx-mono hx-label mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500">
                                 <span className="inline-block size-[5px] bg-dym" /> {t.c('home.projects.eyebrow')}
                             </div>
                             <h1 className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] uppercase lg:text-[clamp(44px,3.8vw,68px)]">

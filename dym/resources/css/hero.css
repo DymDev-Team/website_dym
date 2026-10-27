@@ -22,6 +22,16 @@
     --color-dym-dark: #b3b2a5;
 }
 
+/* Libellés et liens « En savoir plus » : couleur unique choisie dans
+   /admin/settings, prioritaire sur les couleurs saisies texte par texte. */
+[data-label-color] .hx-label,
+[data-label-color] .hx-label * {
+    color: var(--site-label) !important;
+}
+[data-label-color] .hx-label .bg-dym {
+    background-color: var(--site-label) !important;
+}
+
 .hx-mono {
     font-family:
         ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;

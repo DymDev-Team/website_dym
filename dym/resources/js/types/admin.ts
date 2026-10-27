@@ -87,6 +87,7 @@ export type SiteSettings = {
     logo_path?: string | null;
     logo_url: string | null;
     section_colors: Record<string, string>;
+    label_color: string | null;
     tagline: string | null;
     phone: string | null;
     email: string | null;

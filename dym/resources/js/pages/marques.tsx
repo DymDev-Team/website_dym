@@ -44,7 +44,7 @@ export default function MarquesPage({ brands, activities, site }: Props) {
                         {/* En-tête */}
                         <div className="flex flex-wrap items-end justify-between gap-6 lg:pl-[clamp(22px,3vw,52px)]">
                             <div>
-                                <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
+                                <div className="hx-mono hx-label hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
                                     <span className="inline-block size-[5px] bg-dym" /> {t.c('brands.header.eyebrow')}
                                 </div>
                                 <h1 id="marques-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] text-ink uppercase lg:text-[clamp(44px,3.8vw,68px)]">

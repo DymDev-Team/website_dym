@@ -46,7 +46,7 @@ export default function PostPage({ post, related, activities, site }: Props) {
                             {t.c('news.post.back')}
                         </a>
 
-                        <p className="hx-mono mt-8 flex items-center gap-3 text-[10px] tracking-[0.1em] text-neutral-500 uppercase">
+                        <p className="hx-mono hx-label mt-8 flex items-center gap-3 text-[10px] tracking-[0.1em] text-neutral-500 uppercase">
                             <span className="size-[5px] bg-dym" aria-hidden />{' '}
                             {post.category}
                             {post.published_at && (

@@ -53,6 +53,24 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
+    // Couleur unique des libellés (.hx-label) choisie dans /admin/settings.
+    const labelColor = siteSettings?.label_color;
+    useLayoutEffect(() => {
+        const root = document.documentElement;
+
+        if (!labelColor) {
+            return;
+        }
+
+        root.style.setProperty('--site-label', labelColor);
+        root.dataset.labelColor = '';
+
+        return () => {
+            root.style.removeProperty('--site-label');
+            delete root.dataset.labelColor;
+        };
+    }, [labelColor]);
+
     // Place la barre de couleur sous le lien survolé, sinon sous la page active.
     useLayoutEffect(() => {
         const measure = () => {

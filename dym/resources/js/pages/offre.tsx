@@ -31,7 +31,7 @@ const lines = (text: string | null) =>
 
 function Heading({ children }: { children: ReactNode }) {
     return (
-        <h2 className="hx-mono mb-4 flex items-center gap-3 text-[10px] tracking-[0.1em] text-neutral-500 uppercase">
+        <h2 className="hx-mono hx-label mb-4 flex items-center gap-3 text-[10px] tracking-[0.1em] text-neutral-500 uppercase">
             <span className="size-[5px] bg-dym" /> {children}
         </h2>
     );

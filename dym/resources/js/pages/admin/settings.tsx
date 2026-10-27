@@ -43,10 +43,12 @@ function SectionColorField({
     id,
     name,
     value,
+    placeholder = '#ffffff',
 }: {
     id: string;
     name: string;
     value: string;
+    placeholder?: string;
 }) {
     const [color, setColor] = useState(value);
     const pickerValue = /^#[0-9a-fA-F]{6}$/.test(color) ? color : '#ffffff';
@@ -66,7 +68,7 @@ function SectionColorField({
                 type="text"
                 value={color}
                 onChange={(event) => setColor(event.target.value)}
-                placeholder="#ffffff"
+                placeholder={placeholder}
                 maxLength={7}
                 autoComplete="off"
                 aria-label={`Code couleur hexadécimal pour ${name}`}
@@ -108,6 +110,13 @@ export default function Settings({ settings }: { settings: SiteSettings }) {
                                     </div>
                                 ))}
                             </div>
+                        </div>
+
+                        <div className="space-y-5 border-t pt-6">
+                            <Heading variant="small" title="Couleur des libellés" description="Couleur unique des petits libellés (« Nos activités »…) et des liens « En savoir plus » sur tout le site, carré et flèche compris. Elle remplace les couleurs choisies texte par texte. Laissez vide pour garder les couleurs d’origine." />
+                            <Field id="label_color" label="Libellés et liens" error={errors.label_color}>
+                                <SectionColorField id="label_color" name="Libellés et liens" value={settings.label_color ?? ''} placeholder="Couleur d’origine" />
+                            </Field>
                         </div>
 
                         <div className="border-t pt-6" />

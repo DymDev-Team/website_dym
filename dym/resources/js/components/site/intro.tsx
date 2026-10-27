@@ -34,7 +34,7 @@ export function Intro() {
                 </div>
 
                 <div className="w-full max-w-[620px] lg:pl-[clamp(22px,3vw,52px)]">
-                    <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.15)}>
+                    <div className="hx-mono hx-label hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.15)}>
                         <span className="inline-block size-[5px] bg-dym" /> {t.c('home.intro.eyebrow')}
                     </div>
 

@@ -109,7 +109,7 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
                 {/* En-tête */}
                 <div className="grid gap-6 lg:w-[72%] lg:grid-cols-[auto_1fr] lg:items-end lg:gap-14">
                     <div>
-                        <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
+                        <div className="hx-mono hx-label hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
                             <span className="inline-block size-[5px] bg-dym" /> {t.c('home.equipment.eyebrow')}
                         </div>
                         <h2 id="equipements-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] uppercase lg:text-[clamp(40px,3.2vw,60px)] lg:whitespace-nowrap">

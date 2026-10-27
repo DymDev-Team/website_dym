@@ -38,7 +38,7 @@ export function News({ posts: news }: { posts: Post[] }) {
                 {/* En-tête */}
                 <div className="flex flex-wrap items-end justify-between gap-5">
                     <div>
-                        <div className="hx-mono hx-fade mb-4 flex items-center gap-3 text-[10px] tracking-[0.075em] text-white/55" style={delay(0.05)}>
+                        <div className="hx-mono hx-label hx-fade mb-4 flex items-center gap-3 text-[10px] tracking-[0.075em] text-white/55" style={delay(0.05)}>
                             <span className="inline-block size-[5px] bg-dym" /> {t.c('home.news.eyebrow')}
                         </div>
                         <h2 id="actualites-title" className="font-display text-[clamp(34px,7vw,44px)] leading-[0.95] text-white uppercase lg:text-[clamp(36px,2.8vw,50px)]">
@@ -49,7 +49,7 @@ export function News({ posts: news }: { posts: Post[] }) {
                     </div>
 
                     <div className="hx-fade flex items-center gap-6" style={delay(0.3)}>
-                        <a href="/actualites" className="hx-mono group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
+                        <a href="/actualites" className="hx-mono hx-label group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
                             {t.c('home.news.link')}
                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                         </a>
@@ -77,7 +77,7 @@ export function News({ posts: news }: { posts: Post[] }) {
                                 <div className="relative aspect-[2.2/1] overflow-hidden bg-neutral-100">
                                     <img src={n.image_url ?? undefined} alt="" loading="lazy" className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                                 </div>
-                                <p className="hx-mono mt-5 flex items-center gap-2 text-[10px] tracking-[0.1em] text-white/55 uppercase">
+                                <p className="hx-mono hx-label mt-5 flex items-center gap-2 text-[10px] tracking-[0.1em] text-white/55 uppercase">
                                     <span className="size-[5px] bg-dym" aria-hidden /> {n.category}
                                 </p>
                                 <h3 className="mt-2 text-[17px] leading-snug font-semibold text-white">

@@ -23,7 +23,7 @@ const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' });
 
 function Eyebrow({ children }: { children: ReactNode }) {
     return (
-        <div className="hx-mono mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500">
+        <div className="hx-mono hx-label mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500">
             <span className="inline-block size-[5px] bg-dym" /> {children}
         </div>
     );

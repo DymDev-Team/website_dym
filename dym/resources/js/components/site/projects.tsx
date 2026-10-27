@@ -68,7 +68,7 @@ export function Projects({ projects }: { projects: Project[] }) {
             <div className="px-5 pt-16 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] lg:pt-20">
                 <div className="mx-auto flex max-w-[1720px] flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:pl-[clamp(22px,3vw,52px)]">
                     <div>
-                        <div className="hx-mono hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-white/55" style={delay(0.05)}>
+                        <div className="hx-mono hx-label hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-white/55" style={delay(0.05)}>
                             <span className="inline-block size-[5px] bg-dym" /> {t.c('home.projects.eyebrow')}
                         </div>
                         <h2 id="realisations-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] text-white uppercase lg:text-[clamp(44px,3.8vw,68px)]">
@@ -83,7 +83,7 @@ export function Projects({ projects }: { projects: Project[] }) {
                     </div>
 
                     <div className="hx-fade flex items-center gap-6" style={delay(0.35)}>
-                        <Link href={realisations.url()} className="hx-mono group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
+                        <Link href={realisations.url()} className="hx-mono hx-label group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
                             {t.c('home.projects.link')}
                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                         </Link>
