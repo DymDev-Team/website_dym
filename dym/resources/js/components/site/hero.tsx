@@ -156,17 +156,6 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
 
                 </div>
             </div>
-
-            <div className="hx-mono hx-fade mx-auto flex h-11 max-w-[1720px] items-center justify-between gap-4 text-[8px] tracking-[0.05em] text-neutral-500 sm:text-[9px]" style={delay(1.15)}>
-                <span>{t.c('home.hero.bottom_left')}</span>
-                <span className="flex items-center gap-3">
-                    {t.c('home.hero.scroll')}{' '}
-                    <span className="hx-scroll-arrow text-[17px] text-dym" aria-hidden>
-                        ↓
-                    </span>
-                </span>
-                <span className="hidden sm:inline">{t.c('home.hero.bottom_right')}</span>
-            </div>
         </section>
     );
 }

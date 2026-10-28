@@ -47,9 +47,6 @@ return [
                     'top_right' => ['label' => 'Mention en haut à droite', 'default' => 'ÉTUDE TECHNIQUE — 001'],
                     'step' => ['label' => 'Repère de section', 'default' => 'ACCUEIL'],
                     'mobile_tagline' => ['label' => 'Slogan (mobile)', 'default' => 'CONCEPTION • USINAGE • FABRICATION'],
-                    'bottom_left' => ['label' => 'Mention en bas à gauche', 'default' => 'DYM MANUFACTURE — ABIDJAN'],
-                    'scroll' => ['label' => 'Invitation à défiler', 'default' => 'FAIRE DÉFILER'],
-                    'bottom_right' => ['label' => 'Mention en bas à droite', 'default' => '© DYM MANUFACTURE'],
                 ],
             ],
 
