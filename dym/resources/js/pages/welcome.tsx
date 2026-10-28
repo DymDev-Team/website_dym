@@ -3,7 +3,6 @@ import { Activities } from '@/components/site/activities';
 import { AnniversaryModal } from '@/components/site/anniversary-modal';
 import { Equipment } from '@/components/site/equipment';
 import { Hero } from '@/components/site/hero';
-import { Intro } from '@/components/site/intro';
 import { News } from '@/components/site/news';
 import { PageLoader } from '@/components/site/page-loader';
 import { Partners } from '@/components/site/partners';
@@ -56,7 +55,7 @@ export default function Welcome({
                 <SiteHeader />
                 <Hero whatsappUrl={site.whatsapp_url} />
 
-                <Intro />
+                <Equipment equipment={equipment} textKey="home.equipment_2" colorKey="equipment_2" id="equipements-2" blueprint={false} fixedImage />
 
                 <Activities activities={activities} />
 
@@ -65,8 +64,6 @@ export default function Welcome({
                 <Projects projects={projects} />
 
                 <Equipment equipment={equipment} />
-
-                <Equipment equipment={equipment} textKey="home.equipment_2" colorKey="equipment_2" id="equipements-2" blueprint={false} />
 
                 <Partners partners={partners} />
 

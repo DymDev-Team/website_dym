@@ -61,14 +61,16 @@ function MachineBlueprint({ label }: { label: string }) {
 
 type Props = {
     equipment: EquipmentItem[];
-    // 2ᵉ section : ses propres textes, couleur et ancre ; blueprint={false} retire le plan technique.
+    // 2ᵉ section : ses propres textes, couleur et ancre ; blueprint={false} retire le plan technique,
+    // fixedImage affiche la photo du champ « image » des textes au lieu de celle de la machine active.
     textKey?: string;
     colorKey?: string;
     id?: string;
     blueprint?: boolean;
+    fixedImage?: boolean;
 };
 
-export function Equipment({ equipment: equipments, textKey = 'home.equipment', colorKey = 'equipment', id = 'equipements', blueprint = true }: Props) {
+export function Equipment({ equipment: equipments, textKey = 'home.equipment', colorKey = 'equipment', id = 'equipements', blueprint = true, fixedImage = false }: Props) {
     const sectionStyle = useSectionColor(colorKey);
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
     const t = useTexts();
@@ -91,6 +93,8 @@ export function Equipment({ equipment: equipments, textKey = 'home.equipment', c
         return null;
     }
 
+    const photo = fixedImage ? t(`${textKey}.image`) : equipments[active]?.image_url;
+
     return (
         <section
             style={sectionStyle}
@@ -103,8 +107,8 @@ export function Equipment({ equipment: equipments, textKey = 'home.equipment', c
             <div className="hx-fade absolute inset-y-0 right-0 -z-10 hidden w-[42%] lg:block" style={delay(0.2)} aria-hidden>
                 {equipments[active] && (
                     <img
-                        key={equipments[active].id}
-                        src={equipments[active].image_url ?? undefined}
+                        key={fixedImage ? 'photo' : equipments[active].id}
+                        src={photo ?? undefined}
                         alt=""
                         loading="lazy"
                         decoding="async"
@@ -196,9 +200,9 @@ export function Equipment({ equipment: equipments, textKey = 'home.equipment', c
                 <div className="relative mt-10 aspect-video overflow-hidden lg:hidden">
                     {equipments[active] && (
                         <img
-                            key={equipments[active].id}
-                            src={equipments[active].image_url ?? undefined}
-                            alt={equipments[active].name}
+                            key={fixedImage ? 'photo' : equipments[active].id}
+                            src={photo ?? undefined}
+                            alt={fixedImage ? '' : equipments[active].name}
                             loading="lazy"
                             decoding="async"
                             className="absolute inset-0 size-full object-cover"

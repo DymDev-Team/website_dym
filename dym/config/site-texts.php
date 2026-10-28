@@ -53,17 +53,6 @@ return [
                 ],
             ],
 
-            'intro' => [
-                'label' => 'À propos (présentation)',
-                'fields' => [
-                    'eyebrow' => ['label' => 'Surtitre', 'default' => 'DYM MANUFACTURE'],
-                    'title' => ['label' => 'Titre', 'default' => "Nous donnons\nforme à vos idées.", 'multiline' => true, 'help' => $title],
-                    'text' => ['label' => 'Paragraphe', 'default' => 'Depuis 2016, DYM Manufacture, basée à Abidjan, met son expertise au service de vos projets métalliques avec rigueur, précision et passion.', 'multiline' => true],
-                    'values' => ['label' => 'Valeurs (une par ligne)', 'default' => "Précision\nQualité\nInnovation\nAccompagnement", 'multiline' => true],
-                    'image' => ['label' => 'Photo de fond', 'type' => 'image', 'default' => '/images/images/16.jpg'],
-                ],
-            ],
-
             'activities' => [
                 'label' => 'Nos activités',
                 'fields' => [
@@ -116,12 +105,13 @@ return [
             ],
 
             'equipment_2' => [
-                'label' => 'Nos équipements — 2ᵉ section (sans plan)',
+                'label' => 'Nos équipements — 2ᵉ section (sous le bandeau)',
                 'fields' => [
                     'eyebrow' => ['label' => 'Surtitre', 'default' => 'NOS ÉQUIPEMENTS'],
                     'title' => ['label' => 'Titre', 'default' => "Une technologie\nau service de la qualité.", 'multiline' => true, 'help' => $title],
                     'text' => ['label' => 'Paragraphe', 'default' => 'Des machines performantes et des équipes qualifiées pour garantir précision, productivité et fiabilité.', 'multiline' => true],
                     'cta' => ['label' => 'Bouton', 'default' => 'Découvrir nos équipements'],
+                    'image' => ['label' => 'Photo fixe', 'type' => 'image', 'default' => '/images/images/16.jpg'],
                 ],
             ],
 
