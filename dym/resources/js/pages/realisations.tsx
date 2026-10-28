@@ -1,4 +1,5 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { show as projectShow } from '@/routes/realisations';
 import { ArrowRight } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { SiteFooter } from '@/components/site/site-footer';
@@ -41,26 +42,28 @@ export default function RealisationsPage({ projects, activities, site }: Props) 
                             <ul className="mt-12 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16">
                                 {projects.map((project, i) => (
                                     <li key={project.id} className="group" style={delay(i * 0.06)}>
-                                        <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
-                                            <img
-                                                src={project.image_url ?? undefined}
-                                                alt={`${project.title} — ${project.category}`}
-                                                width={1000}
-                                                height={1250}
-                                                loading="lazy"
-                                                className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                            />
-                                            <span className="hx-mono absolute top-3 left-3 bg-white/90 px-2 py-1 text-[9px] text-ink">
-                                                {String(i + 1).padStart(2, '0')}
-                                            </span>
-                                        </div>
-                                        <div className="mt-4 flex items-start justify-between gap-3">
-                                            <div>
-                                                <h2 className="text-[15px] font-semibold">{project.title}</h2>
-                                                <p className="hx-mono mt-1 text-[10px] tracking-[0.08em] text-neutral-500 uppercase">{project.category}</p>
+                                        <Link href={projectShow(project.id)} className="block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-dym">
+                                            <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
+                                                <img
+                                                    src={project.image_url ?? undefined}
+                                                    alt={`${project.title} — ${project.category}`}
+                                                    width={1000}
+                                                    height={1250}
+                                                    loading="lazy"
+                                                    className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                                />
+                                                <span className="hx-mono absolute top-3 left-3 bg-white/90 px-2 py-1 text-[9px] text-ink">
+                                                    {String(i + 1).padStart(2, '0')}
+                                                </span>
                                             </div>
-                                            <ArrowRight className="mt-1 size-4 shrink-0 text-dym transition-transform duration-300 group-hover:translate-x-1" />
-                                        </div>
+                                            <div className="mt-4 flex items-start justify-between gap-3">
+                                                <div>
+                                                    <h2 className="text-[15px] font-semibold">{project.title}</h2>
+                                                    <p className="hx-mono mt-1 text-[10px] tracking-[0.08em] text-neutral-500 uppercase">{project.category}</p>
+                                                </div>
+                                                <ArrowRight className="mt-1 size-4 shrink-0 text-dym transition-transform duration-300 group-hover:translate-x-1" />
+                                            </div>
+                                        </Link>
                                     </li>
                                 ))}
                             </ul>

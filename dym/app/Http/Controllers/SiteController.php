@@ -55,8 +55,19 @@ class SiteController extends Controller
     }
 
     /**
-     * Public page listing published projects.
+     * Public detail page for a published project.
      */
+    public function project(Project $project): Response
+    {
+        abort_unless($project->is_published, 404);
+
+        return Inertia::render('realisation', [
+            'project' => $project,
+            'activities' => Activity::query()->published()->ordered()->get(),
+            'site' => Setting::values(),
+        ]);
+    }
+
     public function projects(): Response
     {
         return Inertia::render('realisations', [

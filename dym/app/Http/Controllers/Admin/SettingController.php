@@ -42,7 +42,7 @@ class SettingController extends Controller
             'whatsapp_url' => ['nullable', 'url', 'max:255'],
             'instagram_url' => ['nullable', 'url', 'max:255'],
             'youtube_url' => ['nullable', 'url', 'max:255'],
-            'label_color' => ['nullable', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            ...collect(Setting::DEFAULTS)->keys()->filter(fn (string $key) => str_starts_with($key, 'section_label_color_'))->mapWithKeys(fn (string $key) => [$key => ['nullable', 'string', 'regex:/^#[0-9a-fA-F]{6}$/']])->all(),
             ...collect(Setting::DEFAULTS)->keys()->filter(fn (string $key) => str_starts_with($key, 'section_color_'))->mapWithKeys(fn (string $key) => [$key => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/']])->all(),
         ]);
 

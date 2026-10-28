@@ -113,10 +113,18 @@ export default function Settings({ settings }: { settings: SiteSettings }) {
                         </div>
 
                         <div className="space-y-5 border-t pt-6">
-                            <Heading variant="small" title="Couleur des libellés" description="Couleur unique des petits libellés (« Nos activités »…) et des liens « En savoir plus » sur tout le site, carré et flèche compris. Elle remplace les couleurs choisies texte par texte. Laissez vide pour garder les couleurs d’origine." />
-                            <Field id="label_color" label="Libellés et liens" error={errors.label_color}>
-                                <SectionColorField id="label_color" name="Libellés et liens" value={settings.label_color ?? ''} placeholder="Couleur d’origine" />
-                            </Field>
+                            <Heading variant="small" title="Couleur des libellés par section" description="Chaque couleur s’applique uniquement aux libellés et liens de la section choisie, carré et flèche compris. Laissez vide pour conserver les couleurs de cette section." />
+                            {colorGroups.map((group) => (
+                                <div key={group.title}>
+                                    <h3 className="mb-3 text-sm font-semibold">{group.title}</h3>
+                                    <div className="grid gap-4 sm:grid-cols-2">
+                                        {group.fields.map(([key, label]) => {
+                                            const field = `section_label_color_${key}`;
+                                            return <Field key={key} id={field} label={label} error={errors[field]}><SectionColorField id={field} name={label} value={settings.section_label_colors[key] ?? ''} placeholder="Couleurs de la section" /></Field>;
+                                        })}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
 
                         <div className="border-t pt-6" />

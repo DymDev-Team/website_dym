@@ -22,14 +22,13 @@
     --color-dym-dark: #b3b2a5;
 }
 
-/* Libellés et liens « En savoir plus » : couleur unique choisie dans
-   /admin/settings, prioritaire sur les couleurs saisies texte par texte. */
-[data-label-color] .hx-label,
-[data-label-color] .hx-label * {
-    color: var(--site-label) !important;
+/* Couleur des libelles et liens propre a chaque section. */
+[style*="--section-label:"] .hx-label,
+[style*="--section-label:"] .hx-label * {
+    color: var(--section-label) !important;
 }
-[data-label-color] .hx-label .bg-dym {
-    background-color: var(--site-label) !important;
+[style*="--section-label:"] .hx-label .bg-dym {
+    background-color: var(--section-label) !important;
 }
 
 .hx-mono {

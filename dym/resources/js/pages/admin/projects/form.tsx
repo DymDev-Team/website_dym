@@ -1,4 +1,4 @@
-import { Form } from '@inertiajs/react';
+import { Form, Link } from '@inertiajs/react';
 import AdminPage from '@/components/admin/admin-page';
 import Field from '@/components/admin/field';
 import { FormActions, PublishFields } from '@/components/admin/form-parts';
@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { dashboard } from '@/routes/admin';
 import { index, store, update } from '@/routes/admin/projects';
 import type { Project } from '@/types/admin';
+import { show as projectShow } from '@/routes/realisations';
 
 type Props = {
     project: Project | null;
@@ -32,6 +33,11 @@ export default function ProjectForm({ project, nextPosition = 1 }: Props) {
                     : 'Nouvelle réalisation'
             }
         >
+            {project?.is_published && (
+                <Link href={projectShow(project.id)} className="mb-6 inline-flex text-sm underline underline-offset-4">
+                    Voir la page publique
+                </Link>
+            )}
             <Form
                 {...(project ? update.form(project.id) : store.form())}
                 encType="multipart/form-data"
@@ -71,8 +77,8 @@ export default function ProjectForm({ project, nextPosition = 1 }: Props) {
 
                         <Field
                             id="description"
-                            label="Description (optionnelle)"
-                            hint="Note interne, non affichée pour l’instant sur la page d’accueil."
+                            label="Description de la page (optionnelle)"
+                            hint="Texte affiché sur la page de cette réalisation. Les retours à la ligne sont conservés."
                             error={errors.description}
                         >
                             <Textarea

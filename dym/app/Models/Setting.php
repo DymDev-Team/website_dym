@@ -35,8 +35,6 @@ class Setting extends Model
         'instagram_url' => null,
         'youtube_url' => null,
         'logo_path' => '/images/logo-dym-couleur.svg',
-        // Couleur unique des libellés et liens « En savoir plus » ; vide = couleurs d'origine.
-        'label_color' => null,
         'section_color_header' => '#ffffff',
         'section_color_hero' => '#ffffff',
         'section_color_intro' => '#ffffff',
@@ -69,6 +67,37 @@ class Setting extends Model
         'section_color_quote_page_form' => '#ffffff',
         'section_color_legal_page_heading' => '#ffffff',
         'section_color_legal_page_content' => '#ffffff',
+        'section_label_color_header' => null,
+        'section_label_color_hero' => null,
+        'section_label_color_intro' => null,
+        'section_label_color_activities' => null,
+        'section_label_color_projects' => null,
+        'section_label_color_equipment' => null,
+        'section_label_color_process' => null,
+        'section_label_color_testimonials' => null,
+        'section_label_color_news' => null,
+        'section_label_color_partners' => null,
+        'section_label_color_footer' => null,
+        'section_label_color_activities_page_cards' => null,
+        'section_label_color_activities_page_products' => null,
+        'section_label_color_activities_page_cta' => null,
+        'section_label_color_activity_page_hero' => null,
+        'section_label_color_activity_page_details' => null,
+        'section_label_color_activity_page_related' => null,
+        'section_label_color_projects_page_list' => null,
+        'section_label_color_news_page_list' => null,
+        'section_label_color_post_page_content' => null,
+        'section_label_color_post_page_related' => null,
+        'section_label_color_brands_page_list' => null,
+        'section_label_color_career_page_intro' => null,
+        'section_label_color_career_page_values' => null,
+        'section_label_color_career_page_jobs' => null,
+        'section_label_color_career_page_application' => null,
+        'section_label_color_job_page_intro' => null,
+        'section_label_color_job_page_details' => null,
+        'section_label_color_quote_page_form' => null,
+        'section_label_color_legal_page_heading' => null,
+        'section_label_color_legal_page_content' => null,
     ];
 
     protected $primaryKey = 'key';
@@ -95,6 +124,11 @@ class Setting extends Model
         $values['section_colors'] = collect(self::DEFAULTS)
             ->filter(fn ($value, $key) => str_starts_with($key, 'section_color_'))
             ->mapWithKeys(fn ($value, $key) => [substr($key, 14) => $values[$key]])
+            ->all();
+
+        $values['section_label_colors'] = collect(self::DEFAULTS)
+            ->filter(fn ($value, $key) => str_starts_with($key, 'section_label_color_'))
+            ->mapWithKeys(fn ($value, $key) => [substr($key, 20) => $values[$key]])
             ->all();
 
         return $values;

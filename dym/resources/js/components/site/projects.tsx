@@ -7,6 +7,7 @@ import type { Project } from '@/types/admin';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
 import { Link } from '@inertiajs/react';
 import { realisations } from '@/routes';
+import { show as projectShow } from '@/routes/realisations';
 
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
@@ -116,7 +117,7 @@ export function Projects({ projects }: { projects: Project[] }) {
                 className="mt-10 flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto scroll-smooth px-5 pb-2 [scrollbar-width:none] sm:scroll-px-8 sm:px-8 lg:mt-12 lg:scroll-px-[calc(max(clamp(24px,3.15vw,58px),(100vw-1720px)/2)+clamp(22px,3vw,52px))] lg:px-[calc(max(clamp(24px,3.15vw,58px),(100vw-1720px)/2)+clamp(22px,3vw,52px))] [&::-webkit-scrollbar]:hidden"
             >
                 {projects.map((p, i) => (
-                    <figure key={p.id} className="group m-0 shrink-0 snap-start">
+                    <Link href={projectShow(p.id)} key={p.id} className="group m-0 shrink-0 snap-start">
                         <div className="hx-wipe relative overflow-hidden bg-white/5" style={delay(0.3 + Math.min(i, 5) * 0.12)}>
                             <img
                                 src={p.image_url ?? undefined}
@@ -130,14 +131,14 @@ export function Projects({ projects }: { projects: Project[] }) {
                             <span className="hx-mono absolute top-3 left-3 bg-ink/90 px-2 py-1 text-[9px] text-white">{String(i + 1).padStart(2, '0')}</span>
                             <span className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink/55 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                         </div>
-                        <figcaption className="hx-fade mt-4 flex w-0 min-w-full items-start justify-between gap-3" style={delay(0.5 + Math.min(i, 5) * 0.12)}>
+                        <div className="hx-fade mt-4 flex w-0 min-w-full items-start justify-between gap-3" style={delay(0.5 + Math.min(i, 5) * 0.12)}>
                             <div>
                                 <p className="text-[15px] font-semibold text-white">{p.title}</p>
                                 <p className="hx-mono mt-1 text-[10px] tracking-[0.08em] text-white/55 uppercase">{p.category}</p>
                             </div>
                             <ArrowRight className="mt-1 size-4 shrink-0 -translate-x-1 text-dym opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
-                        </figcaption>
-                    </figure>
+                        </div>
+                    </Link>
                 ))}
             </div>
 
