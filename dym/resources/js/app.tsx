@@ -14,6 +14,7 @@ const publicPages = [
     'welcome',
     'activites',
     'activite',
+    'realisation',
     'realisations',
     'marques',
     'actualites',
