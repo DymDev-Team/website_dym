@@ -1,12 +1,14 @@
 import { usePage } from '@inertiajs/react';
 import { Fragment } from 'react';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 type Texts = {
     (key: string): string;
     // Texte (ou rendu fourni) dans la couleur choisie dans /admin/texts ;
     // sans couleur personnalisée, le rendu est inchangé.
     c: (key: string, node?: ReactNode) => ReactNode;
+    // Même couleur pour un lien ou bouton entier : la flèche suit le texte.
+    style: (key: string) => CSSProperties | undefined;
 };
 
 // Textes du site modifiables dans /admin/texts (config/site-texts.php).
@@ -21,6 +23,11 @@ export function useTexts(): Texts {
             const color = textColors?.[key];
 
             return color ? <span style={{ color }}>{node}</span> : node;
+        },
+        style: (key: string) => {
+            const color = textColors?.[key];
+
+            return color ? { color } : undefined;
         },
     });
 }

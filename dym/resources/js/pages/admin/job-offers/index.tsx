@@ -1,7 +1,12 @@
+import { Link } from '@inertiajs/react';
+import { Inbox, UserSearch } from 'lucide-react';
 import AdminPage from '@/components/admin/admin-page';
 import ContentTable from '@/components/admin/content-table';
+import { Button } from '@/components/ui/button';
 import { dashboard } from '@/routes/admin';
+import { index as pipeline } from '@/routes/admin/applications';
 import { create, destroy, edit, index } from '@/routes/admin/job-offers';
+import { show as sourcing } from '@/routes/admin/job-offers/sourcing';
 import type { JobOffer } from '@/types/admin';
 
 const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' });
@@ -44,10 +49,38 @@ export default function JobOffersIndex({ offers }: { offers: JobOffer[] }) {
                         o.contract_type,
                         o.location,
                         `${o.applications_count ?? 0} candidature${(o.applications_count ?? 0) > 1 ? 's' : ''}`,
-                    ].join(' · '),
+                        (o.matches_count ?? 0) > 0 &&
+                            `${o.matches_count} profil${(o.matches_count ?? 0) > 1 ? 's' : ''} de la base`,
+                    ]
+                        .filter(Boolean)
+                        .join(' · '),
                     status: offerStatus(o),
                     editHref: edit(o.slug),
                     destroyAction: destroy.form(o.slug),
+                    actions: (
+                        <>
+                            <Button variant="ghost" size="icon" asChild>
+                                <Link
+                                    href={pipeline({
+                                        query: { offer: String(o.id) },
+                                    })}
+                                    aria-label={`Pipeline de ${o.title}`}
+                                    title="Voir le pipeline"
+                                >
+                                    <Inbox />
+                                </Link>
+                            </Button>
+                            <Button variant="ghost" size="icon" asChild>
+                                <Link
+                                    href={sourcing(o.slug)}
+                                    aria-label={`Chercher dans la base de CV pour ${o.title}`}
+                                    title="Chercher dans la base de CV"
+                                >
+                                    <UserSearch />
+                                </Link>
+                            </Button>
+                        </>
+                    ),
                 }))}
             />
         </AdminPage>

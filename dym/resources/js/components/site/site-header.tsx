@@ -131,9 +131,10 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
                 <div className="hd-item flex items-center gap-3" style={delay(0.6)}>
                     <Link
                         href={quoteCreate()}
+                        style={t.style('layout.header.cta')}
                         className="hd-cta relative hidden items-center gap-2 overflow-hidden bg-dym px-5 py-3 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark sm:inline-flex"
                     >
-                        {t.c('layout.header.cta')}
+                        {t('layout.header.cta')}
                         <ArrowRight className="hd-arrow size-3.5" />
                     </Link>
                     <button type="button" onClick={() => setOpen(!open)} className="hd-burger grid size-10 place-items-center border border-black/15 lg:hidden" aria-label="Menu" aria-expanded={open}>
@@ -158,10 +159,10 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
                     <Link
                         href={quoteCreate()}
                         onClick={() => setOpen(false)}
-                        style={delay(0.05 + siteNav.length * 0.05)}
+                        style={{ ...delay(0.05 + siteNav.length * 0.05), ...t.style('layout.header.cta') }}
                         className="hd-cta relative mt-5 inline-flex items-center gap-2 overflow-hidden bg-dym px-5 py-3 text-xs font-semibold tracking-[0.14em] text-white uppercase"
                     >
-                        {t.c('layout.header.cta')} <ArrowRight className="hd-arrow size-3.5" />
+                        {t('layout.header.cta')} <ArrowRight className="hd-arrow size-3.5" />
                     </Link>
                 </nav>
             )}

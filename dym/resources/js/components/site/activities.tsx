@@ -122,9 +122,10 @@ export function Activities({ activities, colorKey = 'activities' }: { activities
 
                             <Link
                                 href={activityShow(a.id)}
+                                style={t.style('home.activities.link')}
                                 className="hx-mono hx-label mt-5 inline-flex items-center gap-2 self-start text-[10px] tracking-[0.1em] text-dym uppercase"
                             >
-                                {t.c('home.activities.link')}
+                                {t('home.activities.link')}
                                 <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                             </Link>
                         </article>

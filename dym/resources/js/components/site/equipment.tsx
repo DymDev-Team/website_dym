@@ -127,9 +127,10 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
                         <p className="max-w-[400px] text-[15px] leading-[1.7] text-neutral-600">{t.c('home.equipment.text')}</p>
                         <ScrollLink
                             target="contact"
+                            style={t.style('home.equipment.cta')}
                             className="hd-cta relative mt-6 inline-flex items-center gap-3 overflow-hidden bg-dym px-6 py-3.5 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark"
                         >
-                            {t.c('home.equipment.cta')}
+                            {t('home.equipment.cta')}
                             <ArrowRight className="hd-arrow size-4" />
                         </ScrollLink>
                     </div>

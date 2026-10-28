@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\JobOfferFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -23,13 +24,19 @@ use Illuminate\Support\Str;
  * @property string|null $summary
  * @property string|null $description
  * @property string|null $requirements
+ * @property list<array{name: string, weight: int, essential: bool}>|null $criteria
+ * @property list<array{id: string, label: string, type: string, options: list<string>, required: bool}>|null $questions
+ * @property Carbon|null $sourcing_started_at
  * @property Carbon|null $closes_at
  * @property bool $is_published
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, JobApplication> $applications
+ * @property-read Collection<int, CandidateMatch> $matches
  */
-#[Fillable(['title', 'slug', 'department', 'location', 'contract_type', 'summary', 'description', 'requirements', 'closes_at', 'is_published'])]
+#[Fillable(['title', 'slug', 'department', 'location', 'contract_type', 'summary', 'description', 'requirements', 'criteria', 'questions', 'closes_at', 'is_published'])]
+// La grille d'évaluation est interne : l'admin la rend visible quand il en a besoin.
+#[Hidden(['criteria', 'sourcing_started_at'])]
 class JobOffer extends Model
 {
     /** @use HasFactory<JobOfferFactory> */
@@ -45,6 +52,9 @@ class JobOffer extends Model
         return [
             'closes_at' => 'date:Y-m-d',
             'is_published' => 'boolean',
+            'criteria' => 'json:unicode',
+            'questions' => 'json:unicode',
+            'sourcing_started_at' => 'datetime',
         ];
     }
 
@@ -109,5 +119,15 @@ class JobOffer extends Model
     public function applications(): HasMany
     {
         return $this->hasMany(JobApplication::class);
+    }
+
+    /**
+     * Candidates of the CV library scored for this offer.
+     *
+     * @return HasMany<CandidateMatch, $this>
+     */
+    public function matches(): HasMany
+    {
+        return $this->hasMany(CandidateMatch::class);
     }
 }

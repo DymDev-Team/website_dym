@@ -16,6 +16,8 @@ export type ContentRow = {
     status: { label: string; visible: boolean };
     editHref: NonNullable<InertiaLinkProps['href']>;
     destroyAction: RouteFormDefinition<'post'>;
+    // Boutons propres à un type de contenu, avant « Modifier ».
+    actions?: ReactNode;
 };
 
 type Props = {
@@ -92,6 +94,7 @@ export default function ContentTable({
                         </Badge>
 
                         <div className="flex shrink-0 items-center">
+                            {row.actions}
                             <Button variant="ghost" size="icon" asChild>
                                 <Link
                                     href={row.editHref}

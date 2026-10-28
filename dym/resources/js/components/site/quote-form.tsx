@@ -153,9 +153,10 @@ export function QuoteForm({ activities, defaultActivity }: { activities: string[
                     <button
                         type="submit"
                         disabled={processing}
+                        style={t.style(processing ? 'quote.form.sending' : 'quote.form.submit')}
                         className="hd-cta relative inline-flex items-center gap-2 overflow-hidden bg-dym px-6 py-4 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark disabled:opacity-60"
                     >
-                        {processing ? t.c('quote.form.sending') : t.c('quote.form.submit')}
+                        {processing ? t('quote.form.sending') : t('quote.form.submit')}
                         <ArrowRight className="hd-arrow size-3.5" />
                     </button>
                 </>

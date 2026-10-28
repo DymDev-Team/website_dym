@@ -12,10 +12,12 @@ import {
     ImageIcon,
     Inbox,
     LayoutGrid,
+    Library,
     MessageSquareQuote,
     Newspaper,
     Scale,
     Settings,
+    SlidersHorizontal,
     Type,
     Users,
 } from 'lucide-react';
@@ -94,10 +96,19 @@ const requestItems: NavItem[] = [
         icon: Calculator,
         matchChildren: true,
     },
+];
+
+const recruitmentItems: NavItem[] = [
     {
-        title: 'Candidatures',
+        title: 'Pipeline',
         href: admin.applications.index(),
         icon: Inbox,
+        matchChildren: true,
+    },
+    {
+        title: 'Base de CV',
+        href: admin.candidates.index(),
+        icon: Library,
         matchChildren: true,
     },
     {
@@ -105,6 +116,11 @@ const requestItems: NavItem[] = [
         href: admin.jobOffers.index(),
         icon: Briefcase,
         matchChildren: true,
+    },
+    {
+        title: 'Réglages',
+        href: admin.recruitment.settings.edit(),
+        icon: SlidersHorizontal,
     },
 ];
 
@@ -155,6 +171,7 @@ export function AppSidebar() {
                         <NavMain items={overviewItems} />
                         <NavMain items={contentItems} label="Contenu du site" />
                         <NavMain items={requestItems} label="Demandes" />
+                        <NavMain items={recruitmentItems} label="Recrutement" />
                         <NavMain items={configItems} label="Configuration" />
                     </>
                 ) : (

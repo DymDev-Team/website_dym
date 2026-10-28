@@ -126,9 +126,9 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
                             target={whatsappUrl ? '_blank' : undefined}
                             rel={whatsappUrl ? 'noopener noreferrer' : undefined}
                             className="hx-button hx-fade hx-mono relative inline-flex min-h-[58px] w-full items-center justify-between gap-4 self-start overflow-hidden border border-ink bg-ink py-[15px] pr-[18px] pl-[21px] text-[9px] tracking-[0.055em] text-paper sm:w-auto sm:min-w-[340px] sm:gap-11 sm:text-[10px]"
-                            style={delay(1.03)}
+                            style={{ ...delay(1.03), ...t.style('home.hero.cta') }}
                         >
-                            <span className="relative z-[1]">Demander un devis par WhatsApp</span>
+                            <span className="relative z-[1]">{t('home.hero.cta')}</span>
                             <span className="hx-arrow relative z-[1] shrink-0 font-sans text-2xl transition-transform duration-300" aria-hidden>
                                 ↗
                             </span>

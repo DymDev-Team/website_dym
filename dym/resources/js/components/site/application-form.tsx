@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { apply } from '@/routes/careers';
 import { show as showLegal } from '@/routes/legal';
 import { useTexts } from '@/components/site/use-texts';
+import type { OfferQuestion } from '@/types/admin';
 
 const inputClass = 'w-full border border-black/15 bg-white px-4 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-neutral-400 focus:border-dym aria-invalid:border-red-500';
 
@@ -18,8 +19,47 @@ function SiteField({ label, error, children }: { label: string; error?: string; 
     );
 }
 
+// Questions propres à l'offre, définies dans l'admin ; réponses envoyées dans answers[id].
+function OfferQuestionField({ question, error }: { question: OfferQuestion; error?: string }) {
+    const t = useTexts();
+    const name = `answers[${question.id}]`;
+    const label = question.required ? `${question.label} *` : question.label;
+
+    if (question.type === 'yes_no') {
+        return (
+            <fieldset>
+                <legend className="hx-mono mb-2 block text-[10px] tracking-[0.1em] text-neutral-500 uppercase">{label}</legend>
+                <div className="flex gap-6">
+                    {(['oui', 'non'] as const).map((value) => (
+                        <label key={value} className="flex items-center gap-2 text-[15px] text-ink">
+                            <input type="radio" name={name} value={value} required={question.required} className="size-4 accent-dym" />
+                            {value === 'oui' ? t.c('careers.form.yes') : t.c('careers.form.no')}
+                        </label>
+                    ))}
+                </div>
+                {error && <span className="mt-1.5 block text-sm text-red-600">{error}</span>}
+            </fieldset>
+        );
+    }
+
+    return (
+        <SiteField label={label} error={error}>
+            {question.type === 'choice' ? (
+                <select name={name} required={question.required} defaultValue="" className={inputClass} aria-invalid={!!error}>
+                    <option value="" disabled={question.required}>{t('careers.form.choose')}</option>
+                    {question.options.map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
+            ) : question.type === 'textarea' ? (
+                <textarea name={name} rows={4} maxLength={3000} required={question.required} className={inputClass} aria-invalid={!!error} />
+            ) : (
+                <input name={name} type={question.type === 'number' ? 'number' : 'text'} min={question.type === 'number' ? 0 : undefined} maxLength={question.type === 'text' ? 500 : undefined} required={question.required} className={inputClass} aria-invalid={!!error} />
+            )}
+        </SiteField>
+    );
+}
+
 // Formulaire de candidature (offre précise ou candidature spontanée).
-export function ApplicationForm({ offerId }: { offerId?: number }) {
+export function ApplicationForm({ offerId, questions = [] }: { offerId?: number; questions?: OfferQuestion[] }) {
     const [sent, setSent] = useState(false);
     const [fileName, setFileName] = useState<string | null>(null);
     const t = useTexts();
@@ -70,6 +110,8 @@ export function ApplicationForm({ offerId }: { offerId?: number }) {
                         <input name="phone" type="tel" maxLength={40} autoComplete="tel" className={inputClass} />
                     </SiteField>
 
+                    {questions.map((question) => <OfferQuestionField key={question.id} question={question} error={errors[`answers.${question.id}` as keyof typeof errors]} />)}
+
                     <SiteField label={t('careers.form.message')} error={errors.message}>
                         <textarea name="message" rows={5} maxLength={5000} placeholder={t('careers.form.message_placeholder')} className={inputClass} />
                     </SiteField>
@@ -105,9 +147,10 @@ export function ApplicationForm({ offerId }: { offerId?: number }) {
                     <button
                         type="submit"
                         disabled={processing}
+                        style={t.style(processing ? 'careers.form.sending' : 'careers.form.submit')}
                         className="hd-cta relative inline-flex items-center gap-2 overflow-hidden bg-dym px-6 py-4 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark disabled:opacity-60"
                     >
-                        {processing ? t.c('careers.form.sending') : t.c('careers.form.submit')}
+                        {processing ? t('careers.form.sending') : t('careers.form.submit')}
                         <ArrowRight className="hd-arrow size-3.5" />
                     </button>
                 </>

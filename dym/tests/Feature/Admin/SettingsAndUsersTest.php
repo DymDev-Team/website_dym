@@ -10,6 +10,8 @@ beforeEach(function () {
 test('site settings can be updated', function () {
     $this->actingAs($this->admin)
         ->put(route('admin.settings.update'), [
+            // Le formulaire envoie toujours les couleurs de section, obligatoires.
+            ...array_filter(Setting::DEFAULTS, fn (string $key) => str_starts_with($key, 'section_color_'), ARRAY_FILTER_USE_KEY),
             'phone' => '+225 07 00 00 00 00',
             'email' => 'info@dym.ci',
             'linkedin_url' => 'https://www.linkedin.com/company/dym',

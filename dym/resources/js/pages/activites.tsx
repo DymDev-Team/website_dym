@@ -68,8 +68,8 @@ function Products() {
                                 />
                                 <div className="absolute inset-x-0 bottom-0 translate-y-full bg-neutral-100/95 px-6 py-5 transition-transform duration-500 ease-out group-hover:translate-y-0 group-focus-visible:translate-y-0 [@media(hover:none)]:translate-y-0">
                                     <h3 className="text-[17px] font-bold tracking-[0.12em] text-ink uppercase">{t.c(p.key, p.title)}</h3>
-                                    <p className="mt-1.5 flex items-center justify-between text-[13px] font-semibold tracking-[0.1em] text-dym">
-                                        {t.c('activities.products.signature')}
+                                    <p style={t.style('activities.products.signature')} className="mt-1.5 flex items-center justify-between text-[13px] font-semibold tracking-[0.1em] text-dym">
+                                        {t('activities.products.signature')}
                                         <ArrowRight className="size-4 -translate-x-2 opacity-0 transition-[opacity,transform] duration-500 group-hover:translate-x-0 group-hover:opacity-100" />
                                     </p>
                                 </div>
@@ -108,9 +108,10 @@ export default function ActivitesPage({ activities, site }: Props) {
                         </h2>
                         <Link
                             href={quoteCreate()}
+                            style={t.style('activities.cta.button')}
                             className="hd-cta relative inline-flex items-center gap-2 overflow-hidden bg-dym px-6 py-4 text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors hover:bg-dym-dark"
                         >
-                            {t.c('activities.cta.button')} <ArrowRight className="hd-arrow size-3.5" />
+                            {t('activities.cta.button')} <ArrowRight className="hd-arrow size-3.5" />
                         </Link>
                     </div>
                 </section>

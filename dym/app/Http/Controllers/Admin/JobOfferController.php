@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\QuestionType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SaveJobOfferRequest;
 use App\Models\JobOffer;
+use App\Recruitment\AiGuard;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -17,17 +19,19 @@ class JobOfferController extends Controller
     public function index(): Response
     {
         return Inertia::render('admin/job-offers/index', [
-            'offers' => JobOffer::query()->withCount('applications')->latest()->get(),
+            'offers' => JobOffer::query()->withCount(['applications', 'matches' => fn ($query) => $query->where('score', '>=', SourcingController::MIN_SCORE)])->latest()->get(),
         ]);
     }
 
     /**
      * Show the creation form.
      */
-    public function create(): Response
+    public function create(AiGuard $guard): Response
     {
         return Inertia::render('admin/job-offers/form', [
             'offer' => null,
+            'questionTypes' => QuestionType::options(),
+            'aiBlockedReason' => $guard->blockedReason(),
         ]);
     }
 
@@ -36,7 +40,7 @@ class JobOfferController extends Controller
      */
     public function store(SaveJobOfferRequest $request): RedirectResponse
     {
-        JobOffer::query()->create($request->validated());
+        JobOffer::query()->create($request->offerData());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Offre créée.']);
 
@@ -46,10 +50,13 @@ class JobOfferController extends Controller
     /**
      * Show the edit form.
      */
-    public function edit(JobOffer $jobOffer): Response
+    public function edit(JobOffer $jobOffer, AiGuard $guard): Response
     {
         return Inertia::render('admin/job-offers/form', [
-            'offer' => $jobOffer,
+            // La grille d'évaluation, masquée sur le site, s'édite ici.
+            'offer' => $jobOffer->makeVisible('criteria'),
+            'questionTypes' => QuestionType::options(),
+            'aiBlockedReason' => $guard->blockedReason(),
         ]);
     }
 
@@ -59,7 +66,7 @@ class JobOfferController extends Controller
     public function update(SaveJobOfferRequest $request, JobOffer $jobOffer): RedirectResponse
     {
         $jobOffer->update([
-            ...$request->validated(),
+            ...$request->offerData(),
             'slug' => $request->validated('slug') ?? JobOffer::uniqueSlug($request->validated('title'), $jobOffer->id),
         ]);
 

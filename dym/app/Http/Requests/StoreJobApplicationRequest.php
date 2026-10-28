@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\QuestionType;
 use App\Models\JobOffer;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,7 +27,45 @@ class StoreJobApplicationRequest extends FormRequest
             'consent' => ['accepted'],
             // Champ piège invisible : rempli uniquement par les robots.
             'website' => ['prohibited'],
+            'answers' => ['nullable', 'array'],
+            ...collect($this->offer()->questions ?? [])->mapWithKeys(fn (array $question) => [
+                "answers.{$question['id']}" => QuestionType::from($question['type'])->answerRules($question['required'], $question['options']),
+            ])->all(),
         ];
+    }
+
+    /**
+     * Get custom attributes for validator errors: the question as asked.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return collect($this->offer()->questions ?? [])
+            ->mapWithKeys(fn (array $question) => ["answers.{$question['id']}" => "« {$question['label']} »"])
+            ->all();
+    }
+
+    /**
+     * Answers to the offer's questions, with each question's label as asked.
+     *
+     * @return list<array{id: string, label: string, answer: string}>
+     */
+    public function answers(): array
+    {
+        $answers = array_map(fn (array $question) => [
+            'id' => $question['id'],
+            'label' => $question['label'],
+            'answer' => trim((string) $this->input("answers.{$question['id']}")),
+        ], $this->offer()->questions ?? []);
+
+        return array_values(array_filter($answers, fn (array $answer) => $answer['answer'] !== ''));
+    }
+
+    private function offer(): ?JobOffer
+    {
+        // Lue une seule fois : règles, libellés et réponses en ont besoin.
+        return once(fn () => $this->filled('job_offer_id') ? JobOffer::query()->find($this->integer('job_offer_id')) : null);
     }
 
     /**

@@ -129,17 +129,42 @@ export type JobOffer = Timestamps & {
     requirements: string | null;
     closes_at: string | null;
     is_published: boolean;
+    // Grille d'évaluation : seulement dans l'admin, jamais envoyée au site.
+    criteria?: Criterion[] | null;
+    questions?: OfferQuestion[] | null;
     applications_count?: number;
+    matches_count?: number;
 };
 
-export type ApplicationStatus =
-    | 'new'
-    | 'reviewing'
-    | 'interview'
-    | 'rejected'
-    | 'hired';
+export type Criterion = { name: string; weight: number; essential: boolean };
 
-export type StatusOption = { value: ApplicationStatus; label: string };
+export type QuestionType = 'text' | 'textarea' | 'choice' | 'yes_no' | 'number';
+
+export type OfferQuestion = {
+    id: string;
+    label: string;
+    type: QuestionType;
+    options: string[];
+    required: boolean;
+};
+
+export type SourcingMatch = {
+    id: number;
+    score: number;
+    reason: string;
+    updated_at: string;
+    candidate: {
+        id: number;
+        display_name: string;
+        location: string | null;
+        years_experience: number | null;
+        summary: string | null;
+        skills: string[];
+        job_family: string | null;
+        seniority: string | null;
+        application_id: number | null;
+    };
+};
 
 export type QuoteStatus = 'new' | 'in_progress' | 'quoted' | 'won' | 'lost';
 
@@ -158,16 +183,204 @@ export type QuoteRequest = Timestamps & {
     status: QuoteStatus;
 };
 
-export type JobApplication = Timestamps & {
+// --- Recrutement (ATS) -------------------------------------------------
+
+export type Option = { value: string; label: string };
+
+export type StageKind = 'open' | 'hired' | 'rejected';
+
+export type RecruitmentStage = {
+    id: number;
+    name: string;
+    color: string;
+    kind: StageKind;
+};
+
+export type Recommendation = 'priority' | 'consider' | 'not_matching';
+
+export type AnalysisStatus =
+    | 'pending'
+    | 'processing'
+    | 'completed'
+    | 'failed'
+    | 'skipped';
+
+export type Labelled = { id: number; label: string };
+
+export type PipelineCard = {
+    id: number;
+    stage_id: number;
+    score: number | null;
+    recommendation: Recommendation | null;
+    viewed: boolean;
+    created_at: string;
+    analysis_status: AnalysisStatus | null;
+    offer: string | null;
+    candidate: {
+        name: string;
+        summary: string | null;
+        job_family: string | null;
+        seniority: string | null;
+        years_experience: number | null;
+    };
+};
+
+export type PipelineStage = RecruitmentStage & {
+    total: number;
+    applications: PipelineCard[];
+};
+
+export type AnalysisResult = {
+    profile: {
+        name: string | null;
+        email: string | null;
+        phone: string | null;
+        location: string | null;
+        headline: string | null;
+        years_experience: number | null;
+        seniority: string | null;
+        job_family: string | null;
+        skills: string[];
+        languages: string[];
+        certifications: string[];
+        education: {
+            degree: string;
+            institution: string | null;
+            year: string | null;
+        }[];
+        experiences: {
+            title: string;
+            company: string | null;
+            period: string | null;
+            highlights: string | null;
+        }[];
+    };
+    summary: string;
+    evaluation: {
+        score: number;
+        // Note proposée par le modèle, avant le calcul sur la grille.
+        model_score?: number;
+        recommendation: Recommendation;
+        criteria: { name: string; score: number; evidence: string }[];
+        strengths: string[];
+        concerns: string[];
+        interview_questions: string[];
+    } | null;
+    offer_matches: { offer_id: number; score: number; reason: string }[];
+    // Absents des analyses faites avant leur introduction.
+    research?: {
+        subject: string;
+        kind: 'school' | 'company' | 'other';
+        finding: string;
+        source_url: string | null;
+    }[];
+    assessment?: {
+        overall: string;
+        strengths: string[];
+        concerns: string[];
+        suggested_roles: string[];
+    };
+    warnings: string[];
+};
+
+export type ApplicationEvent = {
+    id: number;
+    type:
+        | 'received'
+        | 'added_manually'
+        | 'sourced'
+        | 'stage_changed'
+        | 'note'
+        | 'analysis_requested'
+        | 'analysis_completed'
+        | 'analysis_failed'
+        | 'candidate_merged';
+    data: Record<string, string | number | null> | null;
+    user: string | null;
+    created_at: string;
+};
+
+export type ApplicationFile = {
     id: number;
     job_offer_id: number | null;
-    name: string;
-    email: string;
-    phone: string | null;
+    stage_id: number;
+    source_id: number | null;
     message: string | null;
+    answers: { id: string; label: string; answer: string }[] | null;
     cv_name: string;
-    status: ApplicationStatus;
+    cv_mime: string | null;
+    score: number | null;
+    recommendation: Recommendation | null;
+    created_at: string;
+    candidate: {
+        id: number;
+        name: string | null;
+        email: string | null;
+        phone: string | null;
+        location: string | null;
+        display_name: string;
+        years_experience: number | null;
+        skills: string[] | null;
+        profile: Pick<
+            AnalysisResult['profile'],
+            | 'headline'
+            | 'languages'
+            | 'certifications'
+            | 'education'
+            | 'experiences'
+        > | null;
+        summary: string | null;
+        seniority: string | null;
+        job_family: string | null;
+    };
     job_offer: Pick<JobOffer, 'id' | 'title' | 'slug'> | null;
+    source: string | null;
+    added_by: string | null;
+    // Dernière analyse réussie : reste affichée pendant une nouvelle analyse.
+    analysis: {
+        id: number;
+        result: AnalysisResult | null;
+        model: string | null;
+        job_offer_id: number | null;
+        offer: string | null;
+        cost: number;
+        finished_at: string | null;
+    } | null;
+    // Tentative plus récente que cette analyse (en cours, échouée, ignorée).
+    latest_attempt: {
+        id: number;
+        status: AnalysisStatus;
+        status_label: string;
+        error: string | null;
+        attempts: number;
+    } | null;
+    other_applications: {
+        id: number;
+        offer: string | null;
+        stage: Pick<RecruitmentStage, 'name' | 'color'>;
+        score: number | null;
+        created_at: string;
+    }[];
+    events: ApplicationEvent[];
+};
+
+export type CandidateRow = {
+    id: number;
+    display_name: string;
+    email: string | null;
+    phone: string | null;
+    location: string | null;
+    years_experience: number | null;
+    summary: string | null;
+    skills: string[];
+    seniority: string | null;
+    job_family: string | null;
+    applications: {
+        id: number;
+        offer: string | null;
+        stage: Pick<RecruitmentStage, 'name' | 'color'>;
+        score: number | null;
+    }[];
 };
 
 // Image de la médiathèque (App\Support\MediaLibrary). « path » est la valeur

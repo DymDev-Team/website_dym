@@ -130,6 +130,25 @@ Le webhook exécute `migrate --force`, `storage:link --force`, `optimize:clear`
 et `queue:restart`. Le miroir remplace les fichiers suivis ; `.env` et
 `storage/`, ignorés par Git, sont conservés. Il n'exécute aucun `git clean`.
 
+## Recrutement et analyse des CV par IA
+
+Le module de recrutement (`/admin/applications`) ne demande ni cron ni worker :
+l'analyse d'un CV démarre juste après l'envoi de la réponse HTTP, son état est
+gardé en base, et les analyses interrompues reprennent à l'ouverture de l'admin.
+`QUEUE_CONNECTION=sync` reste valable.
+
+- **Clé API** : à saisir dans *Admin > Recrutement > Réglages* (chiffrée avec
+  `APP_KEY`). `ANTHROPIC_API_KEY` dans `.env` sert de repli. Changer `APP_KEY`
+  rend la clé enregistrée illisible : il faut alors la saisir à nouveau.
+- **Plafond mensuel** : réglable au même endroit ; une fois atteint, les CV sont
+  enregistrés mais plus analysés jusqu'au mois suivant.
+- **Envois de CV** : jusqu'à 10 Mo par fichier depuis l'admin. Vérifier dans
+  cPanel > *MultiPHP INI Editor* que `upload_max_filesize` et `post_max_size`
+  valent au moins 12M.
+- La migration `2026_10_27_000001_create_recruitment_tables` reprend les
+  candidatures existantes (fiche candidat par e-mail, statut → étape).
+  Sauvegarder la base avant le premier déploiement qui la contient.
+
 ## Dépannage
 
 - **HTTP 404 sur `/api/deploy/git`** : `dym.ci` sert encore l'ancienne

@@ -83,8 +83,8 @@ export function Projects({ projects }: { projects: Project[] }) {
                     </div>
 
                     <div className="hx-fade flex items-center gap-6" style={delay(0.35)}>
-                        <Link href={realisations.url()} className="hx-mono hx-label group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
-                            {t.c('home.projects.link')}
+                        <Link href={realisations.url()} style={t.style('home.projects.link')} className="hx-mono hx-label group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
+                            {t('home.projects.link')}
                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                         </Link>
                         <div className="flex gap-2">
@@ -109,14 +109,15 @@ export function Projects({ projects }: { projects: Project[] }) {
                 </div>
             </div>
 
-            {/* Bande de photos : alignée à gauche sur le contenu, déborde à droite */}
+            {/* Bande de photos : alignée à gauche sur le contenu, déborde à droite.
+                Hauteur fixe, largeur naturelle : les photos ne sont jamais recadrées. */}
             <div
                 ref={trackRef}
                 className="mt-10 flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto scroll-smooth px-5 pb-2 [scrollbar-width:none] sm:scroll-px-8 sm:px-8 lg:mt-12 lg:scroll-px-[calc(max(clamp(24px,3.15vw,58px),(100vw-1720px)/2)+clamp(22px,3vw,52px))] lg:px-[calc(max(clamp(24px,3.15vw,58px),(100vw-1720px)/2)+clamp(22px,3vw,52px))] [&::-webkit-scrollbar]:hidden"
             >
                 {projects.map((p, i) => (
-                    <figure key={p.id} className="group m-0 w-[78vw] shrink-0 snap-start sm:w-[44vw] lg:w-[clamp(260px,18.5vw,360px)]">
-                        <div className="hx-wipe relative aspect-[4/5] overflow-hidden bg-neutral-100" style={delay(0.3 + Math.min(i, 5) * 0.12)}>
+                    <figure key={p.id} className="group m-0 shrink-0 snap-start">
+                        <div className="hx-wipe relative overflow-hidden bg-white/5" style={delay(0.3 + Math.min(i, 5) * 0.12)}>
                             <img
                                 src={p.image_url ?? undefined}
                                 alt={`${p.title} — ${p.category}`}
@@ -124,12 +125,12 @@ export function Projects({ projects }: { projects: Project[] }) {
                                 height={750}
                                 loading="lazy"
                                 draggable={false}
-                                className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                className="h-[62vw] w-auto max-w-[85vw] object-contain transition-transform duration-700 ease-out group-hover:scale-105 sm:h-[clamp(300px,42vw,440px)] lg:h-[clamp(325px,23vw,450px)] lg:max-w-[60vw]"
                             />
                             <span className="hx-mono absolute top-3 left-3 bg-ink/90 px-2 py-1 text-[9px] text-white">{String(i + 1).padStart(2, '0')}</span>
                             <span className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink/55 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                         </div>
-                        <figcaption className="hx-fade mt-4 flex items-start justify-between gap-3" style={delay(0.5 + Math.min(i, 5) * 0.12)}>
+                        <figcaption className="hx-fade mt-4 flex w-0 min-w-full items-start justify-between gap-3" style={delay(0.5 + Math.min(i, 5) * 0.12)}>
                             <div>
                                 <p className="text-[15px] font-semibold text-white">{p.title}</p>
                                 <p className="hx-mono mt-1 text-[10px] tracking-[0.08em] text-white/55 uppercase">{p.category}</p>

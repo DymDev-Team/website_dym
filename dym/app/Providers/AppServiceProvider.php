@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Recruitment\Ai\CandidateAnalyzer;
+use App\Recruitment\Ai\ClaudeCandidateAnalyzer;
+use App\Recruitment\Ai\ClaudeGateway;
+use App\Recruitment\Ai\ModelGateway;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(ModelGateway::class, ClaudeGateway::class);
+        $this->app->bind(CandidateAnalyzer::class, ClaudeCandidateAnalyzer::class);
     }
 
     /**

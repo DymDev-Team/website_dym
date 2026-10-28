@@ -43,7 +43,9 @@ class LegalPage extends Model
      */
     public function renderedBody(): string
     {
+        // Seuls les réglages texte servent de {{variables}} : section_colors est un tableau.
         $replacements = collect(Setting::values())
+            ->filter(fn (mixed $value) => $value === null || is_string($value))
             ->mapWithKeys(fn (?string $value, string $key) => ["{{{$key}}}" => $value ?: '[à compléter]'])
             ->all();
 

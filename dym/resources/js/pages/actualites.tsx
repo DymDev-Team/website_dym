@@ -142,8 +142,8 @@ export default function ActualitesPage({ posts, categories, category, activities
                                             <Underline>{featured.title}</Underline>
                                         </h2>
                                         {featured.excerpt && <p className="mt-5 line-clamp-4 text-[15px] leading-[1.7] text-neutral-600">{featured.excerpt}</p>}
-                                        <span className="hx-mono mt-6 inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
-                                            {t.c('news.list.read_article')}
+                                        <span style={t.style('news.list.read_article')} className="hx-mono mt-6 inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
+                                            {t('news.list.read_article')}
                                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                                         </span>
                                     </div>
@@ -167,8 +167,8 @@ export default function ActualitesPage({ posts, categories, category, activities
                                                 <Underline>{p.title}</Underline>
                                             </h3>
                                             {p.excerpt && <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-neutral-600">{p.excerpt}</p>}
-                                            <span className="hx-mono mt-4 inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
-                                                {t.c('news.list.read_more')}
+                                            <span style={t.style('news.list.read_more')} className="hx-mono mt-4 inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
+                                                {t('news.list.read_more')}
                                                 <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                                             </span>
                                         </Link>

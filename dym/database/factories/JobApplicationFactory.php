@@ -2,8 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Enums\ApplicationStatus;
+use App\Models\Candidate;
 use App\Models\JobApplication;
+use App\Models\RecruitmentStage;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,13 +20,12 @@ class JobApplicationFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->safeEmail(),
-            'phone' => '+225 07 00 00 00 00',
+            'candidate_id' => Candidate::factory(),
+            'stage_id' => fn () => RecruitmentStage::initial()->id,
             'message' => fake()->paragraph(),
             'cv_path' => 'applications/cv.pdf',
             'cv_name' => 'cv.pdf',
-            'status' => ApplicationStatus::New,
+            'cv_mime' => 'application/pdf',
         ];
     }
 }

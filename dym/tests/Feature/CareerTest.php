@@ -1,8 +1,8 @@
 <?php
 
-use App\Enums\ApplicationStatus;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
+use App\Models\RecruitmentStage;
 use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\NewJobApplication;
@@ -62,8 +62,10 @@ test('a candidate can apply to an offer', function () {
     $application = JobApplication::query()->sole();
 
     expect($application->job_offer_id)->toBe($offer->id)
-        ->and($application->status)->toBe(ApplicationStatus::New)
-        ->and($application->cv_name)->toBe('cv-awa.pdf');
+        ->and($application->stage_id)->toBe(RecruitmentStage::initial()->id)
+        ->and($application->source->label)->toBe('Site web')
+        ->and($application->cv_name)->toBe('cv-awa.pdf')
+        ->and($application->candidate->only(['name', 'email']))->toBe(['name' => 'Awa Koné', 'email' => 'awa@example.com']);
 
     Storage::disk('local')->assertExists($application->cv_path);
 
@@ -145,7 +147,7 @@ test('deleting an offer keeps its applications', function () {
     expect($application->refresh()->job_offer_id)->toBeNull();
 });
 
-test('opening a new application marks it as reviewing', function () {
+test('opening a new application marks it as viewed', function () {
     $admin = User::factory()->admin()->create();
     $application = JobApplication::factory()->create();
 
@@ -154,24 +156,29 @@ test('opening a new application marks it as reviewing', function () {
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('admin/applications/show')->missing('application.cv_path'));
 
-    expect($application->refresh()->status)->toBe(ApplicationStatus::Reviewing);
+    expect($application->refresh()->viewed_at)->not->toBeNull();
 });
 
-test('applications can be filtered and their status changed', function () {
+test('the pipeline can be filtered and an application moved to another stage', function () {
     $admin = User::factory()->admin()->create();
     $offer = JobOffer::factory()->create();
     JobApplication::factory()->for($offer)->create();
     $spontaneous = JobApplication::factory()->create();
+    $interview = RecruitmentStage::query()->where('name', 'Entretien')->sole();
 
     $this->actingAs($admin)
         ->get(route('admin.applications.index', ['offer' => 'spontaneous']))
-        ->assertInertia(fn (Assert $page) => $page->has('applications.data', 1)->where('applications.data.0.id', $spontaneous->id));
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('admin/applications/index')
+            ->where('stages.0.total', 1)
+            ->where('stages.0.applications.0.id', $spontaneous->id));
 
     $this->actingAs($admin)
-        ->patch(route('admin.applications.update', $spontaneous), ['status' => 'interview'])
+        ->patch(route('admin.applications.update', $spontaneous), ['stage_id' => $interview->id])
         ->assertRedirect();
 
-    expect($spontaneous->refresh()->status)->toBe(ApplicationStatus::Interview);
+    expect($spontaneous->refresh()->stage_id)->toBe($interview->id)
+        ->and($spontaneous->events()->where('type', 'stage_changed')->sole()->data)->toBe(['from' => 'Nouvelle', 'to' => 'Entretien']);
 });
 
 test('only admins can download a cv', function () {
@@ -197,4 +204,5 @@ test('deleting an application removes the cv', function () {
         ->assertRedirect(route('admin.applications.index'));
 
     Storage::disk('local')->assertMissing('applications/cv.pdf');
+    expect($application->candidate()->exists())->toBeFalse();
 });

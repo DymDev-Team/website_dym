@@ -108,7 +108,7 @@ export default function OffrePage({ offer, activities, site }: Props) {
                                 <p className="mb-6 font-display text-[28px] leading-none uppercase">
                                     {t.c('careers.offer.apply', withDot(t('careers.offer.apply')))}
                                 </p>
-                                <ApplicationForm offerId={offer.id} />
+                                <ApplicationForm offerId={offer.id} questions={offer.questions ?? []} />
                             </div>
                         </div>
                     </div>

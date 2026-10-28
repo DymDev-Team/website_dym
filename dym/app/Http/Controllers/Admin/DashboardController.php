@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\ApplicationStatus;
 use App\Enums\QuoteStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
@@ -41,7 +40,7 @@ class DashboardController extends Controller
                 ],
                 'applications' => [
                     'total' => JobApplication::query()->count(),
-                    'new' => JobApplication::query()->where('status', ApplicationStatus::New)->count(),
+                    'new' => JobApplication::query()->whereNull('viewed_at')->count(),
                     'openOffers' => JobOffer::query()->open()->count(),
                 ],
                 'quotes' => [

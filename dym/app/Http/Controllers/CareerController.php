@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ApplicationStatus;
 use App\Http\Requests\StoreJobApplicationRequest;
 use App\Models\Activity;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
 use App\Models\Setting;
 use App\Notifications\NewJobApplication;
+use App\Recruitment\ApplicationIntake;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
@@ -42,9 +42,9 @@ class CareerController extends Controller
     }
 
     /**
-     * Store an application and notify the company.
+     * Store an application, start its analysis and notify the company.
      */
-    public function apply(StoreJobApplicationRequest $request): RedirectResponse
+    public function apply(StoreJobApplicationRequest $request, ApplicationIntake $intake): RedirectResponse
     {
         $offer = $request->filled('job_offer_id') ? JobOffer::query()->find($request->integer('job_offer_id')) : null;
 
@@ -52,15 +52,13 @@ class CareerController extends Controller
             return back()->withErrors(['job_offer_id' => 'Cette offre n’est plus ouverte aux candidatures.']);
         }
 
-        $cv = $request->file('cv');
-
-        $application = JobApplication::query()->create([
-            ...$request->safe()->only(['name', 'email', 'phone', 'message']),
-            'job_offer_id' => $offer?->id,
-            'cv_path' => $cv->store('applications', JobApplication::CV_DISK),
-            'cv_name' => $cv->getClientOriginalName(),
-            'status' => ApplicationStatus::New,
-        ]);
+        $application = $intake->fromWebsite(
+            identity: $request->safe()->only(['name', 'email', 'phone']),
+            offer: $offer,
+            message: $request->validated('message'),
+            cv: $request->file('cv'),
+            answers: $request->answers(),
+        );
 
         $this->notify($application);
 

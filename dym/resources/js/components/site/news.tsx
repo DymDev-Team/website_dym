@@ -49,8 +49,8 @@ export function News({ posts: news }: { posts: Post[] }) {
                     </div>
 
                     <div className="hx-fade flex items-center gap-6" style={delay(0.3)}>
-                        <a href="/actualites" className="hx-mono hx-label group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
-                            {t.c('home.news.link')}
+                        <a href="/actualites" style={t.style('home.news.link')} className="hx-mono hx-label group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
+                            {t('home.news.link')}
                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                         </a>
                         <div className="flex gap-2">
@@ -85,8 +85,8 @@ export function News({ posts: news }: { posts: Post[] }) {
                                         {n.title}
                                     </span>
                                 </h3>
-                                <span className="hx-mono mt-4 inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
-                                    {t.c('home.news.read_more')}
+                                <span style={t.style('home.news.read_more')} className="hx-mono mt-4 inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
+                                    {t('home.news.read_more')}
                                     <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                                 </span>
                             </Link>

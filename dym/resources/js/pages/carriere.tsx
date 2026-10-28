@@ -61,9 +61,10 @@ export default function CarrierePage({ offers, activities, site }: Props) {
                             <div className="mt-6 flex flex-wrap gap-3">
                                 <ScrollLink
                                     target="offres"
+                                    style={t.style('careers.header.offers_button')}
                                     className="hd-cta relative inline-flex items-center gap-2 overflow-hidden bg-dym px-6 py-4 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark"
                                 >
-                                    {t.c('careers.header.offers_button')} <ArrowRight className="hd-arrow size-3.5" />
+                                    {t('careers.header.offers_button')} <ArrowRight className="hd-arrow size-3.5" />
                                 </ScrollLink>
                                 <ScrollLink
                                     target="candidature"
@@ -92,7 +93,7 @@ export default function CarrierePage({ offers, activities, site }: Props) {
                 {/* Offres */}
                 <section id="offres" style={jobsStyle} className="scroll-mt-24 px-5 sm:px-8 lg:px-[clamp(24px,3.15vw,58px)]">
                     <div className="mx-auto max-w-[1720px] py-14 lg:py-20 lg:pl-[clamp(22px,3vw,52px)]">
-                        <Eyebrow>{`${t.c('careers.offers.eyebrow')} — ${String(offers.length).padStart(2, '0')}`}</Eyebrow>
+                        <Eyebrow>{t.c('careers.offers.eyebrow', `${t('careers.offers.eyebrow')} — ${String(offers.length).padStart(2, '0')}`)}</Eyebrow>
                         <h2 className="font-display text-[clamp(34px,7vw,44px)] leading-[0.95] uppercase lg:text-[clamp(36px,2.8vw,50px)]">
                             {t.c('careers.offers.title', renderTitle(t('careers.offers.title')))}
                         </h2>
@@ -120,8 +121,8 @@ export default function CarrierePage({ offers, activities, site }: Props) {
                                                 <h3 className="mt-2 text-[20px] font-semibold text-ink transition-colors group-hover:text-dym">{o.title}</h3>
                                                 {o.summary && <p className="mt-1.5 max-w-[760px] text-sm leading-relaxed text-neutral-600">{o.summary}</p>}
                                             </div>
-                                            <span className="hx-mono inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
-                                                {t.c('careers.offers.view')}
+                                            <span style={t.style('careers.offers.view')} className="hx-mono inline-flex items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase">
+                                                {t('careers.offers.view')}
                                                 <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                                             </span>
                                         </Link>

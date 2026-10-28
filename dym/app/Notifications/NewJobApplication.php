@@ -38,12 +38,14 @@ class NewJobApplication extends Notification
             ? 'Candidature spontanée'
             : $this->application->jobOffer->title;
 
+        $candidate = $this->application->candidate;
+
         return (new MailMessage)
             ->subject("Nouvelle candidature — {$offer}")
             ->greeting('Nouvelle candidature reçue')
-            ->line("{$this->application->name} a postulé : {$offer}.")
-            ->line("E-mail : {$this->application->email}")
-            ->when($this->application->phone, fn (MailMessage $mail) => $mail->line("Téléphone : {$this->application->phone}"))
+            ->line("{$candidate->display_name} a postulé : {$offer}.")
+            ->line("E-mail : {$candidate->email}")
+            ->when($candidate->phone, fn (MailMessage $mail) => $mail->line("Téléphone : {$candidate->phone}"))
             ->action('Voir la candidature', route('admin.applications.show', $this->application));
     }
 }
