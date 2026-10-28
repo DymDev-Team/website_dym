@@ -31,6 +31,13 @@
     background-color: var(--section-label) !important;
 }
 
+/* Vidéo du bandeau et photo du 2ᵉ bandeau : depuis la boîte centrée (1720 px
+   max), jusqu'au bord droit de l'écran (marge de la section ou espace libre
+   de part et d'autre de la boîte) ; l'excédent est coupé par la section. */
+.hx-bleed-right {
+    right: calc(-1 * max(clamp(24px, 3.15vw, 58px), (100vw - 1720px) / 2));
+}
+
 .hx-mono {
     font-family:
         ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
