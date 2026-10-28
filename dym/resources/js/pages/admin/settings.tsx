@@ -171,6 +171,21 @@ export default function Settings({ settings }: { settings: SiteSettings }) {
                         </div>
 
                         <Field
+                            id="quote_email"
+                            label="E-mail de réception des demandes de devis"
+                            hint="Chaque demande de devis y est envoyée, avec le message et la pièce jointe du client. Laissez vide pour utiliser info@dym.ci."
+                            error={errors.quote_email}
+                        >
+                            <Input
+                                id="quote_email"
+                                name="quote_email"
+                                type="email"
+                                defaultValue={settings.quote_email ?? ''}
+                                placeholder="info@dym.ci"
+                            />
+                        </Field>
+
+                        <Field
                             id="address"
                             label="Adresse"
                             error={errors.address}

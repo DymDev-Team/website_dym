@@ -27,6 +27,8 @@ class Setting extends Model
         'tagline' => 'Conception, usinage et fabrication métallique sur mesure pour les entreprises et les particuliers.',
         'phone' => '+225 07 89 30 30 00',
         'email' => 'info@dym.ci',
+        // Boîte qui reçoit les demandes de devis, indépendante de l'e-mail affiché sur le site.
+        'quote_email' => 'info@dym.ci',
         'address' => 'Abidjan, CHU Angré — 28 BP 1061 Abidjan 28',
         'linkedin_url' => null,
         'facebook_url' => null,
@@ -107,11 +109,18 @@ class Setting extends Model
     public $incrementing = false;
 
     /**
-     * Every setting, defaults included.
+     * Server-only keys, left out of the props sent to the pages.
+     *
+     * @var list<string>
+     */
+    public const PRIVATE = ['quote_email'];
+
+    /**
+     * Every setting, defaults included; private keys only on request.
      *
      * @return array<string, mixed>
      */
-    public static function values(): array
+    public static function values(bool $withPrivate = false): array
     {
         // Only stored rows are cached, so changing a default in code applies at once.
         $stored = Cache::rememberForever(self::CACHE_KEY, fn () => static::query()->pluck('value', 'key')->all());
@@ -131,7 +140,7 @@ class Setting extends Model
             ->mapWithKeys(fn ($value, $key) => [substr($key, 20) => $values[$key]])
             ->all();
 
-        return $values;
+        return $withPrivate ? $values : array_diff_key($values, array_flip(self::PRIVATE));
     }
 
     /**

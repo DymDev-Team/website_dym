@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\QuoteRequest;
 use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Attachment;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -45,6 +46,11 @@ class NewQuoteRequest extends Notification
             ->line("E-mail : {$this->quote->email}")
             ->line("Téléphone : {$this->quote->phone}")
             ->when($this->quote->deadline, fn (MailMessage $mail) => $mail->line("Délai souhaité : {$this->quote->deadline}"))
+            ->line('Projet :')
+            ->line($this->quote->message)
+            ->when($this->quote->attachment_path, fn (MailMessage $mail) => $mail->attach(
+                Attachment::fromStorageDisk(QuoteRequest::ATTACHMENT_DISK, $this->quote->attachment_path)->as($this->quote->attachment_name ?? 'piece-jointe'),
+            ))
             ->action('Voir la demande', route('admin.quotes.show', $this->quote));
     }
 }

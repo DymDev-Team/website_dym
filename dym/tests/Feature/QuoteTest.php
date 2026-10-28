@@ -64,8 +64,46 @@ test('a visitor can request a quote with plans attached', function () {
     Notification::assertSentTo(
         new AnonymousNotifiable,
         NewQuoteRequest::class,
-        fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === Setting::values()['email'],
+        function (NewQuoteRequest $notification, $channels, $notifiable) {
+            $mail = $notification->toMail($notifiable);
+
+            return $notifiable->routes['mail'] === 'info@dym.ci'
+                && in_array('Portail coulissant de 5 m en claustra découpé.', $mail->introLines, true)
+                && $mail->rawAttachments[0]['name'] === 'plan-portail.pdf';
+        },
     );
+});
+
+test('quote requests go to their own mailbox, not the public contact e-mail', function () {
+    Setting::store(['email' => 'contact@example.com', 'quote_email' => 'devis@example.com']);
+
+    $this->post(route('quotes.store'), quoteData())->assertSessionHasNoErrors();
+
+    Notification::assertSentTo(
+        new AnonymousNotifiable,
+        NewQuoteRequest::class,
+        fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === 'devis@example.com',
+    );
+});
+
+test('a blank quote mailbox falls back to info@dym.ci', function () {
+    Setting::store(['quote_email' => null]);
+
+    $this->post(route('quotes.store'), quoteData())->assertSessionHasNoErrors();
+
+    Notification::assertSentTo(
+        new AnonymousNotifiable,
+        NewQuoteRequest::class,
+        fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === 'info@dym.ci',
+    );
+});
+
+test('the quote mailbox is not exposed to public pages', function () {
+    $this->get(route('quotes.create'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->missing('site.quote_email')
+            ->missing('siteSettings.quote_email'),
+        );
 });
 
 test('the attachment is optional', function () {

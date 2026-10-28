@@ -21,7 +21,7 @@ class SettingController extends Controller
     public function edit(): Response
     {
         return Inertia::render('admin/settings', [
-            'settings' => Setting::values(),
+            'settings' => Setting::values(withPrivate: true),
         ]);
     }
 
@@ -36,6 +36,7 @@ class SettingController extends Controller
             'tagline' => ['nullable', 'string', 'max:300'],
             'phone' => ['nullable', 'string', 'max:40'],
             'email' => ['nullable', 'email', 'max:255'],
+            'quote_email' => ['nullable', 'email', 'max:255'],
             'address' => ['nullable', 'string', 'max:255'],
             'linkedin_url' => ['nullable', 'url', 'max:255'],
             'facebook_url' => ['nullable', 'url', 'max:255'],

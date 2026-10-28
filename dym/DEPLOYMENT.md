@@ -60,7 +60,7 @@ par le workflow FTP, ensuite tout passe par le miroir Git.
    QUEUE_CONNECTION=sync
 
    MAIL_MAILER=smtp
-   MAIL_HOST=mail.dym.ci
+   MAIL_HOST=ssl0.ovh.net
    MAIL_PORT=465
    MAIL_SCHEME=smtps
    MAIL_USERNAME=info@dym.ci
@@ -71,7 +71,16 @@ par le workflow FTP, ensuite tout passe par le miroir Git.
    DEPLOY_TOKEN=jeton-aleatoire
    ```
 
-   `MAIL_HOST` : serveur SMTP affiché dans cPanel > *Comptes de messagerie*.
+   `MAIL_*` : la boîte info@dym.ci est hébergée chez **OVH** (MX `mx*.mail.ovh.net`),
+   pas chez LWS, qui ne gère que le site et la zone DNS. Le site envoie donc par le
+   SMTP d'OVH : `ssl0.ovh.net`, port 465 (offre MX Plan). Pour une offre Email Pro :
+   `MAIL_HOST=pro1.mail.ovh.net`, `MAIL_PORT=587`, `MAIL_SCHEME=smtp`. Identifiant :
+   l'adresse complète ; mot de passe : celui de la boîte (espace client OVH > *Web
+   Cloud* > *E-mails*). `MAIL_FROM_ADDRESS` doit rester l'adresse de ce compte.
+   Ne créez pas de boîte @dym.ci dans cPanel LWS : le serveur livrerait alors en
+   local les e-mails destinés à cette adresse au lieu de les remettre à OVH.
+   La zone DNS (LWS) ne doit contenir **qu'un seul** enregistrement SPF :
+   `v=spf1 include:mx.ovh.com +a +mx +ip4:91.234.195.123 include:premiumsmtp.dnshostservices.com ~all`.
    `APP_KEY` et `DEPLOY_TOKEN` se génèrent ainsi (sur n'importe quel poste avec PHP) :
 
    ```bash

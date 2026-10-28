@@ -91,6 +91,8 @@ export type SiteSettings = {
     tagline: string | null;
     phone: string | null;
     email: string | null;
+    // Envoyé seulement au formulaire de l'admin (Setting::PRIVATE).
+    quote_email?: string | null;
     address: string | null;
     linkedin_url: string | null;
     facebook_url: string | null;

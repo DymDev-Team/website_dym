@@ -51,15 +51,12 @@ class QuoteController extends Controller
     }
 
     /**
-     * Send the notification without failing the request if the mailer is down.
+     * Send the notification to the quote mailbox (info@dym.ci when left blank)
+     * without failing the request if the mailer is down.
      */
     private function notify(QuoteRequest $quote): void
     {
-        $email = Setting::values()['email'];
-
-        if (blank($email)) {
-            return;
-        }
+        $email = Setting::values(withPrivate: true)['quote_email'] ?: Setting::DEFAULTS['quote_email'];
 
         try {
             Notification::route('mail', $email)->notify(new NewQuoteRequest($quote));
