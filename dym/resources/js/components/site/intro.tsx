@@ -21,7 +21,7 @@ export function Intro() {
         <section ref={ref} style={sectionStyle} id="a-propos" aria-labelledby="intro-title" className={`hx-root relative isolate overflow-hidden bg-paper px-5 text-ink sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
             {/* Photo découpe laser, fondue dans le noir vers la gauche */}
             <div className="hx-fade absolute inset-0 -z-10 lg:left-[34%]" style={delay(0.1)} aria-hidden>
-                <img ref={photoRef} src="/images/images/16.jpg" alt="" width={1470} height={754} loading="lazy" className="size-full scale-[1.15] object-cover object-[60%_center] will-change-transform" />
+                <img ref={photoRef} src={t('home.intro.image')} alt="" width={1470} height={754} loading="lazy" className="size-full scale-[1.15] object-cover object-[60%_center] will-change-transform" />
             </div>
             <div className="absolute inset-0 -z-10 bg-paper/85 lg:bg-transparent lg:bg-linear-to-r lg:from-paper lg:from-34% lg:via-paper/80 lg:via-46% lg:to-transparent lg:to-65%" aria-hidden />
 

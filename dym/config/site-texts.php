@@ -54,12 +54,13 @@ return [
             ],
 
             'intro' => [
-                'label' => 'Présentation (bloc noir)',
+                'label' => 'À propos (présentation)',
                 'fields' => [
                     'eyebrow' => ['label' => 'Surtitre', 'default' => 'DYM MANUFACTURE'],
                     'title' => ['label' => 'Titre', 'default' => "Nous donnons\nforme à vos idées.", 'multiline' => true, 'help' => $title],
                     'text' => ['label' => 'Paragraphe', 'default' => 'Depuis 2016, DYM Manufacture, basée à Abidjan, met son expertise au service de vos projets métalliques avec rigueur, précision et passion.', 'multiline' => true],
                     'values' => ['label' => 'Valeurs (une par ligne)', 'default' => "Précision\nQualité\nInnovation\nAccompagnement", 'multiline' => true],
+                    'image' => ['label' => 'Photo de fond', 'type' => 'image', 'default' => '/images/images/16.jpg'],
                 ],
             ],
 
