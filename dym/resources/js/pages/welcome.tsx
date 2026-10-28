@@ -55,7 +55,7 @@ export default function Welcome({
                 <SiteHeader />
                 <Hero whatsappUrl={site.whatsapp_url} />
 
-                <Equipment equipment={equipment} textKey="home.equipment_2" colorKey="equipment_2" id="equipements-2" blueprint={false} fixedImage />
+                <Equipment equipment={equipment} textKey="home.equipment_2" colorKey="equipment_2" id="equipements-2" blueprint={false} fixedImage header={false} />
 
                 <Activities activities={activities} />
 

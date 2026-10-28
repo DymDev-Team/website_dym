@@ -34,9 +34,9 @@ return [
             'hero' => [
                 'label' => 'Bandeau principal',
                 'fields' => [
-                    'eyebrow' => ['label' => 'Surtitre', 'default' => 'FABRICATION MÉTALLIQUE & INDUSTRIELLE'],
-                    'title' => ['label' => 'Titre', 'default' => "Des hommes\net des machines.", 'multiline' => true, 'help' => $title],
-                    'intro' => ['label' => 'Paragraphe', 'default' => 'DYM Manufacture accompagne les entreprises et les particuliers dans la réalisation d’ouvrages métalliques robustes, esthétiques et de haute qualité — de l’étude à la pose.', 'multiline' => true],
+                    'eyebrow' => ['label' => 'Surtitre', 'default' => 'Votre partenaire en fabrication métallique et industrielle'],
+                    'title' => ['label' => 'Titre', 'default' => "À propos de\nDYM Manufacture", 'multiline' => true, 'help' => $title],
+                    'intro' => ['label' => 'Paragraphe', 'default' => 'Depuis 2016, DYM Manufacture met la haute précision et la passion du métal au cœur de chaque réalisation à Abidjan. Nous combinons technologie industrielle de pointe et savoir-faire artisanal pour concevoir des structures sur mesure répondant aux normes les plus exigeantes.', 'multiline' => true],
                     'cta' => ['label' => 'Bouton', 'default' => 'Demander un devis par WhatsApp'],
                     'benefit_1' => ['label' => 'Engagement 1', 'default' => "Bureau d’études\n& plans", 'multiline' => true],
                     'benefit_2' => ['label' => 'Engagement 2', 'default' => "Devis & suivi\ntransparents", 'multiline' => true],
@@ -104,10 +104,6 @@ return [
             'equipment_2' => [
                 'label' => 'Nos équipements — 2ᵉ section (sous le bandeau)',
                 'fields' => [
-                    'eyebrow' => ['label' => 'Surtitre', 'default' => 'NOS ÉQUIPEMENTS'],
-                    'title' => ['label' => 'Titre', 'default' => "Une technologie\nau service de la qualité.", 'multiline' => true, 'help' => $title],
-                    'text' => ['label' => 'Paragraphe', 'default' => 'Des machines performantes et des équipes qualifiées pour garantir précision, productivité et fiabilité.', 'multiline' => true],
-                    'cta' => ['label' => 'Bouton', 'default' => 'Découvrir nos équipements'],
                     'image' => ['label' => 'Photo fixe', 'type' => 'image', 'default' => '/images/images/16.jpg'],
                 ],
             ],

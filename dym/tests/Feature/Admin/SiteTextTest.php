@@ -20,7 +20,7 @@ test('the texts page lists every page of the registry', function () {
             ->has('pages', count(config('site-texts')))
             ->where('pages.0.key', 'home')
             ->where('pages.0.sections.1.fields.1.key', 'home.hero.title')
-            ->where('pages.0.sections.1.fields.1.value', "Des hommes\net des machines."),
+            ->where('pages.0.sections.1.fields.1.value', "À propos de\nDYM Manufacture"),
         );
 });
 
@@ -175,4 +175,19 @@ test('public pages receive the text colors', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->where('textColors', ['news.header.title' => '#141414']),
         );
+});
+
+test('the banner takes over the texts of the former about section', function () {
+    SiteText::query()->insert([
+        ['key' => 'home.intro.title', 'value' => "À propos de\nDYM", 'created_at' => now(), 'updated_at' => now()],
+        ['key' => 'home.hero.eyebrow', 'value' => 'Ancien surtitre', 'created_at' => now(), 'updated_at' => now()],
+    ]);
+
+    (require database_path('migrations/2026_10_28_100000_use_about_texts_in_hero.php'))->up();
+
+    $texts = SiteText::values();
+
+    expect($texts['home.hero.title'])->toBe("À propos de\nDYM")
+        ->and($texts['home.hero.eyebrow'])->toBe(SiteText::defaults()['home.hero.eyebrow'])
+        ->and($texts['home.hero.intro'])->toBe(SiteText::defaults()['home.hero.intro']);
 });
