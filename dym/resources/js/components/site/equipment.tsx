@@ -59,11 +59,20 @@ function MachineBlueprint({ label }: { label: string }) {
     );
 }
 
-export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[] }) {
-    const sectionStyle = useSectionColor('equipment');
+type Props = {
+    equipment: EquipmentItem[];
+    // 2ᵉ section : ses propres textes, couleur et ancre ; blueprint={false} retire le plan technique.
+    textKey?: string;
+    colorKey?: string;
+    id?: string;
+    blueprint?: boolean;
+};
+
+export function Equipment({ equipment: equipments, textKey = 'home.equipment', colorKey = 'equipment', id = 'equipements', blueprint = true }: Props) {
+    const sectionStyle = useSectionColor(colorKey);
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
     const t = useTexts();
-    const titleLines = lines(t('home.equipment.title'));
+    const titleLines = lines(t(`${textKey}.title`));
     const [active, setActive] = useState(0);
     const [paused, setPaused] = useState(false);
 
@@ -86,8 +95,8 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
         <section
             style={sectionStyle}
             ref={ref}
-            id="equipements"
-            aria-labelledby="equipements-title"
+            id={id}
+            aria-labelledby={`${id}-title`}
             className={`hx-root relative isolate overflow-hidden bg-paper px-5 text-ink sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}
         >
             {/* Photos des machines, fondues dans le fond clair vers la gauche */}
@@ -110,13 +119,13 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
                 <div className="grid gap-6 lg:w-[72%] lg:grid-cols-[auto_1fr] lg:items-end lg:gap-14">
                     <div>
                         <div className="hx-mono hx-label hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
-                            <span className="inline-block size-[5px] bg-dym" /> {t.c('home.equipment.eyebrow')}
+                            <span className="inline-block size-[5px] bg-dym" /> {t.c(`${textKey}.eyebrow`)}
                         </div>
-                        <h2 id="equipements-title" className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] uppercase lg:text-[clamp(40px,3.2vw,60px)] lg:whitespace-nowrap">
+                        <h2 id={`${id}-title`} className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] uppercase lg:text-[clamp(40px,3.2vw,60px)] lg:whitespace-nowrap">
                             {titleLines.map((line, i) => (
                                 <span key={line} className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
                                     <span style={delay(0.12 + i * 0.12)}>
-                                        {t.c('home.equipment.title', i === titleLines.length - 1 ? withDot(line) : line)}
+                                        {t.c(`${textKey}.title`, i === titleLines.length - 1 ? withDot(line) : line)}
                                     </span>
                                 </span>
                             ))}
@@ -124,20 +133,20 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
                     </div>
 
                     <div className="hx-fade" style={delay(0.35)}>
-                        <p className="max-w-[400px] text-[15px] leading-[1.7] text-neutral-600">{t.c('home.equipment.text')}</p>
+                        <p className="max-w-[400px] text-[15px] leading-[1.7] text-neutral-600">{t.c(`${textKey}.text`)}</p>
                         <ScrollLink
                             target="contact"
-                            style={t.style('home.equipment.cta')}
+                            style={t.style(`${textKey}.cta`)}
                             className="hd-cta relative mt-6 inline-flex items-center gap-3 overflow-hidden bg-dym px-6 py-3.5 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark"
                         >
-                            {t('home.equipment.cta')}
+                            {t(`${textKey}.cta`)}
                             <ArrowRight className="hd-arrow size-4" />
                         </ScrollLink>
                     </div>
                 </div>
 
-                {/* Liste + plan */}
-                <div className="mt-12 grid gap-10 lg:mt-16 lg:w-[66%] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-end">
+                {/* Liste + plan (sans plan, la liste prend sa place jusqu'à la photo) */}
+                <div className={`mt-12 grid gap-10 lg:mt-16 ${blueprint ? 'lg:w-[66%] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-end' : 'lg:w-[45%]'}`}>
                     <ul className="hx-hair border-t border-ink/15" onMouseLeave={() => setPaused(false)}>
                         {equipments.map((e, i) => {
                             const on = i === active;
@@ -176,9 +185,11 @@ export function Equipment({ equipment: equipments }: { equipment: EquipmentItem[
                         })}
                     </ul>
 
-                    <div className="hidden sm:block">
-                        <MachineBlueprint label={equipments[active].name} />
-                    </div>
+                    {blueprint && (
+                        <div className="hidden sm:block">
+                            <MachineBlueprint label={equipments[active].name} />
+                        </div>
+                    )}
                 </div>
 
                 {/* Photo sur mobile */}

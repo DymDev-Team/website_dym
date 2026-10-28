@@ -115,6 +115,16 @@ return [
                 ],
             ],
 
+            'equipment_2' => [
+                'label' => 'Nos équipements — 2ᵉ section (sans plan)',
+                'fields' => [
+                    'eyebrow' => ['label' => 'Surtitre', 'default' => 'NOS ÉQUIPEMENTS'],
+                    'title' => ['label' => 'Titre', 'default' => "Une technologie\nau service de la qualité.", 'multiline' => true, 'help' => $title],
+                    'text' => ['label' => 'Paragraphe', 'default' => 'Des machines performantes et des équipes qualifiées pour garantir précision, productivité et fiabilité.', 'multiline' => true],
+                    'cta' => ['label' => 'Bouton', 'default' => 'Découvrir nos équipements'],
+                ],
+            ],
+
             'partners' => [
                 'label' => 'Nos partenaires',
                 'fields' => [
@@ -238,6 +248,20 @@ return [
                 'fields' => [
                     'title' => ['label' => 'Titre', 'default' => 'Un projet sur mesure ?', 'help' => 'Un « ? » ou un point final s’affiche dans la couleur DYM.'],
                     'button' => ['label' => 'Bouton', 'default' => 'Demander un devis'],
+                ],
+            ],
+        ],
+    ],
+
+    'projects' => [
+        'label' => 'Page Nos réalisations',
+        'sections' => [
+
+            'project' => [
+                'label' => 'Page d’une réalisation',
+                'fields' => [
+                    'back' => ['label' => 'Lien de retour', 'default' => 'Toutes nos réalisations'],
+                    'cta' => ['label' => 'Bouton', 'default' => 'Parler de votre projet'],
                 ],
             ],
         ],

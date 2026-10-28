@@ -66,6 +66,8 @@ export default function Welcome({
 
                 <Equipment equipment={equipment} />
 
+                <Equipment equipment={equipment} textKey="home.equipment_2" colorKey="equipment_2" id="equipements-2" blueprint={false} />
+
                 <Partners partners={partners} />
 
                 <Testimonials testimonials={testimonials} />

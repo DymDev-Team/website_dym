@@ -24,7 +24,7 @@ const socials: { key: SocialKey; label: string }[] = [
 const colorGroups = [
     { title: 'Page d’accueil', fields: [
         ['header', 'En-tête'], ['hero', 'Bannière principale'], ['intro', 'Présentation'], ['activities', 'Activités'],
-        ['projects', 'Réalisations'], ['equipment', 'Équipements'], ['process', 'Notre approche'],
+        ['projects', 'Réalisations'], ['equipment', 'Équipements'], ['equipment_2', 'Équipements (2ᵉ section)'],['process', 'Notre approche'],
         ['testimonials', 'Témoignages'], ['news', 'Actualités'], ['partners', 'Partenaires'], ['footer', 'Pied de page'],
     ] },
     { title: 'Page Activités', fields: [['activities_page_cards', 'Cartes des activités'], ['activities_page_products', 'Ouvrages fabriqués'], ['activities_page_cta', 'Bandeau de contact']] },

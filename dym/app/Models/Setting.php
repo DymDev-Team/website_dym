@@ -41,6 +41,7 @@ class Setting extends Model
         'section_color_activities' => '#141414',
         'section_color_projects' => '#141414',
         'section_color_equipment' => '#ffffff',
+        'section_color_equipment_2' => '#ffffff',
         'section_color_process' => '#ffffff',
         'section_color_testimonials' => '#ffffff',
         'section_color_news' => '#141414',
