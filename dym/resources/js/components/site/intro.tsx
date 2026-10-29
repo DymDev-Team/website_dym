@@ -20,8 +20,8 @@ export function Intro() {
         // --intro-bg : le voile devant la photo reprend la couleur de fond choisie dans le panel.
         <section ref={ref} style={{ ...sectionStyle, '--intro-bg': sectionStyle.backgroundColor ?? 'var(--color-paper)' } as CSSProperties} id="a-propos" aria-labelledby="intro-title" className={`hx-root relative isolate overflow-hidden bg-paper px-5 text-ink sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}>
             <div className="relative mx-auto max-w-[1720px] py-16 lg:py-24 lg:pl-[clamp(22px,3vw,52px)]">
-                {/* Photo fixe : même départ à 30 % que la vidéo du bandeau */}
-                <div className="hx-fade absolute inset-y-0 right-0 -z-10 hidden lg:left-[30%] lg:block" style={delay(0.2)} aria-hidden>
+                {/* Photo fixe : même départ à 30 % que la vidéo du bandeau, jusqu'au bord droit de l'écran */}
+                <div className="hx-fade hx-bleed-right absolute inset-y-0 -z-10 hidden lg:left-[30%] lg:block" style={delay(0.2)} aria-hidden>
                     <img src={photo} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
                 </div>
                 <div className="absolute inset-0 -z-10 hidden bg-linear-to-r from-(--intro-bg) from-35% via-(--intro-bg)/75 via-48% to-transparent to-62% lg:block" aria-hidden />
