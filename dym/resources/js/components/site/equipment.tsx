@@ -123,10 +123,10 @@ export function Equipment({ equipment: equipments, textKey = 'home.equipment', c
             )}
 
             <div className={`relative mx-auto max-w-[1720px] py-16 lg:py-20 lg:pl-[clamp(22px,3vw,52px)] ${fixedImage ? 'hx-hair border-b' : ''}`}>
-                {/* Photo fixe cadrée comme la vidéo du bandeau principal : départ à 30 %, bord droit de l'écran, même voile */}
+                {/* Photo fixe cadrée comme la vidéo du bandeau principal : même boîte, même départ à 30 %, même voile */}
                 {fixedImage && (
                     <>
-                        <div className="hx-fade hx-bleed-right absolute inset-y-0 -z-10 hidden lg:left-[30%] lg:block" style={delay(0.2)} aria-hidden>
+                        <div className="hx-fade absolute inset-y-0 right-0 -z-10 hidden lg:left-[30%] lg:block" style={delay(0.2)} aria-hidden>
                             <img src={photo ?? undefined} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
                         </div>
                         <div className="absolute inset-0 -z-10 hidden bg-linear-to-r from-paper from-35% via-paper/75 via-48% to-transparent to-62% lg:block" aria-hidden />

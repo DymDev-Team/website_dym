@@ -67,9 +67,9 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
                 <span className="hidden sm:inline">{t.c('home.hero.top_right')}</span>
             </div>
 
-            <div className="hx-hair relative isolate mx-auto flex max-w-[1720px] border-y lg:min-h-[min(640px,calc(100svh-186px))]">
-                {/* Vidéo atelier en arrière-plan, jusqu'au bord droit de l'écran */}
-                <div className="hx-fade hx-bleed-right absolute inset-0 -z-10 hidden overflow-hidden lg:left-[30%] lg:block" style={delay(0.2)} aria-hidden>
+            <div className="hx-hair relative isolate mx-auto flex max-w-[1720px] overflow-hidden border-y lg:min-h-[min(640px,calc(100svh-186px))]">
+                {/* Vidéo atelier en arrière-plan */}
+                <div className="hx-fade absolute inset-0 -z-10 hidden lg:left-[30%] lg:block" style={delay(0.2)} aria-hidden>
                     <video
                         ref={videoRef}
                         poster={VIDEO_POSTER}
