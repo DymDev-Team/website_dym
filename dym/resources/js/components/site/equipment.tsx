@@ -170,13 +170,6 @@ export function Equipment({ equipment: equipments, textKey = 'home.equipment', c
                                         <span className={`hx-mono pt-0.5 text-[10px] transition-colors ${on ? 'text-dym' : 'text-neutral-400'}`}>{String(i + 1).padStart(2, '0')}</span>
                                         <span className="flex-1">
                                             <span className={`hx-mono block text-[12px] tracking-[0.12em] uppercase transition-colors ${on ? 'text-ink' : 'text-neutral-500 group-hover:text-ink'}`}>{e.name}</span>
-                                            <span
-                                                className={`grid text-[13px] leading-relaxed text-neutral-600 transition-[grid-template-rows,opacity,margin] duration-500 ${
-                                                    on ? 'mt-2 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-                                                }`}
-                                            >
-                                                <span className="overflow-hidden">{e.description}</span>
-                                            </span>
                                         </span>
                                         <span className={`mt-1.5 h-px bg-dym transition-all duration-500 ${on ? 'w-8' : 'w-0'}`} aria-hidden />
                                     </button>
