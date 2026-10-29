@@ -61,18 +61,14 @@ function MachineBlueprint({ label }: { label: string }) {
 
 type Props = {
     equipment: EquipmentItem[];
-    // 2ᵉ section : ses propres textes, couleur et ancre ; blueprint={false} retire le plan technique,
-    // fixedImage affiche la photo du champ « image » des textes au lieu de celle de la machine active,
-    // header={false} retire surtitre, titre, paragraphe et bouton.
+    // 2ᵉ section : ses propres textes, couleur et ancre ; blueprint={false} retire le plan technique.
     textKey?: string;
     colorKey?: string;
     id?: string;
     blueprint?: boolean;
-    fixedImage?: boolean;
-    header?: boolean;
 };
 
-export function Equipment({ equipment: equipments, textKey = 'home.equipment', colorKey = 'equipment', id = 'equipements', blueprint = true, fixedImage = false, header = true }: Props) {
+export function Equipment({ equipment: equipments, textKey = 'home.equipment', colorKey = 'equipment', id = 'equipements', blueprint = true }: Props) {
     const sectionStyle = useSectionColor(colorKey);
     const [ref, inView] = useInView<HTMLElement>(0.15, false);
     const t = useTexts();
@@ -95,78 +91,62 @@ export function Equipment({ equipment: equipments, textKey = 'home.equipment', c
         return null;
     }
 
-    const photo = fixedImage ? t(`${textKey}.image`) : equipments[active]?.image_url;
-
     return (
         <section
             style={sectionStyle}
             ref={ref}
             id={id}
-            aria-labelledby={header ? `${id}-title` : undefined}
+            aria-labelledby={`${id}-title`}
             className={`hx-root relative isolate overflow-hidden bg-paper px-5 text-ink sm:px-8 lg:px-[clamp(24px,3.15vw,58px)] ${inView ? 'is-ready' : ''}`}
         >
             {/* Photos des machines, fondues dans le fond clair vers la gauche */}
-            {!fixedImage && (
-                <div className="hx-fade absolute inset-y-0 right-0 -z-10 hidden w-[42%] lg:block" style={delay(0.2)} aria-hidden>
-                    {equipments[active] && (
-                        <img
-                            key={equipments[active].id}
-                            src={photo ?? undefined}
-                            alt=""
-                            loading="lazy"
-                            decoding="async"
-                            className="absolute inset-0 size-full object-cover"
-                        />
-                    )}
-                    <div className="absolute inset-0 bg-linear-to-r from-paper via-paper/55 via-35% to-transparent to-70%" />
-                </div>
-            )}
-
-            <div className={`relative mx-auto max-w-[1720px] py-16 lg:py-20 lg:pl-[clamp(22px,3vw,52px)] ${fixedImage ? 'hx-hair border-b' : ''}`}>
-                {/* Photo fixe cadrée comme la vidéo du bandeau principal : même boîte, même départ à 30 %, même voile */}
-                {fixedImage && (
-                    <>
-                        <div className="hx-fade absolute inset-y-0 right-0 -z-10 hidden lg:left-[30%] lg:block" style={delay(0.2)} aria-hidden>
-                            <img src={photo ?? undefined} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
-                        </div>
-                        <div className="absolute inset-0 -z-10 hidden bg-linear-to-r from-paper from-35% via-paper/75 via-48% to-transparent to-62% lg:block" aria-hidden />
-                    </>
+            <div className="hx-fade absolute inset-y-0 right-0 -z-10 hidden w-[42%] lg:block" style={delay(0.2)} aria-hidden>
+                {equipments[active] && (
+                    <img
+                        key={equipments[active].id}
+                        src={equipments[active].image_url ?? undefined}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="absolute inset-0 size-full object-cover"
+                    />
                 )}
+                <div className="absolute inset-0 bg-linear-to-r from-paper via-paper/55 via-35% to-transparent to-70%" />
+            </div>
 
+            <div className="relative mx-auto max-w-[1720px] py-16 lg:py-20 lg:pl-[clamp(22px,3vw,52px)]">
                 {/* En-tête */}
-                {header && (
-                    <div className="grid gap-6 lg:w-[72%] lg:grid-cols-[auto_1fr] lg:items-end lg:gap-14">
-                        <div>
-                            <div className="hx-mono hx-label hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
-                                <span className="inline-block size-[5px] bg-dym" /> {t.c(`${textKey}.eyebrow`)}
-                            </div>
-                            <h2 id={`${id}-title`} className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] uppercase lg:text-[clamp(40px,3.2vw,60px)] lg:whitespace-nowrap">
-                                {titleLines.map((line, i) => (
-                                    <span key={line} className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
-                                        <span style={delay(0.12 + i * 0.12)}>
-                                            {t.c(`${textKey}.title`, i === titleLines.length - 1 ? withDot(line) : line)}
-                                        </span>
+                <div className="grid gap-6 lg:w-[72%] lg:grid-cols-[auto_1fr] lg:items-end lg:gap-14">
+                    <div>
+                        <div className="hx-mono hx-label hx-fade mb-5 flex items-center gap-3 text-[10px] tracking-[0.075em] text-neutral-500" style={delay(0.05)}>
+                            <span className="inline-block size-[5px] bg-dym" /> {t.c(`${textKey}.eyebrow`)}
+                        </div>
+                        <h2 id={`${id}-title`} className="font-display text-[clamp(40px,9vw,56px)] leading-[0.95] uppercase lg:text-[clamp(40px,3.2vw,60px)] lg:whitespace-nowrap">
+                            {titleLines.map((line, i) => (
+                                <span key={line} className="hx-line -mt-[0.18em] -mb-[0.07em] block overflow-hidden pt-[0.18em] pb-[0.07em]">
+                                    <span style={delay(0.12 + i * 0.12)}>
+                                        {t.c(`${textKey}.title`, i === titleLines.length - 1 ? withDot(line) : line)}
                                     </span>
-                                ))}
-                            </h2>
-                        </div>
-
-                        <div className="hx-fade" style={delay(0.35)}>
-                            <p className="max-w-[400px] text-[15px] leading-[1.7] text-neutral-600">{t.c(`${textKey}.text`)}</p>
-                            <ScrollLink
-                                target="contact"
-                                style={t.style(`${textKey}.cta`)}
-                                className="hd-cta relative mt-6 inline-flex items-center gap-3 overflow-hidden bg-dym px-6 py-3.5 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark"
-                            >
-                                {t(`${textKey}.cta`)}
-                                <ArrowRight className="hd-arrow size-4" />
-                            </ScrollLink>
-                        </div>
+                                </span>
+                            ))}
+                        </h2>
                     </div>
-                )}
+
+                    <div className="hx-fade" style={delay(0.35)}>
+                        <p className="max-w-[400px] text-[15px] leading-[1.7] text-neutral-600">{t.c(`${textKey}.text`)}</p>
+                        <ScrollLink
+                            target="contact"
+                            style={t.style(`${textKey}.cta`)}
+                            className="hd-cta relative mt-6 inline-flex items-center gap-3 overflow-hidden bg-dym px-6 py-3.5 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark"
+                        >
+                            {t(`${textKey}.cta`)}
+                            <ArrowRight className="hd-arrow size-4" />
+                        </ScrollLink>
+                    </div>
+                </div>
 
                 {/* Liste + plan (sans plan, la liste prend sa place jusqu'à la photo) */}
-                <div className={`grid gap-10 ${header ? 'mt-12 lg:mt-16' : ''} ${blueprint ? 'lg:w-[66%] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-end' : 'lg:w-[45%]'}`}>
+                <div className={`mt-12 grid gap-10 lg:mt-16 ${blueprint ? 'lg:w-[66%] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-end' : 'lg:w-[45%]'}`}>
                     <ul className="hx-hair border-t border-ink/15" onMouseLeave={() => setPaused(false)}>
                         {equipments.map((e, i) => {
                             const on = i === active;
@@ -190,6 +170,13 @@ export function Equipment({ equipment: equipments, textKey = 'home.equipment', c
                                         <span className={`hx-mono pt-0.5 text-[10px] transition-colors ${on ? 'text-dym' : 'text-neutral-400'}`}>{String(i + 1).padStart(2, '0')}</span>
                                         <span className="flex-1">
                                             <span className={`hx-mono block text-[12px] tracking-[0.12em] uppercase transition-colors ${on ? 'text-ink' : 'text-neutral-500 group-hover:text-ink'}`}>{e.name}</span>
+                                            <span
+                                                className={`grid text-[13px] leading-relaxed text-neutral-600 transition-[grid-template-rows,opacity,margin] duration-500 ${
+                                                    on ? 'mt-2 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                                                }`}
+                                            >
+                                                <span className="overflow-hidden">{e.description}</span>
+                                            </span>
                                         </span>
                                         <span className={`mt-1.5 h-px bg-dym transition-all duration-500 ${on ? 'w-8' : 'w-0'}`} aria-hidden />
                                     </button>
@@ -209,9 +196,9 @@ export function Equipment({ equipment: equipments, textKey = 'home.equipment', c
                 <div className="relative mt-10 aspect-video overflow-hidden lg:hidden">
                     {equipments[active] && (
                         <img
-                            key={fixedImage ? 'photo' : equipments[active].id}
-                            src={photo ?? undefined}
-                            alt={fixedImage ? '' : equipments[active].name}
+                            key={equipments[active].id}
+                            src={equipments[active].image_url ?? undefined}
+                            alt={equipments[active].name}
                             loading="lazy"
                             decoding="async"
                             className="absolute inset-0 size-full object-cover"

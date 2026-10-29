@@ -23,7 +23,7 @@ const socials: { key: SocialKey; label: string }[] = [
 
 const colorGroups = [
     { title: 'Page d’accueil', fields: [
-        ['header', 'En-tête'], ['hero', 'Bannière principale'], ['equipment_2', 'Équipements (2ᵉ section)'], ['activities', 'Activités'],
+        ['header', 'En-tête'], ['hero', 'Bannière principale'], ['intro', 'À propos'], ['activities', 'Activités'],
         ['projects', 'Réalisations'], ['equipment', 'Équipements'], ['process', 'Notre approche'],
         ['testimonials', 'Témoignages'], ['news', 'Actualités'], ['partners', 'Partenaires'], ['footer', 'Pied de page'],
     ] },

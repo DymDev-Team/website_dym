@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Setting;
 use App\Models\SiteText;
 use App\Models\SiteTextColor;
 use App\Models\User;
@@ -204,4 +205,24 @@ test('the banner gets its own title back', function () {
 
     expect($texts['home.hero.title'])->toBe("Des hommes\net des machines.")
         ->and($texts['home.hero.intro'])->toBe('Paragraphe « À propos »');
+});
+
+test('the second banner becomes the about section', function () {
+    SiteText::query()->insert([
+        ['key' => 'home.hero.eyebrow', 'value' => 'Surtitre saisi', 'created_at' => now(), 'updated_at' => now()],
+        ['key' => 'home.intro.text', 'value' => 'Ancien paragraphe', 'created_at' => now(), 'updated_at' => now()],
+        ['key' => 'home.equipment_2.image', 'value' => 'site-texts/photo.jpg', 'created_at' => now(), 'updated_at' => now()],
+    ]);
+    Setting::query()->create(['key' => 'section_color_equipment_2', 'value' => '#eeeeee']);
+
+    (require database_path('migrations/2026_10_29_000002_turn_second_banner_into_about.php'))->up();
+
+    $texts = SiteText::values();
+
+    expect($texts['home.intro.eyebrow'])->toBe('Surtitre saisi')
+        ->and($texts['home.intro.text'])->toBe(SiteText::defaults()['home.intro.text'])
+        ->and($texts['home.hero.eyebrow'])->toBe(SiteText::defaults()['home.hero.eyebrow'])
+        ->and(SiteText::storedPath('home.intro.image'))->toBe('site-texts/photo.jpg')
+        ->and(SiteText::storedPath('home.equipment_2.image'))->toBeNull()
+        ->and(Setting::values()['section_colors']['intro'])->toBe('#eeeeee');
 });
