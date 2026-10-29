@@ -53,9 +53,11 @@ return [
             'intro' => [
                 'label' => 'À propos (sous le bandeau)',
                 'fields' => [
-                    'eyebrow' => ['label' => 'Surtitre', 'default' => 'Votre partenaire en fabrication métallique et industrielle'],
                     'title' => ['label' => 'Titre', 'default' => "À propos de\nDYM Manufacture", 'multiline' => true, 'help' => $title],
                     'text' => ['label' => 'Paragraphe', 'default' => 'Depuis 2016, DYM Manufacture met la haute précision et la passion du métal au cœur de chaque réalisation à Abidjan. Nous combinons technologie industrielle de pointe et savoir-faire artisanal pour concevoir des structures sur mesure répondant aux normes les plus exigeantes.', 'multiline' => true],
+                    'cta' => ['label' => 'Bouton (vers la page Activités)', 'default' => 'En savoir plus'],
+                    'cta_background' => ['label' => 'Bouton — couleur de fond', 'type' => 'color', 'default' => '#ffffff'],
+                    'cta_border' => ['label' => 'Bouton — couleur de la bordure', 'type' => 'color', 'default' => '#d4d4d4', 'help' => 'Même couleur que le fond pour un bouton sans bordure.'],
                     'image' => ['label' => 'Photo fixe', 'type' => 'image', 'default' => '/images/images/16.jpg'],
                 ],
             ],

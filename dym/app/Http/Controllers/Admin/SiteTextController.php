@@ -10,6 +10,7 @@ use App\Rules\ExistingMedia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -74,6 +75,15 @@ class SiteTextController extends Controller
             'reset_images' => ['sometimes', 'array'],
             'reset_images.*' => ['string', Rule::in($imageKeys)],
         ]);
+
+        // Champs « couleur » : une couleur #rrggbb, ou vide pour la couleur d'origine.
+        $colorKeys = SiteText::colorKeys();
+
+        foreach ($validated['texts'] ?? [] as $index => $text) {
+            if (in_array($text['key'], $colorKeys, true) && filled($text['value']) && ! preg_match('/^#[0-9a-fA-F]{6}$/', $text['value'])) {
+                throw ValidationException::withMessages(["texts.{$index}.value" => 'Choisissez une couleur au format #rrggbb.']);
+            }
+        }
 
         SiteText::store(collect($validated['texts'] ?? [])->pluck('value', 'key')->all());
         SiteTextColor::store(collect($validated['texts'] ?? [])->filter(fn (array $text) => array_key_exists('color', $text))->pluck('color', 'key')->all());

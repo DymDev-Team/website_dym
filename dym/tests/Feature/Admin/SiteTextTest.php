@@ -210,7 +210,7 @@ test('the banner gets its own title back', function () {
 test('the second banner becomes the about section', function () {
     SiteText::query()->insert([
         ['key' => 'home.hero.eyebrow', 'value' => 'Surtitre saisi', 'created_at' => now(), 'updated_at' => now()],
-        ['key' => 'home.intro.text', 'value' => 'Ancien paragraphe', 'created_at' => now(), 'updated_at' => now()],
+        ['key' => 'home.hero.intro', 'value' => 'Paragraphe saisi', 'created_at' => now(), 'updated_at' => now()],
         ['key' => 'home.equipment_2.image', 'value' => 'site-texts/photo.jpg', 'created_at' => now(), 'updated_at' => now()],
     ]);
     Setting::query()->create(['key' => 'section_color_equipment_2', 'value' => '#eeeeee']);
@@ -219,10 +219,52 @@ test('the second banner becomes the about section', function () {
 
     $texts = SiteText::values();
 
-    expect($texts['home.intro.eyebrow'])->toBe('Surtitre saisi')
-        ->and($texts['home.intro.text'])->toBe(SiteText::defaults()['home.intro.text'])
+    expect($texts['home.intro.text'])->toBe('Paragraphe saisi')
+        ->and($texts['home.hero.intro'])->toBe(SiteText::defaults()['home.hero.intro'])
         ->and($texts['home.hero.eyebrow'])->toBe(SiteText::defaults()['home.hero.eyebrow'])
         ->and(SiteText::storedPath('home.intro.image'))->toBe('site-texts/photo.jpg')
         ->and(SiteText::storedPath('home.equipment_2.image'))->toBeNull()
         ->and(Setting::values()['section_colors']['intro'])->toBe('#eeeeee');
+});
+
+test('the about section gets its tinted background unless another color was chosen', function (string $stored, string $expected) {
+    Setting::query()->create(['key' => 'section_color_intro', 'value' => $stored]);
+
+    (require database_path('migrations/2026_10_29_000003_tint_about_section.php'))->up();
+
+    expect(Setting::values()['section_colors']['intro'])->toBe($expected);
+})->with([
+    'former white default' => ['#ffffff', Setting::DEFAULTS['section_color_intro']],
+    'color chosen in the panel' => ['#123456', '#123456'],
+]);
+
+test('a color field takes a color and goes back to its default when emptied', function () {
+    $this->actingAs($this->admin)
+        ->put(route('admin.texts.update'), ['texts' => [
+            ['key' => 'home.intro.cta_background', 'value' => '#766F65'],
+            ['key' => 'home.intro.cta_border', 'value' => '#141414'],
+        ]])
+        ->assertSessionHasNoErrors();
+
+    expect(SiteText::values())
+        ->toHaveKey('home.intro.cta_background', '#766F65')
+        ->toHaveKey('home.intro.cta_border', '#141414');
+
+    $this->actingAs($this->admin)
+        ->put(route('admin.texts.update'), ['texts' => [
+            ['key' => 'home.intro.cta_background', 'value' => ''],
+        ]]);
+
+    expect(SiteText::values()['home.intro.cta_background'])->toBe('#ffffff');
+});
+
+test('a color field rejects anything but a color', function () {
+    $this->actingAs($this->admin)
+        ->put(route('admin.texts.update'), ['texts' => [
+            ['key' => 'home.intro.title', 'value' => 'Titre libre'],
+            ['key' => 'home.intro.cta_border', 'value' => 'red; display:none'],
+        ]])
+        ->assertSessionHasErrors('texts.1.value');
+
+    expect(SiteText::query()->count())->toBe(0);
 });

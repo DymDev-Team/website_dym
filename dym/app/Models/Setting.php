@@ -39,7 +39,7 @@ class Setting extends Model
         'logo_path' => '/images/logo-dym-couleur.svg',
         'section_color_header' => '#ffffff',
         'section_color_hero' => '#ffffff',
-        'section_color_intro' => '#ffffff',
+        'section_color_intro' => '#e8e3e3',
         'section_color_activities' => '#141414',
         'section_color_projects' => '#141414',
         'section_color_equipment' => '#ffffff',

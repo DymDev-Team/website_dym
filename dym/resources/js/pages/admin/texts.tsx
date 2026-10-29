@@ -16,7 +16,8 @@ type TextField = {
     key: string;
     label: string;
     help: string | null;
-    type: 'text' | 'image';
+    // color : la valeur est elle-même une couleur (fond, bordure d'un bouton…).
+    type: 'text' | 'image' | 'color';
     multiline: boolean;
     default: string;
     value: string;
@@ -43,14 +44,17 @@ const palette = [
 ];
 
 // Couleur d'un texte : pastilles de la charte, couleur libre, ou retour au design.
+// preview={false} pour une couleur de fond ou de bordure (l'aperçu « Aa » est celui d'un texte).
 function ColorControl({
     id,
     value,
     onChange,
+    preview = true,
 }: {
     id: string;
     value: string;
     onChange: (color: string) => void;
+    preview?: boolean;
 }) {
     return (
         <div className="flex flex-wrap items-center gap-2">
@@ -93,23 +97,24 @@ function ColorControl({
                     className="absolute inset-0 cursor-pointer opacity-0"
                 />
             </label>
-            {value && (
-                // Aperçu sur fond clair et sombre : le site alterne les deux.
-                <span className="inline-flex overflow-hidden border text-xs font-semibold">
-                    <span
-                        className="bg-white px-1.5 py-0.5"
-                        style={{ color: value }}
-                    >
-                        Aa
+            {value &&
+                preview && (
+                    // Aperçu sur fond clair et sombre : le site alterne les deux.
+                    <span className="inline-flex overflow-hidden border text-xs font-semibold">
+                        <span
+                            className="bg-white px-1.5 py-0.5"
+                            style={{ color: value }}
+                        >
+                            Aa
+                        </span>
+                        <span
+                            className="bg-[#141414] px-1.5 py-0.5"
+                            style={{ color: value }}
+                        >
+                            Aa
+                        </span>
                     </span>
-                    <span
-                        className="bg-[#141414] px-1.5 py-0.5"
-                        style={{ color: value }}
-                    >
-                        Aa
-                    </span>
-                </span>
-            )}
+                )}
             {value ? (
                 <button
                     type="button"
@@ -403,6 +408,35 @@ function PageForm({ page }: { page: TextPage }) {
                                 errors[
                                     `texts.${textFields.indexOf(field)}.value`
                                 ];
+
+                            // Sans couleur choisie, la valeur reste celle d'origine.
+                            if (field.type === 'color') {
+                                return (
+                                    <div key={field.key} className="grid gap-2">
+                                        <Label htmlFor={`${field.key}-color`}>
+                                            {field.label}
+                                        </Label>
+                                        <ColorControl
+                                            id={field.key}
+                                            value={changed ? value : ''}
+                                            onChange={(color) =>
+                                                set(
+                                                    field.key,
+                                                    color || field.default,
+                                                )
+                                            }
+                                            preview={false}
+                                        />
+                                        {field.help && (
+                                            <p className="text-xs text-muted-foreground">
+                                                {field.help}
+                                            </p>
+                                        )}
+                                        <InputError message={error} />
+                                    </div>
+                                );
+                            }
+
                             const Control = field.multiline ? Textarea : Input;
 
                             return (

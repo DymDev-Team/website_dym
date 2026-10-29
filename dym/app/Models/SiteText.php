@@ -55,12 +55,30 @@ class SiteText extends Model
      */
     public static function imageKeys(): array
     {
+        return self::keysOfType('image');
+    }
+
+    /**
+     * Keys of the fields declared with « 'type' => 'color' » (value "#rrggbb").
+     *
+     * @return list<string>
+     */
+    public static function colorKeys(): array
+    {
+        return self::keysOfType('color');
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function keysOfType(string $type): array
+    {
         $keys = [];
 
         foreach (config('site-texts', []) as $pageKey => $page) {
             foreach ($page['sections'] as $sectionKey => $section) {
                 foreach ($section['fields'] as $fieldKey => $field) {
-                    if (($field['type'] ?? null) === 'image') {
+                    if (($field['type'] ?? null) === $type) {
                         $keys[] = "{$pageKey}.{$sectionKey}.{$fieldKey}";
                     }
                 }
