@@ -112,7 +112,7 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
 
                 <div className="hd-item flex items-center gap-3" style={delay(0.6)}>
                     <Link
-                        href={quoteCreate()}
+                        href={t.href('layout.header.cta', quoteCreate())}
                         style={t.style('layout.header.cta')}
                         className="hd-cta relative hidden items-center gap-2 overflow-hidden bg-dym px-5 py-3 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark sm:inline-flex"
                     >
@@ -139,7 +139,7 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
                         </Link>
                     ))}
                     <Link
-                        href={quoteCreate()}
+                        href={t.href('layout.header.cta', quoteCreate())}
                         onClick={() => setOpen(false)}
                         style={{ ...delay(0.05 + siteNav.length * 0.05), ...t.style('layout.header.cta') }}
                         className="hd-cta relative mt-5 inline-flex items-center gap-2 overflow-hidden bg-dym px-5 py-3 text-xs font-semibold tracking-[0.14em] text-white uppercase"

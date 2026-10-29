@@ -136,6 +136,7 @@ export function Equipment({ equipment: equipments, textKey = 'home.equipment', c
                         <p className="max-w-[400px] text-[15px] leading-[1.7] text-neutral-600">{t.c(`${textKey}.text`)}</p>
                         <ScrollLink
                             target="contact"
+                            href={t.href(`${textKey}.cta`, "#contact")}
                             style={t.style(`${textKey}.cta`)}
                             className="hd-cta relative mt-6 inline-flex items-center gap-3 overflow-hidden bg-dym px-6 py-3.5 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark"
                         >

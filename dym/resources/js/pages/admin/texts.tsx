@@ -17,7 +17,7 @@ type TextField = {
     label: string;
     help: string | null;
     // color : la valeur est elle-même une couleur (fond, bordure d'un bouton…).
-    type: 'text' | 'image' | 'color';
+    type: 'text' | 'image' | 'color' | 'url';
     multiline: boolean;
     default: string;
     value: string;

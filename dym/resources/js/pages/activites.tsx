@@ -107,7 +107,7 @@ export default function ActivitesPage({ activities, site }: Props) {
                             {t.c('activities.cta.title', withDot(t('activities.cta.title')))}
                         </h2>
                         <Link
-                            href={quoteCreate()}
+                            href={t.href('activities.cta.button', quoteCreate())}
                             style={t.style('activities.cta.button')}
                             className="hd-cta relative inline-flex items-center gap-2 overflow-hidden bg-dym px-6 py-4 text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors hover:bg-dym-dark"
                         >

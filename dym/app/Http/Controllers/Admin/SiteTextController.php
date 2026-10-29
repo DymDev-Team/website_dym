@@ -78,8 +78,13 @@ class SiteTextController extends Controller
 
         // Champs « couleur » : une couleur #rrggbb, ou vide pour la couleur d'origine.
         $colorKeys = SiteText::colorKeys();
+        $urlKeys = SiteText::keysOfType('url');
 
         foreach ($validated['texts'] ?? [] as $index => $text) {
+            if (in_array($text['key'], $urlKeys, true) && filled($text['value'])
+                && ! preg_match('~^(?:https?://[^\s]+|/(?!/)[^\s]*|#[^\s]*)$~i', $text['value'])) {
+                throw ValidationException::withMessages(["texts.{$index}.value" => 'Utilisez une adresse https://, un chemin /page ou une ancre #section.']);
+            }
             if (in_array($text['key'], $colorKeys, true) && filled($text['value']) && ! preg_match('/^#[0-9a-fA-F]{6}$/', $text['value'])) {
                 throw ValidationException::withMessages(["texts.{$index}.value" => 'Choisissez une couleur au format #rrggbb.']);
             }

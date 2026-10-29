@@ -43,6 +43,10 @@
         ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 }
 
+[style*="--button-background:"]::before {
+    background: var(--button-background) !important;
+}
+
 /* Bouton : remplissage orange par le bas */
 .hx-button::before {
     content: '';

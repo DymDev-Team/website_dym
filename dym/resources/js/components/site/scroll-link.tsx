@@ -1,15 +1,16 @@
 import type { ComponentProps, MouseEvent } from 'react';
 
-type Props = Omit<ComponentProps<'a'>, 'href'> & {
+type Props = ComponentProps<'a'> & {
     /** id de la section visée, sur la même page. */
     target: string;
 };
 
 // Lien vers une section de la page : défilement doux sans ajouter « #… » à
 // l'adresse. Sans JavaScript, le lien d'ancre classique reste fonctionnel.
-export function ScrollLink({ target, onClick, ...props }: Props) {
+export function ScrollLink({ target, href, onClick, ...props }: Props) {
     const scroll = (event: MouseEvent<HTMLAnchorElement>) => {
         onClick?.(event);
+        if (href && href !== `#${target}`) return;
         const section = document.getElementById(target);
 
         if (!section || event.defaultPrevented) {
@@ -21,5 +22,5 @@ export function ScrollLink({ target, onClick, ...props }: Props) {
         section.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
     };
 
-    return <a href={`#${target}`} onClick={scroll} {...props} />;
+    return <a href={href || `#${target}`} onClick={scroll} {...props} />;
 }

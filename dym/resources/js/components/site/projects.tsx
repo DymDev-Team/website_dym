@@ -84,7 +84,7 @@ export function Projects({ projects }: { projects: Project[] }) {
                     </div>
 
                     <div className="hx-fade flex items-center gap-6" style={delay(0.35)}>
-                        <Link href={realisations.url()} style={t.style('home.projects.link')} className="hx-mono hx-label group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
+                        <Link href={t.href('home.projects.link', realisations.url())} style={t.style('home.projects.link')} className="hx-mono hx-label group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
                             {t('home.projects.link')}
                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                         </Link>

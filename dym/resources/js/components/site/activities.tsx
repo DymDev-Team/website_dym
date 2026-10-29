@@ -121,7 +121,7 @@ export function Activities({ activities, colorKey = 'activities' }: { activities
                             <p className="mt-5 flex-1 text-sm leading-relaxed text-white/70">{a.description}</p>
 
                             <Link
-                                href={activityShow(a.id)}
+                                href={t.href('home.activities.link', activityShow(a.id))}
                                 style={t.style('home.activities.link')}
                                 className="hx-mono hx-label mt-5 inline-flex items-center gap-2 self-start text-[10px] tracking-[0.1em] text-dym uppercase"
                             >

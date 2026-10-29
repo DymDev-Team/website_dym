@@ -67,7 +67,7 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
                 <span className="hidden sm:inline">{t.c('home.hero.top_right')}</span>
             </div>
 
-            <div className="hx-hair relative isolate mx-auto flex max-w-[1720px] border-y lg:min-h-[min(640px,calc(100svh-186px))]">
+            <div className="hx-hair relative isolate mx-auto flex max-w-[1720px] border-t lg:min-h-[min(640px,calc(100svh-186px))]">
                 {/* Vidéo atelier en arrière-plan, jusqu'au bord droit de l'écran (coupée ici, plus par la boîte) */}
                 <div className="hx-fade hx-bleed-right absolute inset-y-0 left-0 -z-10 hidden overflow-hidden lg:left-[30%] lg:block" style={delay(0.2)} aria-hidden>
                     <video
@@ -122,7 +122,7 @@ export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
                         </div>
 
                         <a
-                            href={whatsappUrl ?? '/devis'}
+                            href={t.href('home.hero.cta', whatsappUrl ?? '/devis')}
                             target={whatsappUrl ? '_blank' : undefined}
                             rel={whatsappUrl ? 'noopener noreferrer' : undefined}
                             className="hx-button hx-fade hx-mono relative inline-flex min-h-[58px] w-full items-center justify-between gap-4 self-start overflow-hidden border border-ink bg-ink py-[15px] pr-[18px] pl-[21px] text-[9px] tracking-[0.055em] text-paper sm:w-auto sm:min-w-[340px] sm:gap-11 sm:text-[10px]"

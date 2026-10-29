@@ -49,7 +49,7 @@ export function News({ posts: news }: { posts: Post[] }) {
                     </div>
 
                     <div className="hx-fade flex items-center gap-6" style={delay(0.3)}>
-                        <a href="/actualites" style={t.style('home.news.link')} className="hx-mono hx-label group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
+                        <a href={t.href("home.news.link", "/actualites")} style={t.style('home.news.link')} className="hx-mono hx-label group hidden items-center gap-2 text-[10px] tracking-[0.1em] text-dym uppercase sm:inline-flex">
                             {t('home.news.link')}
                             <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                         </a>

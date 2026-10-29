@@ -12,6 +12,30 @@ beforeEach(function () {
     $this->admin = User::factory()->admin()->create();
 });
 
+test('button colors can be edited independently from the panel', function () {
+    $this->actingAs($this->admin)->put(route('admin.texts.update'), ['texts' => [
+        ['key' => 'layout.header.cta', 'value' => 'Obtenir un devis', 'color' => '#ffffff'],
+        ['key' => 'layout.header.cta_background', 'value' => '#990000'],
+        ['key' => 'layout.header.cta_border', 'value' => '#123456'],
+    ]])->assertSessionHasNoErrors();
+
+    expect(SiteText::values()['layout.header.cta_background'])->toBe('#990000')
+        ->and(SiteText::values()['layout.header.cta_border'])->toBe('#123456')
+        ->and(SiteText::values()['home.hero.cta_background'])->toBe('');
+});
+
+test('button destinations can be saved and unsafe schemes are rejected', function () {
+    $this->actingAs($this->admin)->put(route('admin.texts.update'), ['texts' => [
+        ['key' => 'layout.header.cta_url', 'value' => '/devis'],
+    ]])->assertSessionHasNoErrors();
+
+    expect(SiteText::values()['layout.header.cta_url'])->toBe('/devis');
+
+    $this->actingAs($this->admin)->put(route('admin.texts.update'), ['texts' => [
+        ['key' => 'layout.header.cta_url', 'value' => 'javascript:alert(1)'],
+    ]])->assertSessionHasErrors('texts.0.value');
+});
+
 test('the texts page lists every page of the registry', function () {
     $this->actingAs($this->admin)
         ->get(route('admin.texts.edit'))

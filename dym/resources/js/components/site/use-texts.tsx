@@ -3,6 +3,7 @@ import { Fragment } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 
 type Texts = {
+    href: (key: string, fallback: string | { url: string }) => string;
     (key: string): string;
     // Texte (ou rendu fourni) dans la couleur choisie dans /admin/texts ;
     // sans couleur personnalisée, le rendu est inchangé.
@@ -19,6 +20,7 @@ export function useTexts(): Texts {
     const t = (key: string): string => texts?.[key] ?? '';
 
     return Object.assign(t, {
+        href: (key: string, fallback: string | { url: string }) => t(`${key}_url`) || (typeof fallback === 'string' ? fallback : fallback.url),
         c: (key: string, node: ReactNode = t(key)) => {
             const color = textColors?.[key];
 
@@ -27,7 +29,16 @@ export function useTexts(): Texts {
         style: (key: string) => {
             const color = textColors?.[key];
 
-            return color ? { color } : undefined;
+            const backgroundColor = t(`${key}_background`) || undefined;
+            const borderColor = t(`${key}_border`) || undefined;
+
+            return {
+                color,
+                backgroundColor,
+                borderColor,
+                ...(borderColor ? { borderWidth: 1, borderStyle: 'solid' } : {}),
+                '--button-background': backgroundColor,
+            } as CSSProperties;
         },
     });
 }

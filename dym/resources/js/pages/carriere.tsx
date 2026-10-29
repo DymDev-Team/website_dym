@@ -61,6 +61,7 @@ export default function CarrierePage({ offers, activities, site }: Props) {
                             <div className="mt-6 flex flex-wrap gap-3">
                                 <ScrollLink
                                     target="offres"
+                                    href={t.href('careers.header.offers_button', '#offres')}
                                     style={t.style('careers.header.offers_button')}
                                     className="hd-cta relative inline-flex items-center gap-2 overflow-hidden bg-dym px-6 py-4 text-[11px] font-semibold tracking-[0.14em] text-white uppercase transition-colors hover:bg-dym-dark"
                                 >
@@ -68,6 +69,8 @@ export default function CarrierePage({ offers, activities, site }: Props) {
                                 </ScrollLink>
                                 <ScrollLink
                                     target="candidature"
+                                    href={t.href('careers.header.application_button', '#candidature')}
+                                    style={t.style('careers.header.application_button')}
                                     className="inline-flex items-center gap-2 border border-ink/20 px-6 py-4 text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors hover:border-dym hover:text-dym"
                                 >
                                     {t.c('careers.header.application_button')}

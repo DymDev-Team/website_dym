@@ -40,7 +40,7 @@ export function Intro() {
                     </p>
 
                     <Link
-                        href={activities()}
+                        href={t.href('home.intro.cta', activities())}
                         // Fond et bordure choisis dans /admin/texts ; couleur du texte comme les autres textes.
                         style={{ ...delay(0.55), backgroundColor: t('home.intro.cta_background'), borderColor: t('home.intro.cta_border'), ...t.style('home.intro.cta') }}
                         className="hx-fade mt-8 inline-flex items-center rounded-[10px] border px-5 py-2.5 text-[18px] font-bold text-dym shadow-sm transition-[box-shadow,filter] hover:shadow-md hover:brightness-95 lg:text-[clamp(18px,1.5vw,26px)]"

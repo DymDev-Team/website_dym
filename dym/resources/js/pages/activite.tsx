@@ -1,3 +1,4 @@
+import { useTexts } from '@/components/site/use-texts';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SiteFooter } from '@/components/site/site-footer';
@@ -11,6 +12,7 @@ import { useSectionColor } from '@/components/site/use-section-color';
 type Props = { activity: Activity; activities: Activity[]; site: SiteSettings };
 
 export default function Activite({ activity, activities, site }: Props) {
+    const t = useTexts();
     const heroStyle = useSectionColor('activity_page_hero');
     const detailsStyle = useSectionColor('activity_page_details');
     const relatedStyle = useSectionColor('activity_page_related');
@@ -46,7 +48,7 @@ export default function Activite({ activity, activities, site }: Props) {
                                 <div className="space-y-5 text-base leading-[1.9] text-neutral-700">
                                     {(activity.detail_content || activity.description).split('\n').filter(Boolean).map((paragraph, index) => <p key={index}>{paragraph}</p>)}
                                 </div>
-                                <Link href={quoteCreate({ query: { activite: activity.title } })} className="inline-flex items-center gap-3 bg-dym px-6 py-4 text-xs font-semibold uppercase tracking-widest text-white transition-colors hover:bg-dym-dark">Parler de votre projet <ArrowRight className="size-4" /></Link>
+                                <Link href={t.href('activity.details.cta', quoteCreate({ query: { activite: activity.title } }))} style={t.style('activity.details.cta')} className="inline-flex items-center gap-3 bg-dym px-6 py-4 text-xs font-semibold uppercase tracking-widest text-white transition-colors hover:bg-dym-dark">{t('activity.details.cta')} <ArrowRight className="size-4" /></Link>
                             </div>
                         </div>
                     </section>

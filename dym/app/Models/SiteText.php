@@ -71,7 +71,7 @@ class SiteText extends Model
     /**
      * @return list<string>
      */
-    private static function keysOfType(string $type): array
+    public static function keysOfType(string $type): array
     {
         $keys = [];
 

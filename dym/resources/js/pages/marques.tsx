@@ -76,7 +76,8 @@ export default function MarquesPage({ brands, activities, site }: Props) {
                                             {brand.description && <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-neutral-600">{brand.description}</p>}
                                             {brand.website_url && (
                                                 <a
-                                                    href={brand.website_url}
+                                                    href={t.href('brands.header.link', brand.website_url)}
+                                                    style={t.style('brands.header.link')}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="group/link mt-5 inline-flex items-center gap-3 self-start border border-dym/30 px-4 py-2.5 text-dym transition-colors duration-300 hover:border-dym hover:bg-dym hover:text-white"
