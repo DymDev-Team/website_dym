@@ -35,7 +35,7 @@ return [
                 'label' => 'Bandeau principal',
                 'fields' => [
                     'eyebrow' => ['label' => 'Surtitre', 'default' => 'Votre partenaire en fabrication métallique et industrielle'],
-                    'title' => ['label' => 'Titre', 'default' => "À propos de\nDYM Manufacture", 'multiline' => true, 'help' => $title],
+                    'title' => ['label' => 'Titre', 'default' => "Des hommes\net des machines.", 'multiline' => true, 'help' => $title],
                     'intro' => ['label' => 'Paragraphe', 'default' => 'Depuis 2016, DYM Manufacture met la haute précision et la passion du métal au cœur de chaque réalisation à Abidjan. Nous combinons technologie industrielle de pointe et savoir-faire artisanal pour concevoir des structures sur mesure répondant aux normes les plus exigeantes.', 'multiline' => true],
                     'cta' => ['label' => 'Bouton', 'default' => 'Demander un devis par WhatsApp'],
                     'benefit_1' => ['label' => 'Engagement 1', 'default' => "Bureau d’études\n& plans", 'multiline' => true],

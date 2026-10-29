@@ -20,7 +20,7 @@ test('the texts page lists every page of the registry', function () {
             ->has('pages', count(config('site-texts')))
             ->where('pages.0.key', 'home')
             ->where('pages.0.sections.1.fields.1.key', 'home.hero.title')
-            ->where('pages.0.sections.1.fields.1.value', "À propos de\nDYM Manufacture"),
+            ->where('pages.0.sections.1.fields.1.value', "Des hommes\net des machines."),
         );
 });
 
@@ -190,4 +190,18 @@ test('the banner takes over the texts of the former about section', function () 
     expect($texts['home.hero.title'])->toBe("À propos de\nDYM")
         ->and($texts['home.hero.eyebrow'])->toBe(SiteText::defaults()['home.hero.eyebrow'])
         ->and($texts['home.hero.intro'])->toBe(SiteText::defaults()['home.hero.intro']);
+});
+
+test('the banner gets its own title back', function () {
+    SiteText::query()->insert([
+        ['key' => 'home.hero.title', 'value' => "À propos de\nDYM", 'created_at' => now(), 'updated_at' => now()],
+        ['key' => 'home.hero.intro', 'value' => 'Paragraphe « À propos »', 'created_at' => now(), 'updated_at' => now()],
+    ]);
+
+    (require database_path('migrations/2026_10_29_000001_restore_hero_title.php'))->up();
+
+    $texts = SiteText::values();
+
+    expect($texts['home.hero.title'])->toBe("Des hommes\net des machines.")
+        ->and($texts['home.hero.intro'])->toBe('Paragraphe « À propos »');
 });
