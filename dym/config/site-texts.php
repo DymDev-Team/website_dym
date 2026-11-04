@@ -176,6 +176,7 @@ return [
                 'label' => 'Menu (en-tête)',
                 'fields' => [
                     'nav_home' => ['label' => 'Menu — Accueil', 'default' => 'Accueil'],
+                    'nav_offering' => ['label' => 'Menu — Activités et marques', 'default' => 'Nos activités & marques'],
                     'nav_about' => ['label' => 'Menu — À propos', 'default' => 'À propos'],
                     'nav_activities' => ['label' => 'Menu — Activités', 'default' => 'Nos activités'],
                     'nav_projects' => ['label' => 'Menu — Réalisations', 'default' => 'Nos réalisations'],

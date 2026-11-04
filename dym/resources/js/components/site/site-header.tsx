@@ -1,9 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
-import { ArrowRight, Menu, X } from 'lucide-react';
+import { ArrowRight, ChevronDown, Menu, X } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { create as quoteCreate } from '@/routes/quotes';
-import { about, brands, realisations } from '@/routes';
+import { about, activities, brands, realisations } from '@/routes';
 import { useTexts } from '@/components/site/use-texts';
 import { useSectionColor } from '@/components/site/use-section-color';
 import type { SiteSettings } from '@/types/admin';
@@ -13,7 +14,7 @@ export const siteNav = [
     // vient de t(`layout.header.nav_${key}`).
     { key: 'home', label: 'Accueil', href: '/' },
     { key: 'about', label: 'À propos', navLabel: 'À propos', href: about.url() },
-    { key: 'activities', label: 'Activités', navLabel: 'Nos activités', href: '/activites' },
+    { key: 'activities', label: 'Activités', navLabel: 'Nos activités', href: activities.url() },
     { key: 'projects', label: 'Réalisations', navLabel: 'Nos réalisations', href: realisations.url() },
     { key: 'brands', label: 'Marques', href: brands.url() },
     { key: 'news', label: 'Actualités', href: '/actualites' },
@@ -21,6 +22,27 @@ export const siteNav = [
 ];
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
+
+const headerNav = siteNav.filter((item) => item.key !== 'brands');
+
+function ActivitiesMenu({ children, active, onNavigate }: { children: ReactNode; active: string; onNavigate?: () => void }) {
+    const t = useTexts();
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+            <DropdownMenuContent align="start" sideOffset={0} className="min-w-56 rounded-none border-black/10 bg-paper p-2 text-ink shadow-lg">
+                {siteNav.filter((item) => item.key === 'activities' || item.key === 'brands').map((item) => (
+                    <DropdownMenuItem key={item.key} asChild>
+                        <Link href={item.href} onClick={onNavigate} aria-current={item.label === active ? 'page' : undefined} className="rounded-none px-4 py-3 text-xs font-semibold tracking-wider uppercase focus:bg-black/5 focus:text-ink">
+                            {t.c(`layout.header.nav_${item.key}`, t(`layout.header.nav_${item.key}`) || item.navLabel || item.label)}
+                        </Link>
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
 
 export function SiteLogo({ light = false, className = 'h-12', src }: { light?: boolean; className?: string; src?: string | null }) {
     const configuredLogo = usePage<{ siteSettings?: SiteSettings }>().props.siteSettings?.logo_url;
@@ -39,10 +61,10 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
     const [scrolled, setScrolled] = useState(false);
     const [hovered, setHovered] = useState<number | null>(null);
     const [bar, setBar] = useState({ x: 0, w: 0 });
-    const itemsRef = useRef<(HTMLAnchorElement | null)[]>([]);
+    const itemsRef = useRef<(HTMLElement | null)[]>([]);
     const t = useTexts();
 
-    const activeIndex = siteNav.findIndex((item) => item.label === active);
+    const activeIndex = headerNav.findIndex((item) => item.label === active || (item.key === 'activities' && active === 'Marques'));
     const target = hovered ?? activeIndex;
 
     // Compacte le header dès qu'on quitte le haut de page.
@@ -82,7 +104,22 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
                 </div>
 
                 <nav className="relative hidden h-full items-stretch lg:flex" onMouseLeave={() => setHovered(null)}>
-                    {siteNav.map((item, i) => (
+                    {headerNav.map((item, i) => item.key === 'activities' ? (
+                        <ActivitiesMenu key={item.key} active={active}>
+                            <button
+                                type="button"
+                                ref={(el) => { itemsRef.current[i] = el; }}
+                                onMouseEnter={() => setHovered(i)}
+                                onFocus={() => setHovered(i)}
+                                onBlur={() => setHovered(null)}
+                                style={delay(0.25 + i * 0.06)}
+                                className={`hd-item relative flex items-center gap-2 border-l border-black/10 px-5 text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors ${i === target ? 'text-ink' : 'text-neutral-600 hover:text-ink'}`}
+                            >
+                                {t.c('layout.header.nav_offering')}
+                                <ChevronDown aria-hidden className="size-3.5" />
+                            </button>
+                        </ActivitiesMenu>
+                    ) : (
                         <Link
                             key={item.label}
                             ref={(el: HTMLAnchorElement | null) => {
@@ -128,7 +165,14 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
 
             {open && (
                 <nav className="hd-mobile border-t border-black/10 bg-paper px-5 pb-6 lg:hidden">
-                    {siteNav.map((item, i) => (
+                    {headerNav.map((item, i) => item.key === 'activities' ? (
+                        <ActivitiesMenu key={item.key} active={active} onNavigate={() => setOpen(false)}>
+                            <button type="button" style={delay(0.05 + i * 0.05)} className={`flex w-full items-center justify-between gap-2 border-b border-black/10 py-3 text-left text-xs font-semibold tracking-[0.14em] uppercase ${active === 'Activités' || active === 'Marques' ? 'text-dym' : ''}`}>
+                                {t.c('layout.header.nav_offering')}
+                                <ChevronDown aria-hidden className="size-4" />
+                            </button>
+                        </ActivitiesMenu>
+                    ) : (
                         <Link
                             key={item.label}
                             href={item.href}
