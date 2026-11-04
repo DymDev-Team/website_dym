@@ -398,21 +398,14 @@ export default function AboutPage({
                                         </li>
                                     </ul>
                                 </div>
-                                <div className="space-y-4 rounded-xl border border-[#2E3440] bg-[#181B20] p-6 lg:col-span-5">
-                                    <div className="py-4 text-center">
-                                        <p className="font-mono text-4xl font-extrabold text-[#C5A059]">
-                                            {t.c('about.rse.text_12')}
-                                        </p>
-                                        <p className="mt-1 text-xs tracking-wider text-gray-400 uppercase">
-                                            {t.c('about.rse.text_13')}
-                                        </p>
-                                    </div>
-                                    <div className="rounded-lg border border-[#2E3440] bg-[#0F1115]/60 p-3 text-xs text-gray-400">
-                                        <span className="font-semibold text-white">
-                                            {t.c('about.rse.text_14')}
-                                        </span>{' '}
-                                        {t.c('about.rse.text_15')}
-                                    </div>
+                                {/* Photo modifiable dans /admin/texts (À propos › Engagement RSE). */}
+                                <div className="overflow-hidden rounded-xl border border-[#2E3440] bg-[#181B20] lg:col-span-5">
+                                    <img
+                                        src={t('about.rse.recyclage_image')}
+                                        alt={t('about.rse.text_08')}
+                                        loading="lazy"
+                                        className="aspect-4/3 w-full object-cover"
+                                    />
                                 </div>
                             </div>
 

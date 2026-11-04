@@ -163,6 +163,24 @@ test('the about page hero background can be replaced from the panel', function (
         ->where('texts', fn ($texts) => $texts[$key] === Storage::disk('public')->url(SiteText::storedPath($key))));
 });
 
+test('the about page recycling tab shows a photo that can be replaced from the panel', function () {
+    Storage::fake('public');
+    $key = 'about.rse.recyclage_image';
+
+    $this->get(route('about'))->assertInertia(fn (Assert $page) => $page
+        ->where('texts', fn ($texts) => $texts[$key] === '/images/process/02-atelier.jpg'
+            && ! isset($texts['about.rse.text_12'])));
+
+    $this->actingAs($this->admin)
+        ->put(route('admin.texts.update'), ['images' => [
+            ['key' => $key, 'file' => UploadedFile::fake()->image('chutes.jpg')],
+        ]])
+        ->assertSessionHasNoErrors();
+
+    $this->get(route('about'))->assertInertia(fn (Assert $page) => $page
+        ->where('texts', fn ($texts) => $texts[$key] === Storage::disk('public')->url(SiteText::storedPath($key))));
+});
+
 test('only declared image fields accept a photo, and only images', function () {
     Storage::fake('public');
 

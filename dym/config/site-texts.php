@@ -671,10 +671,10 @@ return [
                     'text_09' => ['label' => 'Dans notre atelier, chaque tôle et chaque profilé est optimisé grâc…', 'default' => 'Dans notre atelier, chaque tôle et chaque profilé est optimisé grâce à nos logiciels de découpe automatique (imbrication de pièces). Cela nous permet de réduire au strict minimum les chutages de métal.', 'multiline' => true],
                     'text_10' => ['label' => 'Revalorisation à 100% des chutes métalliques auprès de filières de …', 'default' => 'Revalorisation à 100% des chutes métalliques auprès de filières de recyclage agréées.'],
                     'text_11' => ['label' => 'Tri sélectif rigoureux de tous les déchets industriels banals et da…', 'default' => 'Tri sélectif rigoureux de tous les déchets industriels banals et dangereux.'],
-                    'text_12' => ['label' => '100%', 'default' => '100%'],
-                    'text_13' => ['label' => 'Des Chutes Métalliques Revalorisées', 'default' => 'Des Chutes Métalliques Revalorisées'],
-                    'text_14' => ['label' => 'Indicateur d\'Atelier :', 'default' => 'Indicateur d\'Atelier :'],
-                    'text_15' => ['label' => 'Zéro déchet métallique non-traité. Traçabilité complète du cycle de…', 'default' => 'Zéro déchet métallique non-traité. Traçabilité complète du cycle de réutilisation des sous-produits.'],
+                    // text_12 à text_15 (encadré « 100 % des chutes revalorisées ») remplacés par
+                    // cette photo. Ne pas renuméroter les suivants : leurs valeurs personnalisées
+                    // sont enregistrées sous ces clés.
+                    'recyclage_image' => ['label' => 'Onglet Recyclage — photo', 'type' => 'image', 'default' => '/images/process/02-atelier.jpg'],
                     'text_16' => ['label' => 'Pérennité des Ouvrages', 'default' => 'Pérennité des Ouvrages'],
                     'text_17' => ['label' => 'Traitement Anti-Corrosion & Matériaux Résistants', 'default' => 'Traitement Anti-Corrosion & Matériaux Résistants'],
                     'text_18' => ['label' => 'Un ouvrage durable est un ouvrage qui résiste à l\'épreuve du temps …', 'default' => 'Un ouvrage durable est un ouvrage qui résiste à l\'épreuve du temps et des contraintes climatiques. Nous appliquons des traitements de surface de haute qualité (galvanisation, thermolaquage, finitions anticorrosion).', 'multiline' => true],
