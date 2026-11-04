@@ -684,6 +684,8 @@ return [
                     'text_22' => ['label' => 'Résistance Estimée aux Intempéries', 'default' => 'Résistance Estimée aux Intempéries'],
                     'text_23' => ['label' => 'Standard Qualité :', 'default' => 'Standard Qualité :'],
                     'text_24' => ['label' => 'Application strictement conforme aux exigences d\'exposition en mili…', 'default' => 'Application strictement conforme aux exigences d\'exposition en milieu industriel et urbain.'],
+                    // Photo de l'onglet : le chiffre clé (text_21 à text_24) s'affiche par-dessus.
+                    'durabilite_image' => ['label' => 'Onglet Durabilité — photo', 'type' => 'image', 'default' => '/images/realisations/facade-perforee.jpg'],
                     'text_25' => ['label' => 'Social & Territoire', 'default' => 'Social & Territoire'],
                     'text_26' => ['label' => 'Ancrage Territorial & Montée en Compétences', 'default' => 'Ancrage Territorial & Montée en Compétences'],
                     'text_27' => ['label' => 'Nous investissons continuellement dans l\'humain. Transmettre les sa…', 'default' => 'Nous investissons continuellement dans l\'humain. Transmettre les savoir-faire de la chaudronnerie et de la métallerie est essentiel pour préserver l\'excellence industrielle de notre territoire.', 'multiline' => true],
@@ -693,6 +695,8 @@ return [
                     'text_31' => ['label' => 'Équipes & Partenaires Régionaux', 'default' => 'Équipes & Partenaires Régionaux'],
                     'text_32' => ['label' => 'Valeur Humaine :', 'default' => 'Valeur Humaine :'],
                     'text_33' => ['label' => 'Promotion de l\'apprentissage et valorisation des métiers manuels qu…', 'default' => 'Promotion de l\'apprentissage et valorisation des métiers manuels qualifiés.'],
+                    // Photo de l'onglet : le chiffre clé (text_30 à text_33) s'affiche par-dessus.
+                    'ancrage_image' => ['label' => 'Onglet Ancrage local — photo', 'type' => 'image', 'default' => '/images/images/nosavant.jpg'],
                 ],
             ],
             'chiffres' => [

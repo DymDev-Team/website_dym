@@ -181,6 +181,30 @@ test('the about page recycling tab shows a photo that can be replaced from the p
         ->where('texts', fn ($texts) => $texts[$key] === Storage::disk('public')->url(SiteText::storedPath($key))));
 });
 
+test('the about page durability and local tabs each show a replaceable photo', function () {
+    Storage::fake('public');
+    $durability = 'about.rse.durabilite_image';
+    $local = 'about.rse.ancrage_image';
+
+    // Les chiffres clés restent affichés par-dessus les photos.
+    $this->get(route('about'))->assertInertia(fn (Assert $page) => $page
+        ->where('texts', fn ($texts) => $texts[$durability] === '/images/realisations/facade-perforee.jpg'
+            && $texts[$local] === '/images/images/nosavant.jpg'
+            && $texts['about.rse.text_21'] === '20+ Ans'
+            && $texts['about.rse.text_30'] === '100%'));
+
+    $this->actingAs($this->admin)
+        ->put(route('admin.texts.update'), ['images' => [
+            ['key' => $durability, 'file' => UploadedFile::fake()->image('facade.jpg')],
+            ['key' => $local, 'file' => UploadedFile::fake()->image('equipe.jpg')],
+        ]])
+        ->assertSessionHasNoErrors();
+
+    $this->get(route('about'))->assertInertia(fn (Assert $page) => $page
+        ->where('texts', fn ($texts) => $texts[$durability] === Storage::disk('public')->url(SiteText::storedPath($durability))
+            && $texts[$local] === Storage::disk('public')->url(SiteText::storedPath($local))));
+});
+
 test('only declared image fields accept a photo, and only images', function () {
     Storage::fake('public');
 

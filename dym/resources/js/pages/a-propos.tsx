@@ -17,6 +17,7 @@ import {
     Send,
 } from 'lucide-react';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { useTexts } from '@/components/site/use-texts';
 import { SiteHeader } from '@/components/site/site-header';
 import { SiteFooter } from '@/components/site/site-footer';
@@ -443,22 +444,14 @@ export default function AboutPage({
                                         </li>
                                     </ul>
                                 </div>
-                                <div className="space-y-4 rounded-xl border border-[#2E3440] bg-[#181B20] p-6 lg:col-span-5">
-                                    <div className="py-4 text-center">
-                                        <p className="font-mono text-4xl font-extrabold text-[#C5A059]">
-                                            {t.c('about.rse.text_21')}
-                                        </p>
-                                        <p className="mt-1 text-xs tracking-wider text-gray-400 uppercase">
-                                            {t.c('about.rse.text_22')}
-                                        </p>
-                                    </div>
-                                    <div className="rounded-lg border border-[#2E3440] bg-[#0F1115]/60 p-3 text-xs text-gray-400">
-                                        <span className="font-semibold text-white">
-                                            {t.c('about.rse.text_23')}
-                                        </span>{' '}
-                                        {t.c('about.rse.text_24')}
-                                    </div>
-                                </div>
+                                <TabPhoto
+                                    src={t('about.rse.durabilite_image')}
+                                    alt={t('about.rse.text_17')}
+                                    figure={t.c('about.rse.text_21')}
+                                    caption={t.c('about.rse.text_22')}
+                                    noteTitle={t.c('about.rse.text_23')}
+                                    note={t.c('about.rse.text_24')}
+                                />
                             </div>
 
                             <div
@@ -495,22 +488,14 @@ export default function AboutPage({
                                         </li>
                                     </ul>
                                 </div>
-                                <div className="space-y-4 rounded-xl border border-[#2E3440] bg-[#181B20] p-6 lg:col-span-5">
-                                    <div className="py-4 text-center">
-                                        <p className="font-mono text-4xl font-extrabold text-[#C5A059]">
-                                            {t.c('about.rse.text_30')}
-                                        </p>
-                                        <p className="mt-1 text-xs tracking-wider text-gray-400 uppercase">
-                                            {t.c('about.rse.text_31')}
-                                        </p>
-                                    </div>
-                                    <div className="rounded-lg border border-[#2E3440] bg-[#0F1115]/60 p-3 text-xs text-gray-400">
-                                        <span className="font-semibold text-white">
-                                            {t.c('about.rse.text_32')}
-                                        </span>{' '}
-                                        {t.c('about.rse.text_33')}
-                                    </div>
-                                </div>
+                                <TabPhoto
+                                    src={t('about.rse.ancrage_image')}
+                                    alt={t('about.rse.text_26')}
+                                    figure={t.c('about.rse.text_30')}
+                                    caption={t.c('about.rse.text_31')}
+                                    noteTitle={t.c('about.rse.text_32')}
+                                    note={t.c('about.rse.text_33')}
+                                />
                             </div>
                         </div>
                     </div>
@@ -619,5 +604,52 @@ export default function AboutPage({
             </main>
             <SiteFooter activities={activities} site={site} />
         </>
+    );
+}
+
+// Photo d'un onglet RSE (modifiable dans /admin/texts › À propos › Engagement
+// RSE), avec le chiffre clé et sa note affichés par-dessus. Même format que la
+// photo de l'onglet Recyclage ; le cadre s'agrandit si le texte est long.
+function TabPhoto({
+    src,
+    alt,
+    figure,
+    caption,
+    noteTitle,
+    note,
+}: {
+    src: string;
+    alt: string;
+    figure: ReactNode;
+    caption: ReactNode;
+    noteTitle: ReactNode;
+    note: ReactNode;
+}) {
+    return (
+        <div className="relative overflow-hidden rounded-xl border border-[#2E3440] bg-[#181B20] lg:col-span-5">
+            <img
+                src={src}
+                alt={alt}
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0F1115] via-[#0F1115]/70 to-[#0F1115]/0"></div>
+            <div className="relative flex aspect-4/3 flex-col justify-end gap-4 p-6">
+                <div>
+                    <p className="font-mono text-4xl font-extrabold text-[#C5A059]">
+                        {figure}
+                    </p>
+                    <p className="mt-1 text-xs tracking-wider text-gray-200 uppercase">
+                        {caption}
+                    </p>
+                </div>
+                <div className="rounded-lg border border-white/10 bg-[#0F1115]/75 p-3 text-xs text-gray-300 backdrop-blur-sm">
+                    <span className="font-semibold text-white">
+                        {noteTitle}
+                    </span>{' '}
+                    {note}
+                </div>
+            </div>
+        </div>
     );
 }
