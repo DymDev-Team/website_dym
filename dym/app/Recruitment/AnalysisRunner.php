@@ -160,7 +160,13 @@ class AnalysisRunner
         }
 
         if (function_exists('set_time_limit')) {
-            @set_time_limit((int) config('recruitment.timeout') + 60);
+            @set_time_limit((int) config('recruitment.timeout') * 2 + 60);
+        }
+
+        // Le proxy de l'hébergeur coupe les longues requêtes : l'analyse continue
+        // même si la page qui l'a lancée n'attend plus la réponse.
+        if (function_exists('ignore_user_abort')) {
+            @ignore_user_abort(true);
         }
 
         $started = hrtime(true);

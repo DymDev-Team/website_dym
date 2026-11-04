@@ -13,6 +13,13 @@
     </FilesMatch>
 </IfModule>
 
+# LiteSpeed : ne pas couper PHP quand la connexion se ferme (analyses des CV
+# lancées après la réponse ou depuis l'admin, qui durent plusieurs minutes).
+<IfModule Litespeed>
+    SetEnv noabort 1
+    SetEnv noconntimeout 1
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

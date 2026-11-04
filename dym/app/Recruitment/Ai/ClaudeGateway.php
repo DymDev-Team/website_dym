@@ -73,8 +73,8 @@ class ClaudeGateway implements ModelGateway
     }
 
     /**
-     * SDK client; the SDK itself retries rate limits and server errors twice
-     * before the callers' own attempts.
+     * SDK client without its own retries: the callers' attempts retry, so an
+     * attempt (research + analysis) always ends before it is deemed stale.
      */
     protected function client(string $apiKey, ?ClientInterface $transporter = null): Client
     {
@@ -82,7 +82,7 @@ class ClaudeGateway implements ModelGateway
             apiKey: $apiKey,
             requestOptions: RequestOptions::with(
                 timeout: (float) config('recruitment.timeout'),
-                maxRetries: 2,
+                maxRetries: 0,
                 transporter: $transporter,
             ),
         );
