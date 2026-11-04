@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { useSectionColor } from '@/components/site/use-section-color';
 import { useTexts } from '@/components/site/use-texts';
 import { SiteHeader } from '@/components/site/site-header';
 import { SiteFooter } from '@/components/site/site-footer';
@@ -33,6 +34,14 @@ export default function AboutPage({
 }) {
     const t = useTexts();
     const [tab, setTab] = useState('recyclage');
+    // Couleurs de fond et des libellés, réglables dans /admin/settings.
+    const heroStyle = useSectionColor('about_page_hero');
+    const heroColor: string = heroStyle.backgroundColor ?? '#0F1115';
+    const missionStyle = useSectionColor('about_page_mission');
+    const hseStyle = useSectionColor('about_page_hse');
+    const rseStyle = useSectionColor('about_page_rse');
+    const figuresStyle = useSectionColor('about_page_figures');
+    const contactStyle = useSectionColor('about_page_contact');
     return (
         <>
             <Head title={t('about.meta.title')}>
@@ -43,7 +52,10 @@ export default function AboutPage({
             </Head>
             <SiteHeader active="À propos" />
             <main className="bg-[#0F1115] text-gray-100 [&_section[id]]:scroll-mt-24">
-                <section className="relative flex min-h-[65vh] items-center overflow-hidden py-20">
+                <section
+                    style={heroStyle}
+                    className="relative flex min-h-[65vh] items-center overflow-hidden py-20"
+                >
                     {/* Image de fond modifiable dans /admin/texts (À propos › Bandeau principal). */}
                     <img
                         src={t('about.hero.background')}
@@ -52,15 +64,26 @@ export default function AboutPage({
                         fetchPriority="high"
                         className="absolute inset-0 h-full w-full object-cover"
                     />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0F1115] via-[#0F1115]/85 to-[#0F1115]/45"></div>
+                    {/* Voiles teintés de la couleur choisie dans /admin/settings. */}
+                    <div
+                        className="pointer-events-none absolute inset-0"
+                        style={{
+                            backgroundImage: `linear-gradient(to right, ${heroColor}, color-mix(in srgb, ${heroColor} 85%, transparent), color-mix(in srgb, ${heroColor} 45%, transparent))`,
+                        }}
+                    ></div>
                     <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[30px_30px]"></div>
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0F1115]"></div>
+                    <div
+                        className="pointer-events-none absolute inset-0"
+                        style={{
+                            backgroundImage: `linear-gradient(to bottom, transparent, transparent, ${heroColor})`,
+                        }}
+                    ></div>
 
                     <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-8">
                             <div className="space-y-6 lg:col-span-7">
-                                <div className="inline-flex items-center gap-2 rounded-full border border-[#C5A059]/30 bg-[#C5A059]/10 px-3.5 py-1.5 text-xs font-semibold tracking-wider text-[#C5A059] uppercase">
-                                    <span className="h-2 w-2 animate-pulse rounded-full bg-[#C5A059]"></span>
+                                <div className="inline-flex items-center gap-2 hx-label rounded-full border border-current/30 bg-current/10 px-3.5 py-1.5 text-xs font-semibold tracking-wider text-[#C5A059] uppercase">
+                                    <span className="h-2 w-2 animate-pulse rounded-full bg-current"></span>
                                     {t.c('about.hero.text_01')}
                                 </div>
 
@@ -82,11 +105,12 @@ export default function AboutPage({
 
                 <section
                     id="mission-vision"
+                    style={missionStyle}
                     className="border-y border-[#2E3440]/60 bg-[#181B20]/50 py-20"
                 >
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="mx-auto mb-16 max-w-3xl space-y-3 text-center">
-                            <span className="rounded-full border border-[#C5A059]/20 bg-[#C5A059]/10 px-3 py-1 text-xs font-semibold tracking-widest text-[#C5A059] uppercase">
+                            <span className="hx-label rounded-full border border-current/20 bg-current/10 px-3 py-1 text-xs font-semibold tracking-widest text-[#C5A059] uppercase">
                                 {t.c('about.mission_vision.text_01')}
                             </span>
                             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
@@ -106,7 +130,7 @@ export default function AboutPage({
                                             className="h-7 w-7"
                                         />
                                     </div>
-                                    <span className="font-mono text-xs tracking-widest text-[#C5A059] uppercase">
+                                    <span className="hx-label font-mono text-xs tracking-widest text-[#C5A059] uppercase">
                                         {t.c('about.mission_vision.text_04')}
                                     </span>
                                     <h3 className="text-2xl font-bold text-white">
@@ -142,7 +166,7 @@ export default function AboutPage({
                                             className="h-7 w-7"
                                         />
                                     </div>
-                                    <span className="font-mono text-xs tracking-widest text-[#C5A059] uppercase">
+                                    <span className="hx-label font-mono text-xs tracking-widest text-[#C5A059] uppercase">
                                         {t.c('about.mission_vision.text_09')}
                                     </span>
                                     <h3 className="text-2xl font-bold text-white">
@@ -173,11 +197,11 @@ export default function AboutPage({
                     </div>
                 </section>
 
-                <section id="hse" className="relative py-20">
+                <section id="hse" style={hseStyle} className="relative py-20">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
                             <div>
-                                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#C5A059]/20 bg-[#C5A059]/10 px-3 py-1 text-xs font-semibold tracking-widest text-[#C5A059] uppercase">
+                                <div className="mb-3 inline-flex items-center gap-2 hx-label rounded-full border border-current/20 bg-current/10 px-3 py-1 text-xs font-semibold tracking-widest text-[#C5A059] uppercase">
                                     <Shield
                                         aria-hidden="true"
                                         className="h-3.5 w-3.5"
@@ -304,11 +328,12 @@ export default function AboutPage({
 
                 <section
                     id="rse"
+                    style={rseStyle}
                     className="border-t border-[#2E3440]/60 bg-[#181B20]/40 py-20"
                 >
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="mx-auto mb-16 max-w-3xl space-y-3 text-center">
-                            <span className="rounded-full border border-[#C5A059]/20 bg-[#C5A059]/10 px-3 py-1 text-xs font-semibold tracking-widest text-[#C5A059] uppercase">
+                            <span className="hx-label rounded-full border border-current/20 bg-current/10 px-3 py-1 text-xs font-semibold tracking-widest text-[#C5A059] uppercase">
                                 {t.c('about.rse.text_01')}
                             </span>
                             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
@@ -373,7 +398,7 @@ export default function AboutPage({
                                 className="hidden:hidden grid grid-cols-1 items-center gap-8 lg:grid-cols-12"
                             >
                                 <div className="space-y-4 lg:col-span-7">
-                                    <span className="font-mono text-xs tracking-wider text-[#C5A059] uppercase">
+                                    <span className="hx-label font-mono text-xs tracking-wider text-[#C5A059] uppercase">
                                         {t.c('about.rse.text_07')}
                                     </span>
                                     <h3 className="text-2xl font-bold text-white">
@@ -418,7 +443,7 @@ export default function AboutPage({
                                 className="hidden:hidden grid grid-cols-1 items-center gap-8 lg:grid-cols-12"
                             >
                                 <div className="space-y-4 lg:col-span-7">
-                                    <span className="font-mono text-xs tracking-wider text-[#C5A059] uppercase">
+                                    <span className="hx-label font-mono text-xs tracking-wider text-[#C5A059] uppercase">
                                         {t.c('about.rse.text_16')}
                                     </span>
                                     <h3 className="text-2xl font-bold text-white">
@@ -462,7 +487,7 @@ export default function AboutPage({
                                 className="hidden:hidden grid grid-cols-1 items-center gap-8 lg:grid-cols-12"
                             >
                                 <div className="space-y-4 lg:col-span-7">
-                                    <span className="font-mono text-xs tracking-wider text-[#C5A059] uppercase">
+                                    <span className="hx-label font-mono text-xs tracking-wider text-[#C5A059] uppercase">
                                         {t.c('about.rse.text_25')}
                                     </span>
                                     <h3 className="text-2xl font-bold text-white">
@@ -503,6 +528,7 @@ export default function AboutPage({
 
                 <section
                     id="chiffres"
+                    style={figuresStyle}
                     className="relative overflow-hidden bg-[#0F1115] py-20"
                 >
                     <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -569,12 +595,12 @@ export default function AboutPage({
                     </div>
                 </section>
 
-                <section className="bg-[#181B20]/60 py-20">
+                <section style={contactStyle} className="bg-[#181B20]/60 py-20">
                     <div className="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
                         <div className="relative overflow-hidden rounded-2xl border border-[#2E3440] bg-[#20242C] p-8 shadow-2xl sm:p-12">
                             <div className="pointer-events-none absolute top-0 right-0 h-48 w-48 rounded-full bg-[#C5A059]/10 blur-3xl"></div>
 
-                            <span className="rounded-full border border-[#C5A059]/20 bg-[#C5A059]/10 px-3 py-1 font-mono text-xs tracking-widest text-[#C5A059] uppercase">
+                            <span className="hx-label rounded-full border border-current/20 bg-current/10 px-3 py-1 font-mono text-xs tracking-widest text-[#C5A059] uppercase">
                                 {t.c('about.contact.text_01')}
                             </span>
 

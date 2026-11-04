@@ -69,6 +69,13 @@ class Setting extends Model
         'section_color_quote_page_form' => '#ffffff',
         'section_color_legal_page_heading' => '#ffffff',
         'section_color_legal_page_content' => '#ffffff',
+        // Page À propos (thème sombre) : teintes actuelles des sections, voiles compris.
+        'section_color_about_page_hero' => '#0f1115',
+        'section_color_about_page_mission' => '#14161b',
+        'section_color_about_page_hse' => '#0f1115',
+        'section_color_about_page_rse' => '#131519',
+        'section_color_about_page_figures' => '#0f1115',
+        'section_color_about_page_contact' => '#14171c',
         'section_label_color_header' => null,
         'section_label_color_hero' => null,
         'section_label_color_intro' => null,
@@ -100,6 +107,12 @@ class Setting extends Model
         'section_label_color_quote_page_form' => null,
         'section_label_color_legal_page_heading' => null,
         'section_label_color_legal_page_content' => null,
+        'section_label_color_about_page_hero' => null,
+        'section_label_color_about_page_mission' => null,
+        'section_label_color_about_page_hse' => null,
+        'section_label_color_about_page_rse' => null,
+        'section_label_color_about_page_figures' => null,
+        'section_label_color_about_page_contact' => null,
     ];
 
     protected $primaryKey = 'key';

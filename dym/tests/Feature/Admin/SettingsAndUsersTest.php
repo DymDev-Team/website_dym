@@ -2,6 +2,7 @@
 
 use App\Models\Setting;
 use App\Models\User;
+use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
     $this->admin = User::factory()->admin()->create();
@@ -48,6 +49,23 @@ test('label colors are saved independently for each section', function () {
         ->intro->toBeNull()
         ->activities->toBe('#123456')
         ->projects->toBeNull();
+});
+
+test('the about page section colors can be changed from the settings', function () {
+    $this->get(route('about'))->assertInertia(fn (Assert $page) => $page
+        ->where('siteSettings.section_colors.about_page_hero', '#0f1115')
+        ->where('siteSettings.section_label_colors.about_page_rse', null));
+
+    $this->actingAs($this->admin)->put(route('admin.settings.update'), [
+        ...array_filter(Setting::DEFAULTS, fn (string $key) => str_starts_with($key, 'section_color_'), ARRAY_FILTER_USE_KEY),
+        'section_color_about_page_hero' => '#222222',
+        'section_label_color_about_page_rse' => '#990000',
+    ])->assertSessionHasNoErrors();
+
+    $this->get(route('about'))->assertInertia(fn (Assert $page) => $page
+        ->where('siteSettings.section_colors.about_page_hero', '#222222')
+        ->where('siteSettings.section_colors.about_page_contact', '#14171c')
+        ->where('siteSettings.section_label_colors.about_page_rse', '#990000'));
 });
 
 test('section label colors must be valid hex colors', function () {
