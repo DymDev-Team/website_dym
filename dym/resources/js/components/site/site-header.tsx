@@ -3,7 +3,7 @@ import { ArrowRight, Menu, X } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { create as quoteCreate } from '@/routes/quotes';
-import { brands, realisations } from '@/routes';
+import { about, brands, realisations } from '@/routes';
 import { useTexts } from '@/components/site/use-texts';
 import { useSectionColor } from '@/components/site/use-section-color';
 import type { SiteSettings } from '@/types/admin';
@@ -12,6 +12,7 @@ export const siteNav = [
     // `label` identifie l'entrée (prop `active` des pages) ; le texte affiché
     // vient de t(`layout.header.nav_${key}`).
     { key: 'home', label: 'Accueil', href: '/' },
+    { key: 'about', label: 'À propos', navLabel: 'À propos', href: about.url() },
     { key: 'activities', label: 'Activités', navLabel: 'Nos activités', href: '/activites' },
     { key: 'projects', label: 'Réalisations', navLabel: 'Nos réalisations', href: realisations.url() },
     { key: 'brands', label: 'Marques', href: brands.url() },

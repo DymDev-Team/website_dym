@@ -12,6 +12,7 @@ use App\Models\LegalPage;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [SiteController::class, 'home'])->name('home');
+Route::get('a-propos', [SiteController::class, 'about'])->name('about');
 Route::get('activites', [SiteController::class, 'activities'])->name('activities');
 Route::get('activites/{activity}', [SiteController::class, 'activity'])->name('activities.show');
 Route::get('realisations', [SiteController::class, 'projects'])->name('realisations');

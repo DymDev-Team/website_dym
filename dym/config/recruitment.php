@@ -42,7 +42,11 @@ return [
     'web_search_price' => 0.01,
 
     // Recherches web au plus par CV (écoles et entreprises citées).
-    'web_searches_per_cv' => 5,
+    'web_searches_per_cv' => 3,
+
+    // Modèle rapide pour cette recherche, qui précède l'analyse elle-même :
+    // elle ne fait que vérifier des noms, inutile d'attendre le modèle choisi.
+    'research_model' => 'claude-haiku-5-5',
 
     /*
     |--------------------------------------------------------------------------

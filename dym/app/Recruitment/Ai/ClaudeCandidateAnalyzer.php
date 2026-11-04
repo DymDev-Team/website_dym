@@ -65,7 +65,7 @@ class ClaudeCandidateAnalyzer implements CandidateAnalyzer
                 content: [$this->cvBlock($request->cv), BetaTextBlockParam::with(text: 'Renseigne-toi sur les établissements et entreprises cités dans ce CV.')],
                 schema: AnalysisSchema::researchSchema(),
                 apiKey: $request->apiKey,
-                model: $request->model,
+                model: (string) (config('recruitment.research_model') ?: $request->model),
                 effort: 'low',
                 maxTokens: 8000,
                 tools: [BetaWebSearchTool20260209::with(maxUses: (int) config('recruitment.web_searches_per_cv'))],

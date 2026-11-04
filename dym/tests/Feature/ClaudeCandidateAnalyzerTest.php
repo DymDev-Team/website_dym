@@ -147,7 +147,10 @@ test('web research sends the search tool and bills each search', function () {
     $analysis = json_decode((string) $analyzer->transport->sent[1]->getBody(), true);
 
     // Deux appels : les recherches (avec l'outil, petit schéma), puis l'analyse (sans outil).
-    expect($research['tools'][0])->toMatchArray(['type' => 'web_search_20260209', 'name' => 'web_search', 'max_uses' => 5])
+    expect($research['tools'][0])->toMatchArray(['type' => 'web_search_20260209', 'name' => 'web_search', 'max_uses' => 3])
+        // La recherche passe par le modèle rapide, l'analyse par le modèle choisi.
+        ->and($research['model'])->toBe('claude-haiku-5-5')
+        ->and($analysis['model'])->toBe('claude-opus-5-5')
         ->and(array_keys($research['output_config']['format']['schema']['properties']))->toBe(['research'])
         ->and($analysis)->not->toHaveKey('tools')
         ->and($analysis['messages'][0]['content'][1]['text'])->toContain('<recherches_sur_le_parcours>')

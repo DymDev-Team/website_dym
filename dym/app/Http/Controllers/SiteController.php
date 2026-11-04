@@ -16,6 +16,14 @@ use Inertia\Response;
 
 class SiteController extends Controller
 {
+    public function about(): Response
+    {
+        return Inertia::render('a-propos', [
+            'activities' => Activity::query()->published()->ordered()->get(),
+            'site' => Setting::values(),
+        ]);
+    }
+
     /**
      * Public home page.
      */
