@@ -13,11 +13,11 @@ export const siteNav = [
     // `label` identifie l'entrée (prop `active` des pages) ; le texte affiché
     // vient de t(`layout.header.nav_${key}`).
     { key: 'home', label: 'Accueil', href: '/' },
-    { key: 'about', label: 'À propos', navLabel: 'À propos', href: about.url() },
     { key: 'activities', label: 'Activités', navLabel: 'Nos activités', href: activities.url() },
     { key: 'projects', label: 'Réalisations', navLabel: 'Nos réalisations', href: realisations.url() },
     { key: 'brands', label: 'Marques', href: brands.url() },
     { key: 'news', label: 'Actualités', href: '/actualites' },
+    { key: 'about', label: 'À propos', navLabel: 'À propos', href: about.url() },
     { key: 'careers', label: 'Carrière', href: '/carriere' },
 ];
 
