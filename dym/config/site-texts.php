@@ -616,6 +616,7 @@ return [
                     'text_02' => ['label' => 'Le spécialiste de la métallurgie', 'default' => 'Le spécialiste de la métallurgie'],
                     'text_03' => ['label' => 'Rigoureuse et Responsable.', 'default' => 'Rigoureuse et Responsable.'],
                     'text_04' => ['label' => 'Nous concevons et façonnons des ouvrages industriels et architectur…', 'default' => 'Nous concevons et façonnons des ouvrages industriels et architecturaux sur mesure en alliant haute précision technique, sécurité absolue sur chantier et durabilité garantie des matériaux.', 'multiline' => true],
+                    'background' => ['label' => 'Image de fond du bandeau', 'type' => 'image', 'default' => '/images/hero/atelier-dym.jpg'],
                 ],
             ],
             'mission_vision' => [

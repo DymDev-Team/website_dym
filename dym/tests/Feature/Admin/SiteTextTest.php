@@ -145,6 +145,24 @@ test('a process photo can be replaced, replaced again and reset to its default',
         ->and(SiteText::values()[$key])->toBe('/images/process/02-atelier.jpg');
 });
 
+test('the about page hero background can be replaced from the panel', function () {
+    Storage::fake('public');
+    $key = 'about.hero.background';
+
+    // La clé contient des points : comparaison sur le tableau entier.
+    $this->get(route('about'))->assertInertia(fn (Assert $page) => $page
+        ->where('texts', fn ($texts) => $texts[$key] === '/images/hero/atelier-dym.jpg'));
+
+    $this->actingAs($this->admin)
+        ->put(route('admin.texts.update'), ['images' => [
+            ['key' => $key, 'file' => UploadedFile::fake()->image('fond.jpg')],
+        ]])
+        ->assertSessionHasNoErrors();
+
+    $this->get(route('about'))->assertInertia(fn (Assert $page) => $page
+        ->where('texts', fn ($texts) => $texts[$key] === Storage::disk('public')->url(SiteText::storedPath($key))));
+});
+
 test('only declared image fields accept a photo, and only images', function () {
     Storage::fake('public');
 

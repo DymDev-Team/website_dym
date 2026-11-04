@@ -42,8 +42,18 @@ export default function AboutPage({
             </Head>
             <SiteHeader active="À propos" />
             <main className="bg-[#0F1115] text-gray-100 [&_section[id]]:scroll-mt-24">
-                <section className="relative flex min-h-[65vh] items-center overflow-hidden bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[30px_30px] py-20">
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0F1115]/40 via-[#0F1115]/80 to-[#0F1115]"></div>
+                <section className="relative flex min-h-[65vh] items-center overflow-hidden py-20">
+                    {/* Image de fond modifiable dans /admin/texts (À propos › Bandeau principal). */}
+                    <img
+                        src={t('about.hero.background')}
+                        alt=""
+                        aria-hidden="true"
+                        fetchPriority="high"
+                        className="absolute inset-0 h-full w-full object-cover"
+                    />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0F1115] via-[#0F1115]/85 to-[#0F1115]/45"></div>
+                    <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[30px_30px]"></div>
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0F1115]"></div>
 
                     <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-8">
