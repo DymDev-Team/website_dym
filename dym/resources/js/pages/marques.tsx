@@ -26,7 +26,7 @@ function hostname(url: string): string {
 }
 
 export default function MarquesPage({ brands, activities, site }: Props) {
-    const [ref, inView] = useInView<HTMLElement>(0.05, false);
+    const [ref, inView] = useInView<HTMLElement>(0.05);
     const t = useTexts();
     const listStyle = useSectionColor('brands_page_list');
 

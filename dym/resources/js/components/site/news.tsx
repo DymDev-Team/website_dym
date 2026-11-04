@@ -12,7 +12,7 @@ const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 export function News({ posts: news }: { posts: Post[] }) {
     const sectionStyle = useSectionColor('news');
-    const [ref, inView] = useInView<HTMLElement>(0.15, false);
+    const [ref, inView] = useInView<HTMLElement>(0.15);
     const trackRef = useRef<HTMLDivElement>(null);
     const t = useTexts();
 

@@ -48,7 +48,7 @@ function useAutoplay(video: RefObject<HTMLVideoElement | null>, active: boolean)
 export function Hero({ whatsappUrl }: { whatsappUrl: string | null }) {
     const sectionStyle = useSectionColor('hero');
     // Animations rejouées à chaque retour dans l'écran + photo en parallaxe légère.
-    const [ref, inView] = useInView<HTMLElement>(0.2, false);
+    const [ref, inView] = useInView<HTMLElement>(0.2);
     // Attend la levée de l'écran de chargement avant de jouer l'entrée.
     const loaded = useSiteLoaded();
     const ready = inView && loaded;

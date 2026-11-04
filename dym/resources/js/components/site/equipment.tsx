@@ -70,7 +70,7 @@ type Props = {
 
 export function Equipment({ equipment: equipments, textKey = 'home.equipment', colorKey = 'equipment', id = 'equipements', blueprint = true }: Props) {
     const sectionStyle = useSectionColor(colorKey);
-    const [ref, inView] = useInView<HTMLElement>(0.15, false);
+    const [ref, inView] = useInView<HTMLElement>(0.15);
     const t = useTexts();
     const titleLines = lines(t(`${textKey}.title`));
     const [active, setActive] = useState(0);

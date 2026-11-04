@@ -11,7 +11,7 @@ const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 // page À propos ; photo fixe cadrée comme la vidéo du bandeau.
 export function Intro() {
     const sectionStyle = useSectionColor('intro');
-    const [ref, inView] = useInView<HTMLElement>(0.2, false);
+    const [ref, inView] = useInView<HTMLElement>(0.2);
     const t = useTexts();
     const titleLines = lines(t('home.intro.title'));
     const photo = t('home.intro.image');

@@ -67,7 +67,7 @@ function PageLink({ url, dir }: { url: string | null; dir: 1 | -1 }) {
 }
 
 export default function ActualitesPage({ posts, categories, category, activities, site }: Props) {
-    const [ref, inView] = useInView<HTMLElement>(0.05, false);
+    const [ref, inView] = useInView<HTMLElement>(0.05);
     const t = useTexts();
     const listStyle = useSectionColor('news_page_list');
 

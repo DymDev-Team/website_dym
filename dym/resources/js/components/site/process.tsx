@@ -16,7 +16,7 @@ const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 export function Process() {
     const sectionStyle = useSectionColor('process');
-    const [ref, inView] = useInView<HTMLElement>(0.15, false);
+    const [ref, inView] = useInView<HTMLElement>(0.15);
     const trackRef = useRef<HTMLOListElement>(null);
     const [current, setCurrent] = useState(0);
     const t = useTexts();

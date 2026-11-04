@@ -31,7 +31,7 @@ const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 function Products() {
     const sectionStyle = useSectionColor('activities_page_products');
-    const [ref, inView] = useInView<HTMLElement>(0.1, false);
+    const [ref, inView] = useInView<HTMLElement>(0.1);
     const t = useTexts();
     const products = productImages.map((image, i) => ({
         image,

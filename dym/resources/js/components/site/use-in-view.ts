@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
-// Passe à true quand l'élément entre dans la fenêtre (déclenche les animations
-// .hx-fade / .hx-line via la classe is-ready). Avec once=false, repasse à false
-// quand il en sort complètement, pour rejouer l'animation au retour.
-export function useInView<T extends Element>(threshold = 0.2, once = true) {
+// Déclenche les animations .hx-fade / .hx-line à la première apparition.
+// Le contenu reste visible ensuite, y compris en remontant la page.
+export function useInView<T extends Element>(threshold = 0.2) {
     const ref = useRef<T>(null);
     const [inView, setInView] = useState(false);
 
@@ -19,11 +18,7 @@ export function useInView<T extends Element>(threshold = 0.2, once = true) {
                 if (entry.intersectionRatio >= threshold) {
                     setInView(true);
 
-                    if (once) {
-                        observer.disconnect();
-                    }
-                } else if (!once && !entry.isIntersecting) {
-                    setInView(false);
+                    observer.disconnect();
                 }
             },
             { threshold: [0, threshold] },
@@ -31,7 +26,7 @@ export function useInView<T extends Element>(threshold = 0.2, once = true) {
         observer.observe(el);
 
         return () => observer.disconnect();
-    }, [threshold, once]);
+    }, [threshold]);
 
     return [ref, inView] as const;
 }
