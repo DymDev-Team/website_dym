@@ -3,12 +3,12 @@ import type { CSSProperties } from 'react';
 import { useInView } from '@/components/site/use-in-view';
 import { useSectionColor } from '@/components/site/use-section-color';
 import { lines, useTexts, withDot } from '@/components/site/use-texts';
-import { activities } from '@/routes';
+import { about } from '@/routes';
 
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 // « À propos », sous le bandeau principal : titre, paragraphe et bouton vers la
-// page Activités ; photo fixe cadrée comme la vidéo du bandeau.
+// page À propos ; photo fixe cadrée comme la vidéo du bandeau.
 export function Intro() {
     const sectionStyle = useSectionColor('intro');
     const [ref, inView] = useInView<HTMLElement>(0.2, false);
@@ -40,7 +40,7 @@ export function Intro() {
                     </p>
 
                     <Link
-                        href={t.href('home.intro.cta', activities())}
+                        href={t.href('home.intro.cta', about())}
                         // Fond et bordure choisis dans /admin/texts ; couleur du texte comme les autres textes.
                         style={{ ...delay(0.55), backgroundColor: t('home.intro.cta_background'), borderColor: t('home.intro.cta_border'), ...t.style('home.intro.cta') }}
                         className="hx-fade mt-8 inline-flex items-center rounded-[10px] border px-5 py-2.5 text-[18px] font-bold text-dym shadow-sm transition-[box-shadow,filter] hover:shadow-md hover:brightness-95 lg:text-[clamp(18px,1.5vw,26px)]"

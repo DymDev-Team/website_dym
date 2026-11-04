@@ -17,6 +17,7 @@ import {
     Send,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useTexts } from '@/components/site/use-texts';
 import { SiteHeader } from '@/components/site/site-header';
 import { SiteFooter } from '@/components/site/site-footer';
 import { create as quoteCreate } from '@/routes/quotes';
@@ -29,13 +30,14 @@ export default function AboutPage({
     activities: SiteActivity[];
     site: SiteSettings;
 }) {
+    const t = useTexts();
     const [tab, setTab] = useState('recyclage');
     return (
         <>
-            <Head title="À propos | DYM Manufacture">
+            <Head title={t('about.meta.title')}>
                 <meta
                     name="description"
-                    content="Découvrez la mission, la vision et les engagements HSE et RSE de DYM Manufacture, spécialiste des ouvrages métalliques sur mesure."
+                    content={t('about.meta.description')}
                 />
             </Head>
             <SiteHeader active="À propos" />
@@ -48,23 +50,19 @@ export default function AboutPage({
                             <div className="space-y-6 lg:col-span-7">
                                 <div className="inline-flex items-center gap-2 rounded-full border border-[#C5A059]/30 bg-[#C5A059]/10 px-3.5 py-1.5 text-xs font-semibold tracking-wider text-[#C5A059] uppercase">
                                     <span className="h-2 w-2 animate-pulse rounded-full bg-[#C5A059]"></span>
-                                    À Propos de DYM Manufacture
+                                    {t.c('about.hero.text_01')}
                                 </div>
 
                                 <h1 className="text-3xl leading-tight font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                                    Le spécialiste de la métallurgie{' '}
+                                    {t.c('about.hero.text_02')}{' '}
                                     <br className="hidden sm:inline" />
                                     <span className="bg-gradient-to-br from-[#FFF0D0] via-[#C5A059] to-[#E5C158] bg-clip-text text-transparent">
-                                        Rigoureuse et Responsable.
+                                        {t.c('about.hero.text_03')}
                                     </span>
                                 </h1>
 
                                 <p className="max-w-2xl text-base leading-relaxed font-normal text-gray-300 sm:text-lg">
-                                    Nous concevons et façonnons des ouvrages
-                                    industriels et architecturaux sur mesure en
-                                    alliant haute précision technique, sécurité
-                                    absolue sur chantier et durabilité garantie
-                                    des matériaux.
+                                    {t.c('about.hero.text_04')}
                                 </p>
                             </div>
                         </div>
@@ -78,14 +76,13 @@ export default function AboutPage({
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="mx-auto mb-16 max-w-3xl space-y-3 text-center">
                             <span className="rounded-full border border-[#C5A059]/20 bg-[#C5A059]/10 px-3 py-1 text-xs font-semibold tracking-widest text-[#C5A059] uppercase">
-                                Notre Raison d'Être
+                                {t.c('about.mission_vision.text_01')}
                             </span>
                             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-                                Un cap clair pour l'industrie de demain
+                                {t.c('about.mission_vision.text_02')}
                             </h2>
                             <p className="text-sm text-gray-400 sm:text-base">
-                                Chaque projet est une synthèse entre précision
-                                technique et responsabilité industrielle.
+                                {t.c('about.mission_vision.text_03')}
                             </p>
                         </div>
 
@@ -99,19 +96,13 @@ export default function AboutPage({
                                         />
                                     </div>
                                     <span className="font-mono text-xs tracking-widest text-[#C5A059] uppercase">
-                                        Orientation Stratégique
+                                        {t.c('about.mission_vision.text_04')}
                                     </span>
                                     <h3 className="text-2xl font-bold text-white">
-                                        Notre Mission
+                                        {t.c('about.mission_vision.text_05')}
                                     </h3>
                                     <p className="text-sm leading-relaxed text-gray-300">
-                                        Concevoir et fabriquer des ouvrages
-                                        métalliques et multi-matériaux sur
-                                        mesure, en garantissant une précision
-                                        d'exécution irréprochable et un suivi
-                                        rigoureux à chaque étape du projet, de
-                                        l'étude B2B jusqu'à la pose finale sur
-                                        chantier.
+                                        {t.c('about.mission_vision.text_06')}
                                     </p>
                                 </div>
                                 <ul className="mt-6 space-y-2 border-t border-[#2E3440]/60 pt-6 text-xs text-gray-400">
@@ -120,16 +111,14 @@ export default function AboutPage({
                                             aria-hidden="true"
                                             className="h-4 w-4 text-[#C5A059]"
                                         />{' '}
-                                        Étude personnalisée & métrés de
-                                        précision
+                                        {t.c('about.mission_vision.text_07')}
                                     </li>
                                     <li className="flex items-center gap-2">
                                         <Check
                                             aria-hidden="true"
                                             className="h-4 w-4 text-[#C5A059]"
                                         />{' '}
-                                        Sélection d'alliages certifiés &
-                                        traçables
+                                        {t.c('about.mission_vision.text_08')}
                                     </li>
                                 </ul>
                             </div>
@@ -143,18 +132,13 @@ export default function AboutPage({
                                         />
                                     </div>
                                     <span className="font-mono text-xs tracking-widest text-[#C5A059] uppercase">
-                                        Ambition & Avenir
+                                        {t.c('about.mission_vision.text_09')}
                                     </span>
                                     <h3 className="text-2xl font-bold text-white">
-                                        Notre Vision
+                                        {t.c('about.mission_vision.text_10')}
                                     </h3>
                                     <p className="text-sm leading-relaxed text-gray-300">
-                                        Devenir la référence industrielle
-                                        régionale en matière d'innovation
-                                        rigoureuse, de sécurité sur chantier et
-                                        de fabrication responsable pour tous les
-                                        projets architecturaux, tertiaires et
-                                        industriels d'envergure.
+                                        {t.c('about.mission_vision.text_11')}
                                     </p>
                                 </div>
                                 <ul className="mt-6 space-y-2 border-t border-[#2E3440]/60 pt-6 text-xs text-gray-400">
@@ -163,16 +147,14 @@ export default function AboutPage({
                                             aria-hidden="true"
                                             className="h-4 w-4 text-[#C5A059]"
                                         />{' '}
-                                        Décarbonation progressive des process
-                                        d'usinage
+                                        {t.c('about.mission_vision.text_12')}
                                     </li>
                                     <li className="flex items-center gap-2">
                                         <Check
                                             aria-hidden="true"
                                             className="h-4 w-4 text-[#C5A059]"
                                         />{' '}
-                                        Standard 'Zéro Accident' sur tous nos
-                                        chantiers
+                                        {t.c('about.mission_vision.text_13')}
                                     </li>
                                 </ul>
                             </div>
@@ -189,17 +171,14 @@ export default function AboutPage({
                                         aria-hidden="true"
                                         className="h-3.5 w-3.5"
                                     />{' '}
-                                    Normes & Rigueurs Opérationnelles
+                                    {t.c('about.hse.text_01')}
                                 </div>
                                 <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-                                    Politique HSE : La Sécurité sans Compromis
+                                    {t.c('about.hse.text_02')}
                                 </h2>
                             </div>
                             <p className="max-w-md text-sm text-gray-400">
-                                La qualité d'un ouvrage ne s'arrête pas à son
-                                esthétique. Elle repose sur la maîtrise totale
-                                des risques humains et environnementaux en
-                                atelier comme sur chantier.
+                                {t.c('about.hse.text_03')}
                             </p>
                         </div>
 
@@ -212,7 +191,7 @@ export default function AboutPage({
                                     />
                                 </div>
                                 <h3 className="mb-3 text-xl font-bold text-white">
-                                    Sécurité des Équipes
+                                    {t.c('about.hse.text_04')}
                                 </h3>
                                 <ul className="space-y-3 text-sm text-gray-300">
                                     <li className="flex items-start gap-2.5">
@@ -220,32 +199,21 @@ export default function AboutPage({
                                             aria-hidden="true"
                                             className="mt-0.5 h-4 w-4 shrink-0 text-[#C5A059]"
                                         />
-                                        <span>
-                                            Port systématique des EPI
-                                            obligatoires en atelier et sur site
-                                            client.
-                                        </span>
+                                        <span>{t.c('about.hse.text_05')}</span>
                                     </li>
                                     <li className="flex items-start gap-2.5">
                                         <ShieldAlert
                                             aria-hidden="true"
                                             className="mt-0.5 h-4 w-4 shrink-0 text-[#C5A059]"
                                         />
-                                        <span>
-                                            Protocoles stricts pour la
-                                            manipulation des machines et charges
-                                            lourdes.
-                                        </span>
+                                        <span>{t.c('about.hse.text_06')}</span>
                                     </li>
                                     <li className="flex items-start gap-2.5">
                                         <ShieldAlert
                                             aria-hidden="true"
                                             className="mt-0.5 h-4 w-4 shrink-0 text-[#C5A059]"
                                         />
-                                        <span>
-                                            Procédures d'ancrage et de pose
-                                            sécurisées pour les utilisateurs.
-                                        </span>
+                                        <span>{t.c('about.hse.text_07')}</span>
                                     </li>
                                 </ul>
                             </div>
@@ -258,7 +226,7 @@ export default function AboutPage({
                                     />
                                 </div>
                                 <h3 className="mb-3 text-xl font-bold text-white">
-                                    Santé & Ergonomie
+                                    {t.c('about.hse.text_08')}
                                 </h3>
                                 <ul className="space-y-3 text-sm text-gray-300">
                                     <li className="flex items-start gap-2.5">
@@ -266,32 +234,21 @@ export default function AboutPage({
                                             aria-hidden="true"
                                             className="mt-0.5 h-4 w-4 shrink-0 text-[#C5A059]"
                                         />
-                                        <span>
-                                            Aménagement ergonomique des postes
-                                            d'usinage et d'assemblage.
-                                        </span>
+                                        <span>{t.c('about.hse.text_09')}</span>
                                     </li>
                                     <li className="flex items-start gap-2.5">
                                         <HeartPulse
                                             aria-hidden="true"
                                             className="mt-0.5 h-4 w-4 shrink-0 text-[#C5A059]"
                                         />
-                                        <span>
-                                            Prévention active des risques
-                                            professionnels et des TMS (troubles
-                                            musculo-squelettiques).
-                                        </span>
+                                        <span>{t.c('about.hse.text_10')}</span>
                                     </li>
                                     <li className="flex items-start gap-2.5">
                                         <HeartPulse
                                             aria-hidden="true"
                                             className="mt-0.5 h-4 w-4 shrink-0 text-[#C5A059]"
                                         />
-                                        <span>
-                                            Maintien d'un environnement de
-                                            travail propre, ordonné et
-                                            régulièrement audité.
-                                        </span>
+                                        <span>{t.c('about.hse.text_11')}</span>
                                     </li>
                                 </ul>
                             </div>
@@ -304,7 +261,7 @@ export default function AboutPage({
                                     />
                                 </div>
                                 <h3 className="mb-3 text-xl font-bold text-white">
-                                    Maîtrise des Impacts
+                                    {t.c('about.hse.text_12')}
                                 </h3>
                                 <ul className="space-y-3 text-sm text-gray-300">
                                     <li className="flex items-start gap-2.5">
@@ -312,32 +269,21 @@ export default function AboutPage({
                                             aria-hidden="true"
                                             className="mt-0.5 h-4 w-4 shrink-0 text-[#C5A059]"
                                         />
-                                        <span>
-                                            Captation haute performance des
-                                            fumées de soudure et contrôle des
-                                            émissions.
-                                        </span>
+                                        <span>{t.c('about.hse.text_13')}</span>
                                     </li>
                                     <li className="flex items-start gap-2.5">
                                         <Fan
                                             aria-hidden="true"
                                             className="mt-0.5 h-4 w-4 shrink-0 text-[#C5A059]"
                                         />
-                                        <span>
-                                            Gestion stricte des étincelles et
-                                            réduction des nuisances sonores.
-                                        </span>
+                                        <span>{t.c('about.hse.text_14')}</span>
                                     </li>
                                     <li className="flex items-start gap-2.5">
                                         <Fan
                                             aria-hidden="true"
                                             className="mt-0.5 h-4 w-4 shrink-0 text-[#C5A059]"
                                         />
-                                        <span>
-                                            Stockage sécurisé des produits de
-                                            finition et gestion responsable des
-                                            consommables.
-                                        </span>
+                                        <span>{t.c('about.hse.text_15')}</span>
                                     </li>
                                 </ul>
                             </div>
@@ -352,16 +298,13 @@ export default function AboutPage({
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="mx-auto mb-16 max-w-3xl space-y-3 text-center">
                             <span className="rounded-full border border-[#C5A059]/20 bg-[#C5A059]/10 px-3 py-1 text-xs font-semibold tracking-widest text-[#C5A059] uppercase">
-                                Engagement RSE
+                                {t.c('about.rse.text_01')}
                             </span>
                             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-                                Une Fabrication Pensée pour Durer & Respecter
-                                les Ressources
+                                {t.c('about.rse.text_02')}
                             </h2>
                             <p className="text-sm text-gray-400 sm:text-base">
-                                Découvrez comment nous intégrons la
-                                responsabilité sociétale au cœur de nos
-                                processus de fabrication.
+                                {t.c('about.rse.text_03')}
                             </p>
                         </div>
 
@@ -379,7 +322,7 @@ export default function AboutPage({
                                         aria-hidden="true"
                                         className="h-4 w-4"
                                     />
-                                    1. Recyclage & Matière
+                                    {t.c('about.rse.text_04')}
                                 </button>
                                 <button
                                     type="button"
@@ -393,7 +336,7 @@ export default function AboutPage({
                                         aria-hidden="true"
                                         className="h-4 w-4"
                                     />
-                                    2. Durabilité & Finitions
+                                    {t.c('about.rse.text_05')}
                                 </button>
                                 <button
                                     type="button"
@@ -407,7 +350,7 @@ export default function AboutPage({
                                         aria-hidden="true"
                                         className="h-4 w-4"
                                     />
-                                    3. Ancrage Local & Capital Humain
+                                    {t.c('about.rse.text_06')}
                                 </button>
                             </div>
 
@@ -420,19 +363,13 @@ export default function AboutPage({
                             >
                                 <div className="space-y-4 lg:col-span-7">
                                     <span className="font-mono text-xs tracking-wider text-[#C5A059] uppercase">
-                                        Optimisation des Matières Premières
+                                        {t.c('about.rse.text_07')}
                                     </span>
                                     <h3 className="text-2xl font-bold text-white">
-                                        Gestion Intelligente des Métaux &
-                                        Déchets
+                                        {t.c('about.rse.text_08')}
                                     </h3>
                                     <p className="text-sm leading-relaxed text-gray-300">
-                                        Dans notre atelier, chaque tôle et
-                                        chaque profilé est optimisé grâce à nos
-                                        logiciels de découpe automatique
-                                        (imbrication de pièces). Cela nous
-                                        permet de réduire au strict minimum les
-                                        chutages de métal.
+                                        {t.c('about.rse.text_09')}
                                     </p>
                                     <ul className="space-y-2 pt-2 text-sm text-gray-300">
                                         <li className="flex items-center gap-2">
@@ -440,37 +377,31 @@ export default function AboutPage({
                                                 aria-hidden="true"
                                                 className="h-4 w-4 shrink-0 text-[#C5A059]"
                                             />{' '}
-                                            Revalorisation à 100% des chutes
-                                            métalliques auprès de filières de
-                                            recyclage agréées.
+                                            {t.c('about.rse.text_10')}
                                         </li>
                                         <li className="flex items-center gap-2">
                                             <CheckCircle2
                                                 aria-hidden="true"
                                                 className="h-4 w-4 shrink-0 text-[#C5A059]"
                                             />{' '}
-                                            Tri sélectif rigoureux de tous les
-                                            déchets industriels banals et
-                                            dangereux.
+                                            {t.c('about.rse.text_11')}
                                         </li>
                                     </ul>
                                 </div>
                                 <div className="space-y-4 rounded-xl border border-[#2E3440] bg-[#181B20] p-6 lg:col-span-5">
                                     <div className="py-4 text-center">
                                         <p className="font-mono text-4xl font-extrabold text-[#C5A059]">
-                                            100%
+                                            {t.c('about.rse.text_12')}
                                         </p>
                                         <p className="mt-1 text-xs tracking-wider text-gray-400 uppercase">
-                                            Des Chutes Métalliques Revalorisées
+                                            {t.c('about.rse.text_13')}
                                         </p>
                                     </div>
                                     <div className="rounded-lg border border-[#2E3440] bg-[#0F1115]/60 p-3 text-xs text-gray-400">
                                         <span className="font-semibold text-white">
-                                            Indicateur d'Atelier :
+                                            {t.c('about.rse.text_14')}
                                         </span>{' '}
-                                        Zéro déchet métallique non-traité.
-                                        Traçabilité complète du cycle de
-                                        réutilisation des sous-produits.
+                                        {t.c('about.rse.text_15')}
                                     </div>
                                 </div>
                             </div>
@@ -484,19 +415,13 @@ export default function AboutPage({
                             >
                                 <div className="space-y-4 lg:col-span-7">
                                     <span className="font-mono text-xs tracking-wider text-[#C5A059] uppercase">
-                                        Pérennité des Ouvrages
+                                        {t.c('about.rse.text_16')}
                                     </span>
                                     <h3 className="text-2xl font-bold text-white">
-                                        Traitement Anti-Corrosion & Matériaux
-                                        Résistants
+                                        {t.c('about.rse.text_17')}
                                     </h3>
                                     <p className="text-sm leading-relaxed text-gray-300">
-                                        Un ouvrage durable est un ouvrage qui
-                                        résiste à l'épreuve du temps et des
-                                        contraintes climatiques. Nous appliquons
-                                        des traitements de surface de haute
-                                        qualité (galvanisation, thermolaquage,
-                                        finitions anticorrosion).
+                                        {t.c('about.rse.text_18')}
                                     </p>
                                     <ul className="space-y-2 pt-2 text-sm text-gray-300">
                                         <li className="flex items-center gap-2">
@@ -504,37 +429,31 @@ export default function AboutPage({
                                                 aria-hidden="true"
                                                 className="h-4 w-4 shrink-0 text-[#C5A059]"
                                             />{' '}
-                                            Choix rigoureux d'alliages adaptés à
-                                            chaque environnement
-                                            (intérieur/extérieur/marin).
+                                            {t.c('about.rse.text_19')}
                                         </li>
                                         <li className="flex items-center gap-2">
                                             <CheckCircle2
                                                 aria-hidden="true"
                                                 className="h-4 w-4 shrink-0 text-[#C5A059]"
                                             />{' '}
-                                            Conception pensée pour faciliter la
-                                            maintenance future et réduire les
-                                            coûts globaux.
+                                            {t.c('about.rse.text_20')}
                                         </li>
                                     </ul>
                                 </div>
                                 <div className="space-y-4 rounded-xl border border-[#2E3440] bg-[#181B20] p-6 lg:col-span-5">
                                     <div className="py-4 text-center">
                                         <p className="font-mono text-4xl font-extrabold text-[#C5A059]">
-                                            20+ Ans
+                                            {t.c('about.rse.text_21')}
                                         </p>
                                         <p className="mt-1 text-xs tracking-wider text-gray-400 uppercase">
-                                            Résistance Estimée aux Intempéries
+                                            {t.c('about.rse.text_22')}
                                         </p>
                                     </div>
                                     <div className="rounded-lg border border-[#2E3440] bg-[#0F1115]/60 p-3 text-xs text-gray-400">
                                         <span className="font-semibold text-white">
-                                            Standard Qualité :
+                                            {t.c('about.rse.text_23')}
                                         </span>{' '}
-                                        Application strictement conforme aux
-                                        exigences d'exposition en milieu
-                                        industriel et urbain.
+                                        {t.c('about.rse.text_24')}
                                     </div>
                                 </div>
                             </div>
@@ -548,19 +467,13 @@ export default function AboutPage({
                             >
                                 <div className="space-y-4 lg:col-span-7">
                                     <span className="font-mono text-xs tracking-wider text-[#C5A059] uppercase">
-                                        Social & Territoire
+                                        {t.c('about.rse.text_25')}
                                     </span>
                                     <h3 className="text-2xl font-bold text-white">
-                                        Ancrage Territorial & Montée en
-                                        Compétences
+                                        {t.c('about.rse.text_26')}
                                     </h3>
                                     <p className="text-sm leading-relaxed text-gray-300">
-                                        Nous investissons continuellement dans
-                                        l'humain. Transmettre les savoir-faire
-                                        de la chaudronnerie et de la métallerie
-                                        est essentiel pour préserver
-                                        l'excellence industrielle de notre
-                                        territoire.
+                                        {t.c('about.rse.text_27')}
                                     </p>
                                     <ul className="space-y-2 pt-2 text-sm text-gray-300">
                                         <li className="flex items-center gap-2">
@@ -568,37 +481,31 @@ export default function AboutPage({
                                                 aria-hidden="true"
                                                 className="h-4 w-4 shrink-0 text-[#C5A059]"
                                             />{' '}
-                                            Plan de formation continue pour nos
-                                            soudeurs, ajusteurs et chefs de
-                                            chantier.
+                                            {t.c('about.rse.text_28')}
                                         </li>
                                         <li className="flex items-center gap-2">
                                             <CheckCircle2
                                                 aria-hidden="true"
                                                 className="h-4 w-4 shrink-0 text-[#C5A059]"
                                             />{' '}
-                                            Partenariats avec les acteurs
-                                            économiques et sous-traitants
-                                            locaux.
+                                            {t.c('about.rse.text_29')}
                                         </li>
                                     </ul>
                                 </div>
                                 <div className="space-y-4 rounded-xl border border-[#2E3440] bg-[#181B20] p-6 lg:col-span-5">
                                     <div className="py-4 text-center">
                                         <p className="font-mono text-4xl font-extrabold text-[#C5A059]">
-                                            100%
+                                            {t.c('about.rse.text_30')}
                                         </p>
                                         <p className="mt-1 text-xs tracking-wider text-gray-400 uppercase">
-                                            Équipes & Partenaires Régionaux
+                                            {t.c('about.rse.text_31')}
                                         </p>
                                     </div>
                                     <div className="rounded-lg border border-[#2E3440] bg-[#0F1115]/60 p-3 text-xs text-gray-400">
                                         <span className="font-semibold text-white">
-                                            Valeur Humaine :
+                                            {t.c('about.rse.text_32')}
                                         </span>{' '}
-                                        Promotion de l'apprentissage et
-                                        valorisation des métiers manuels
-                                        qualifiés.
+                                        {t.c('about.rse.text_33')}
                                     </div>
                                 </div>
                             </div>
@@ -614,61 +521,59 @@ export default function AboutPage({
                         <div className="rounded-2xl border border-[#C5A059]/30 bg-gradient-to-r from-[#181B20] via-[#20242C] to-[#181B20] p-8 shadow-2xl sm:p-12">
                             <div className="mx-auto mb-10 max-w-2xl text-center">
                                 <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
-                                    Indicateurs de Réassurance B2B
+                                    {t.c('about.chiffres.text_01')}
                                 </h2>
                                 <p className="mt-2 text-xs text-[#9CA3AF] sm:text-sm">
-                                    Des standards rigoureux mesurés pour la
-                                    tranquillité d'esprit de nos donneurs
-                                    d'ordre.
+                                    {t.c('about.chiffres.text_02')}
                                 </p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-8 divide-y divide-[#2E3440]/60 text-center lg:grid-cols-4 lg:divide-x lg:divide-y-0">
                                 <div className="pt-4 lg:pt-0">
                                     <p className="font-mono text-3xl font-extrabold tracking-tight text-[#C5A059] sm:text-5xl">
-                                        0
+                                        {t.c('about.chiffres.text_03')}
                                     </p>
                                     <p className="mt-2 text-sm font-semibold text-white">
-                                        Accident Majeur
+                                        {t.c('about.chiffres.text_04')}
                                     </p>
                                     <p className="mt-1 text-xs text-gray-400">
-                                        Objectif permanent sur nos chantiers
+                                        {t.c('about.chiffres.text_05')}
                                     </p>
                                 </div>
 
                                 <div className="pt-4 lg:pt-0">
                                     <p className="font-mono text-3xl font-extrabold tracking-tight text-[#C5A059] sm:text-5xl">
-                                        100%
+                                        {t.c('about.chiffres.text_06')}
                                     </p>
                                     <p className="mt-2 text-sm font-semibold text-white">
-                                        Sur Mesure Validé
+                                        {t.c('about.chiffres.text_07')}
                                     </p>
                                     <p className="mt-1 text-xs text-gray-400">
-                                        Selon les normes de résistance
+                                        {t.c('about.chiffres.text_08')}
                                     </p>
                                 </div>
 
                                 <div className="pt-4 lg:pt-0">
                                     <p className="font-mono text-3xl font-extrabold tracking-tight text-[#C5A059] sm:text-5xl">
-                                        Longue
+                                        {t.c('about.chiffres.text_09')}
                                     </p>
                                     <p className="mt-2 text-sm font-semibold text-white">
-                                        Durabilité Garantie
+                                        {t.c('about.chiffres.text_10')}
                                     </p>
                                     <p className="mt-1 text-xs text-gray-400">
-                                        Traitements anticorrosion maîtrisés
+                                        {t.c('about.chiffres.text_11')}
                                     </p>
                                 </div>
 
                                 <div className="pt-4 lg:pt-0">
                                     <p className="font-mono text-3xl font-extrabold tracking-tight text-[#C5A059] sm:text-5xl">
-                                        Précis
+                                        {t.c('about.chiffres.text_12')}
                                     </p>
                                     <p className="mt-2 text-sm font-semibold text-white">
-                                        Dimensionnement
+                                        {t.c('about.chiffres.text_13')}
                                     </p>
                                     <p className="mt-1 text-xs text-gray-400">
-                                        Contrôle structurel rigoureux
+                                        {t.c('about.chiffres.text_14')}
                                     </p>
                                 </div>
                             </div>
@@ -682,18 +587,15 @@ export default function AboutPage({
                             <div className="pointer-events-none absolute top-0 right-0 h-48 w-48 rounded-full bg-[#C5A059]/10 blur-3xl"></div>
 
                             <span className="rounded-full border border-[#C5A059]/20 bg-[#C5A059]/10 px-3 py-1 font-mono text-xs tracking-widest text-[#C5A059] uppercase">
-                                Engagement & Partenariat
+                                {t.c('about.contact.text_01')}
                             </span>
 
                             <h2 className="mt-6 mb-4 text-2xl font-extrabold text-white sm:text-4xl">
-                                Un Projet d'Aménagement ou d'Ouvrage Métallique
-                                ?
+                                {t.c('about.contact.text_02')}
                             </h2>
 
                             <p className="mx-auto mb-8 max-w-2xl text-sm text-gray-300 sm:text-base">
-                                Échangeons sur vos contraintes techniques, vos
-                                exigences de sécurité HSE et vos besoins de
-                                fabrication sur mesure.
+                                {t.c('about.contact.text_03')}
                             </p>
 
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -705,7 +607,7 @@ export default function AboutPage({
                                         aria-hidden="true"
                                         className="h-5 w-5"
                                     />
-                                    Demander un Devis / Échanger avec un Expert
+                                    {t.c('about.contact.text_04')}
                                 </Link>
                             </div>
                         </div>

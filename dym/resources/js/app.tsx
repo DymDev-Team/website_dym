@@ -12,6 +12,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 // doivent pas hériter du layout (sidebar) de l'application.
 const publicPages = [
     'welcome',
+    'a-propos',
     'activites',
     'activite',
     'realisation',
