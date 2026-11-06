@@ -728,6 +728,8 @@ return [
                     'text_02' => ['label' => 'Un Projet d\'Aménagement ou d\'Ouvrage Métallique ?', 'default' => 'Un Projet d\'Aménagement ou d\'Ouvrage Métallique ?'],
                     'text_03' => ['label' => 'Échangeons sur vos contraintes techniques, vos exigences de sécurit…', 'default' => 'Échangeons sur vos contraintes techniques, vos exigences de sécurité HSE et vos besoins de fabrication sur mesure.', 'multiline' => true],
                     'text_04' => ['label' => 'Demander un Devis / Échanger avec un Expert', 'default' => 'Demander un Devis / Échanger avec un Expert'],
+                    'text_04_background' => ['label' => 'Bouton devis - fond', 'type' => 'color', 'default' => ''],
+                    'text_04_border' => ['label' => 'Bouton devis - bordure', 'type' => 'color', 'default' => ''],
                 ],
             ],
         ],

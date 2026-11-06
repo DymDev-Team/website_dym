@@ -656,7 +656,9 @@ export default function AboutPage({
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <Link
                                     href={quoteCreate()}
-                                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#C5A059] px-8 py-4 text-base font-semibold text-[#0F1115] shadow-lg transition-all duration-200 hover:bg-[#E5C158] sm:w-auto"
+                                    // Fond, bordure et couleur du texte choisis dans /admin/texts (À propos › Contact).
+                                    style={t.style('about.contact.text_04')}
+                                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#C5A059] px-8 py-4 text-base font-semibold text-[#0F1115] shadow-lg transition-all duration-200 hover:bg-[#E5C158] hover:brightness-95 sm:w-auto"
                                 >
                                     <Send
                                         aria-hidden="true"
