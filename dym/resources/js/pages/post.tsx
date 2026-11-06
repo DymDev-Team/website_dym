@@ -14,8 +14,6 @@ type Props = {
     site: SiteSettings;
 };
 
-const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' });
-
 export default function PostPage({ post, related, activities, site }: Props) {
     const t = useTexts();
     const contentStyle = useSectionColor('post_page_content');
@@ -49,16 +47,6 @@ export default function PostPage({ post, related, activities, site }: Props) {
                         <p className="hx-mono hx-label mt-8 flex items-center gap-3 text-[10px] tracking-[0.1em] text-neutral-500 uppercase">
                             <span className="size-[5px] bg-dym" aria-hidden />{' '}
                             {post.category}
-                            {post.published_at && (
-                                <>
-                                    <span className="text-neutral-300">/</span>
-                                    <time dateTime={post.published_at}>
-                                        {dateFormat.format(
-                                            new Date(post.published_at),
-                                        )}
-                                    </time>
-                                </>
-                            )}
                         </p>
 
                         <h1 className="mt-4 font-display text-[clamp(34px,6vw,58px)] leading-[0.98] uppercase">

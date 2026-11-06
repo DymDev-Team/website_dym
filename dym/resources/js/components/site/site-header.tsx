@@ -100,7 +100,7 @@ export function SiteHeader({ active = 'Accueil' }: { active?: string }) {
         >
             <div className={`mx-auto flex max-w-330 items-center justify-between gap-6 px-5 transition-[height] duration-300 lg:px-10 ${scrolled ? 'h-15' : 'h-18'}`}>
                 <div className="hd-item" style={delay(0.15)}>
-                    <SiteLogo className={scrolled ? 'h-10' : 'h-12'} src={siteSettings?.logo_url} />
+                    <SiteLogo className={scrolled ? 'h-12' : 'h-16'} src={siteSettings?.logo_url} />
                 </div>
 
                 <nav className="relative hidden h-full items-stretch lg:flex" onMouseLeave={() => setHovered(null)}>

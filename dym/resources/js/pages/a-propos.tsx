@@ -42,6 +42,11 @@ export default function AboutPage({
     const rseStyle = useSectionColor('about_page_rse');
     const figuresStyle = useSectionColor('about_page_figures');
     const contactStyle = useSectionColor('about_page_contact');
+    const missionCardsStyle = useSectionColor('about_page_mission_cards');
+    const hseCardsStyle = useSectionColor('about_page_hse_cards');
+    const rseCardsStyle = useSectionColor('about_page_rse_cards');
+    const figuresCardsStyle = useSectionColor('about_page_figures_cards');
+    const contactCardsStyle = useSectionColor('about_page_contact_cards');
     return (
         <>
             <Head title={t('about.meta.title')}>
@@ -122,7 +127,7 @@ export default function AboutPage({
                         </div>
 
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                            <div className="group flex flex-col justify-between rounded-2xl border border-[#2E3440] bg-[#20242C] p-8 shadow-lg transition-all duration-300 hover:border-[#C5A059]/40">
+                            <div style={missionCardsStyle} className="group flex flex-col justify-between rounded-2xl border border-[#2E3440] bg-[#20242C] p-8 shadow-lg transition-all duration-300 hover:border-[#C5A059]/40">
                                 <div className="space-y-4">
                                     <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[#C5A059]/30 bg-[#C5A059]/10 text-[#C5A059] transition-transform group-hover:scale-110">
                                         <Compass
@@ -158,7 +163,7 @@ export default function AboutPage({
                                 </ul>
                             </div>
 
-                            <div className="group flex flex-col justify-between rounded-2xl border border-[#2E3440] bg-[#20242C] p-8 shadow-lg transition-all duration-300 hover:border-[#C5A059]/40">
+                            <div style={missionCardsStyle} className="group flex flex-col justify-between rounded-2xl border border-[#2E3440] bg-[#20242C] p-8 shadow-lg transition-all duration-300 hover:border-[#C5A059]/40">
                                 <div className="space-y-4">
                                     <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[#C5A059]/30 bg-[#C5A059]/10 text-[#C5A059] transition-transform group-hover:scale-110">
                                         <Target
@@ -218,7 +223,7 @@ export default function AboutPage({
                         </div>
 
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-                            <div className="rounded-xl border border-[#2E3440] bg-[#181B20] p-6 transition-all hover:border-[#C5A059]/40">
+                            <div style={hseCardsStyle} className="rounded-xl border border-[#2E3440] bg-[#181B20] p-6 transition-all hover:border-[#C5A059]/40">
                                 <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-[#C5A059]/10 text-[#C5A059]">
                                     <HardHat
                                         aria-hidden="true"
@@ -253,7 +258,7 @@ export default function AboutPage({
                                 </ul>
                             </div>
 
-                            <div className="rounded-xl border border-[#2E3440] bg-[#181B20] p-6 transition-all hover:border-[#C5A059]/40">
+                            <div style={hseCardsStyle} className="rounded-xl border border-[#2E3440] bg-[#181B20] p-6 transition-all hover:border-[#C5A059]/40">
                                 <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-[#C5A059]/10 text-[#C5A059]">
                                     <Activity
                                         aria-hidden="true"
@@ -288,7 +293,7 @@ export default function AboutPage({
                                 </ul>
                             </div>
 
-                            <div className="rounded-xl border border-[#2E3440] bg-[#181B20] p-6 transition-all hover:border-[#C5A059]/40">
+                            <div style={hseCardsStyle} className="rounded-xl border border-[#2E3440] bg-[#181B20] p-6 transition-all hover:border-[#C5A059]/40">
                                 <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-[#C5A059]/10 text-[#C5A059]">
                                     <Leaf
                                         aria-hidden="true"
@@ -344,7 +349,7 @@ export default function AboutPage({
                             </p>
                         </div>
 
-                        <div className="rounded-2xl border border-[#2E3440] bg-[#20242C] p-6 shadow-xl sm:p-8">
+                        <div style={rseCardsStyle} className="rounded-2xl border border-[#2E3440] bg-[#20242C] p-6 shadow-xl sm:p-8">
                             <div className="mb-8 flex flex-wrap gap-2 border-b border-[#2E3440] pb-6">
                                 <button
                                     type="button"
@@ -532,7 +537,7 @@ export default function AboutPage({
                     className="relative overflow-hidden bg-[#0F1115] py-20"
                 >
                     <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="rounded-2xl border border-[#C5A059]/30 bg-gradient-to-r from-[#181B20] via-[#20242C] to-[#181B20] p-8 shadow-2xl sm:p-12">
+                        <div style={figuresCardsStyle} className="rounded-2xl border border-[#C5A059]/30 bg-[#20242C] p-8 shadow-2xl sm:p-12">
                             <div className="mx-auto mb-10 max-w-2xl text-center">
                                 <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
                                     {t.c('about.chiffres.text_01')}
@@ -597,7 +602,7 @@ export default function AboutPage({
 
                 <section style={contactStyle} className="bg-[#181B20]/60 py-20">
                     <div className="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
-                        <div className="relative overflow-hidden rounded-2xl border border-[#2E3440] bg-[#20242C] p-8 shadow-2xl sm:p-12">
+                        <div style={contactCardsStyle} className="relative overflow-hidden rounded-2xl border border-[#2E3440] bg-[#20242C] p-8 shadow-2xl sm:p-12">
                             <div className="pointer-events-none absolute top-0 right-0 h-48 w-48 rounded-full bg-[#C5A059]/10 blur-3xl"></div>
 
                             <span className="hx-label rounded-full border border-current/20 bg-current/10 px-3 py-1 font-mono text-xs tracking-widest text-[#C5A059] uppercase">

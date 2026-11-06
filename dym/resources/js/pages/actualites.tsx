@@ -17,8 +17,6 @@ type Props = {
     site: SiteSettings;
 };
 
-const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' });
-
 const delay = (d: number) => ({ '--d': `${d}s` }) as CSSProperties;
 
 const listUrl = (category: string | null) => (category ? `/actualites?categorie=${encodeURIComponent(category)}` : '/actualites');
@@ -27,12 +25,6 @@ function Meta({ post }: { post: Post }) {
     return (
         <p className="hx-mono hx-label flex flex-wrap items-center gap-2 text-[10px] tracking-[0.1em] text-neutral-500 uppercase">
             <span className="size-[5px] bg-dym" aria-hidden /> {post.category}
-            {post.published_at && (
-                <>
-                    <span className="text-neutral-300">/</span>
-                    <time dateTime={post.published_at}>{dateFormat.format(new Date(post.published_at))}</time>
-                </>
-            )}
         </p>
     );
 }

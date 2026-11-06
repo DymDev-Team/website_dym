@@ -28,6 +28,7 @@ const colorGroups = [
         ['testimonials', 'Témoignages'], ['news', 'Actualités'], ['partners', 'Partenaires'], ['footer', 'Pied de page'],
     ] },
     { title: 'Page À propos', fields: [['about_page_hero', 'Bandeau principal'], ['about_page_mission', 'Mission & Vision'], ['about_page_hse', 'Politique HSE'], ['about_page_rse', 'Engagement RSE'], ['about_page_figures', 'Chiffres clés'], ['about_page_contact', 'Appel à contact']] },
+    { title: 'Page À propos — Cartes', fields: [['about_page_mission_cards', 'Cartes Mission & Vision'], ['about_page_hse_cards', 'Cartes HSE'], ['about_page_rse_cards', 'Carte Engagement RSE'], ['about_page_figures_cards', 'Carte Chiffres clés'], ['about_page_contact_cards', 'Carte Contact']] },
     { title: 'Page Activités', fields: [['activities_page_cards', 'Cartes des activités'], ['activities_page_products', 'Ouvrages fabriqués'], ['activities_page_cta', 'Bandeau de contact']] },
     { title: 'Pages détail activité', fields: [['activity_page_hero', 'Présentation de l’activité'], ['activity_page_details', 'Savoir-faire'], ['activity_page_related', 'Autres activités']] },
     { title: 'Page Réalisations', fields: [['projects_page_list', 'Liste des réalisations']] },

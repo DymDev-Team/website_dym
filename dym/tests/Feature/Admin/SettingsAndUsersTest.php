@@ -59,11 +59,21 @@ test('the about page section colors can be changed from the settings', function 
     $this->actingAs($this->admin)->put(route('admin.settings.update'), [
         ...array_filter(Setting::DEFAULTS, fn (string $key) => str_starts_with($key, 'section_color_'), ARRAY_FILTER_USE_KEY),
         'section_color_about_page_hero' => '#222222',
+        'section_color_about_page_mission_cards' => '#334455',
+        'section_color_about_page_hse_cards' => '#445566',
+        'section_color_about_page_rse_cards' => '#556677',
+        'section_color_about_page_figures_cards' => '#667788',
+        'section_color_about_page_contact_cards' => '#778899',
         'section_label_color_about_page_rse' => '#990000',
     ])->assertSessionHasNoErrors();
 
     $this->get(route('about'))->assertInertia(fn (Assert $page) => $page
         ->where('siteSettings.section_colors.about_page_hero', '#222222')
+        ->where('siteSettings.section_colors.about_page_mission_cards', '#334455')
+        ->where('siteSettings.section_colors.about_page_hse_cards', '#445566')
+        ->where('siteSettings.section_colors.about_page_rse_cards', '#556677')
+        ->where('siteSettings.section_colors.about_page_figures_cards', '#667788')
+        ->where('siteSettings.section_colors.about_page_contact_cards', '#778899')
         ->where('siteSettings.section_colors.about_page_contact', '#14171c')
         ->where('siteSettings.section_label_colors.about_page_rse', '#990000'));
 });
