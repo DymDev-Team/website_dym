@@ -223,7 +223,19 @@ export default function AboutPage({
                         </div>
 
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-                            <div style={hseCardsStyle} className="rounded-xl border border-[#2E3440] bg-[#181B20] p-6 transition-all hover:border-[#C5A059]/40">
+                            <div style={hseCardsStyle} className="group relative isolate overflow-hidden rounded-xl border border-[#2E3440] bg-[#181B20] p-6 transition-all hover:border-[#C5A059]/40">
+                                {/* Photo de fond modifiable dans /admin/texts (À propos › Politique HSE). */}
+                                <img
+                                    src={t('about.hse.card1_image')}
+                                    alt=""
+                                    aria-hidden="true"
+                                    loading="lazy"
+                                    className="absolute inset-0 -z-10 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                />
+                                <div
+                                    aria-hidden="true"
+                                    className="absolute inset-0 -z-10 bg-linear-to-t from-[#0F1115] via-[#0F1115]/85 to-[#0F1115]/45"
+                                />
                                 <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-[#C5A059]/10 text-[#C5A059]">
                                     <HardHat
                                         aria-hidden="true"
@@ -258,7 +270,19 @@ export default function AboutPage({
                                 </ul>
                             </div>
 
-                            <div style={hseCardsStyle} className="rounded-xl border border-[#2E3440] bg-[#181B20] p-6 transition-all hover:border-[#C5A059]/40">
+                            <div style={hseCardsStyle} className="group relative isolate overflow-hidden rounded-xl border border-[#2E3440] bg-[#181B20] p-6 transition-all hover:border-[#C5A059]/40">
+                                {/* Photo de fond modifiable dans /admin/texts (À propos › Politique HSE). */}
+                                <img
+                                    src={t('about.hse.card2_image')}
+                                    alt=""
+                                    aria-hidden="true"
+                                    loading="lazy"
+                                    className="absolute inset-0 -z-10 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                />
+                                <div
+                                    aria-hidden="true"
+                                    className="absolute inset-0 -z-10 bg-linear-to-t from-[#0F1115] via-[#0F1115]/85 to-[#0F1115]/45"
+                                />
                                 <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-[#C5A059]/10 text-[#C5A059]">
                                     <Activity
                                         aria-hidden="true"
@@ -293,7 +317,19 @@ export default function AboutPage({
                                 </ul>
                             </div>
 
-                            <div style={hseCardsStyle} className="rounded-xl border border-[#2E3440] bg-[#181B20] p-6 transition-all hover:border-[#C5A059]/40">
+                            <div style={hseCardsStyle} className="group relative isolate overflow-hidden rounded-xl border border-[#2E3440] bg-[#181B20] p-6 transition-all hover:border-[#C5A059]/40">
+                                {/* Photo de fond modifiable dans /admin/texts (À propos › Politique HSE). */}
+                                <img
+                                    src={t('about.hse.card3_image')}
+                                    alt=""
+                                    aria-hidden="true"
+                                    loading="lazy"
+                                    className="absolute inset-0 -z-10 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                />
+                                <div
+                                    aria-hidden="true"
+                                    className="absolute inset-0 -z-10 bg-linear-to-t from-[#0F1115] via-[#0F1115]/85 to-[#0F1115]/45"
+                                />
                                 <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-[#C5A059]/10 text-[#C5A059]">
                                     <Leaf
                                         aria-hidden="true"

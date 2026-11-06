@@ -655,6 +655,9 @@ return [
                     'text_13' => ['label' => 'Captation haute performance des fumées de soudure et contrôle des é…', 'default' => 'Captation haute performance des fumées de soudure et contrôle des émissions.'],
                     'text_14' => ['label' => 'Gestion stricte des étincelles et réduction des nuisances sonores.', 'default' => 'Gestion stricte des étincelles et réduction des nuisances sonores.'],
                     'text_15' => ['label' => 'Stockage sécurisé des produits de finition et gestion responsable d…', 'default' => 'Stockage sécurisé des produits de finition et gestion responsable des consommables.'],
+                    'card1_image' => ['label' => 'Carte Sécurité des Équipes — photo de fond', 'type' => 'image', 'default' => '/images/process/03-realisation.jpg'],
+                    'card2_image' => ['label' => 'Carte Santé & Ergonomie — photo de fond', 'type' => 'image', 'default' => '/images/equipements/usinage.jpg'],
+                    'card3_image' => ['label' => 'Carte Maîtrise des Impacts — photo de fond', 'type' => 'image', 'default' => '/images/equipements/soudure.jpg'],
                 ],
             ],
             'rse' => [
