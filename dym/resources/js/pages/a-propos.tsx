@@ -4,11 +4,8 @@ import {
     Check,
     Target,
     Shield,
-    HardHat,
     ShieldAlert,
-    Activity,
     HeartPulse,
-    Leaf,
     Fan,
     Recycle,
     ShieldCheck,
@@ -17,7 +14,7 @@ import {
     Send,
 } from 'lucide-react';
 import { useState } from 'react';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useSectionColor } from '@/components/site/use-section-color';
 import { useTexts } from '@/components/site/use-texts';
 import { SiteHeader } from '@/components/site/site-header';
@@ -42,6 +39,7 @@ export default function AboutPage({
     const rseStyle = useSectionColor('about_page_rse');
     const figuresStyle = useSectionColor('about_page_figures');
     const contactStyle = useSectionColor('about_page_contact');
+    const buttonsStyle = useSectionColor('about_page_buttons');
     const missionCardsStyle = useSectionColor('about_page_mission_cards');
     const hseCardsStyle = useSectionColor('about_page_hse_cards');
     const rseCardsStyle = useSectionColor('about_page_rse_cards');
@@ -56,7 +54,10 @@ export default function AboutPage({
                 />
             </Head>
             <SiteHeader active="À propos" />
-            <main className="bg-[#0F1115] text-gray-100 [&_section[id]]:scroll-mt-24">
+            <main
+                className="about-page bg-[#0F1115] text-gray-100 [&_section[id]]:scroll-mt-24"
+                style={{ '--about-accent': buttonsStyle.backgroundColor ?? '#c5a059' } as CSSProperties}
+            >
                 <section
                     style={heroStyle}
                     className="relative flex min-h-[65vh] items-center overflow-hidden py-20"
@@ -95,7 +96,7 @@ export default function AboutPage({
                                 <h1 className="text-3xl leading-tight font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
                                     {t.c('about.hero.text_02')}{' '}
                                     <br className="hidden sm:inline" />
-                                    <span className="bg-gradient-to-br from-[#FFF0D0] via-[#C5A059] to-[#E5C158] bg-clip-text text-transparent">
+                                    <span className="about-page-accent-title bg-gradient-to-br from-[#FFF0D0] via-[#C5A059] to-[#E5C158] bg-clip-text text-transparent">
                                         {t.c('about.hero.text_03')}
                                     </span>
                                 </h1>
@@ -236,12 +237,6 @@ export default function AboutPage({
                                     aria-hidden="true"
                                     className="absolute inset-0 -z-10 bg-linear-to-t from-[#0F1115] via-[#0F1115]/85 to-[#0F1115]/45"
                                 />
-                                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-[#C5A059]/10 text-[#C5A059]">
-                                    <HardHat
-                                        aria-hidden="true"
-                                        className="h-6 w-6"
-                                    />
-                                </div>
                                 <h3 className="mb-3 text-xl font-bold text-white">
                                     {t.c('about.hse.text_04')}
                                 </h3>
@@ -283,12 +278,6 @@ export default function AboutPage({
                                     aria-hidden="true"
                                     className="absolute inset-0 -z-10 bg-linear-to-t from-[#0F1115] via-[#0F1115]/85 to-[#0F1115]/45"
                                 />
-                                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-[#C5A059]/10 text-[#C5A059]">
-                                    <Activity
-                                        aria-hidden="true"
-                                        className="h-6 w-6"
-                                    />
-                                </div>
                                 <h3 className="mb-3 text-xl font-bold text-white">
                                     {t.c('about.hse.text_08')}
                                 </h3>
@@ -330,12 +319,6 @@ export default function AboutPage({
                                     aria-hidden="true"
                                     className="absolute inset-0 -z-10 bg-linear-to-t from-[#0F1115] via-[#0F1115]/85 to-[#0F1115]/45"
                                 />
-                                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-[#C5A059]/10 text-[#C5A059]">
-                                    <Leaf
-                                        aria-hidden="true"
-                                        className="h-6 w-6"
-                                    />
-                                </div>
                                 <h3 className="mb-3 text-xl font-bold text-white">
                                     {t.c('about.hse.text_12')}
                                 </h3>

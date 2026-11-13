@@ -267,3 +267,30 @@
     --radius: 0px;
     color-scheme: light;
 }
+
+/* Page À propos : une seule couleur du panel pilote boutons et accents. */
+.about-page [class~='text-[#C5A059]'] {
+    color: var(--about-accent) !important;
+}
+
+.about-page [class~='bg-[#C5A059]'] {
+    background-color: var(--about-accent) !important;
+}
+
+.about-page [class~='bg-[#C5A059]/10'] {
+    background-color: color-mix(in srgb, var(--about-accent) 10%, transparent) !important;
+}
+
+.about-page [class~='border-[#C5A059]/30'],
+.about-page [class~='hover:border-[#C5A059]/40']:hover {
+    border-color: var(--about-accent) !important;
+}
+
+.about-page [class~='hover:bg-[#E5C158]']:hover {
+    background-color: color-mix(in srgb, var(--about-accent) 85%, white) !important;
+}
+
+.about-page-accent-title {
+    background-image: none !important;
+    color: var(--about-accent) !important;
+}

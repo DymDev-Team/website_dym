@@ -22,6 +22,7 @@ const socials: { key: SocialKey; label: string }[] = [
 ];
 
 const colorGroups = [
+    { title: 'Page À propos — Style', fields: [['about_page_buttons', 'Boutons et accents']] },
     { title: 'Page d’accueil', fields: [
         ['header', 'En-tête'], ['hero', 'Bannière principale'], ['intro', 'À propos'], ['activities', 'Activités'],
         ['projects', 'Réalisations'], ['equipment', 'Équipements'], ['process', 'Notre approche'],

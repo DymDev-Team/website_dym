@@ -76,6 +76,7 @@ class Setting extends Model
         'section_color_about_page_rse' => '#131519',
         'section_color_about_page_figures' => '#0f1115',
         'section_color_about_page_contact' => '#14171c',
+        'section_color_about_page_buttons' => '#c5a059',
         'section_color_about_page_mission_cards' => '#20242c',
         'section_color_about_page_hse_cards' => '#181b20',
         'section_color_about_page_rse_cards' => '#20242c',

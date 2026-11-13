@@ -64,6 +64,7 @@ test('the about page section colors can be changed from the settings', function 
         'section_color_about_page_rse_cards' => '#556677',
         'section_color_about_page_figures_cards' => '#667788',
         'section_color_about_page_contact_cards' => '#778899',
+        'section_color_about_page_buttons' => '#aabbcc',
         'section_label_color_about_page_rse' => '#990000',
     ])->assertSessionHasNoErrors();
 
@@ -74,6 +75,7 @@ test('the about page section colors can be changed from the settings', function 
         ->where('siteSettings.section_colors.about_page_rse_cards', '#556677')
         ->where('siteSettings.section_colors.about_page_figures_cards', '#667788')
         ->where('siteSettings.section_colors.about_page_contact_cards', '#778899')
+        ->where('siteSettings.section_colors.about_page_buttons', '#aabbcc')
         ->where('siteSettings.section_colors.about_page_contact', '#14171c')
         ->where('siteSettings.section_label_colors.about_page_rse', '#990000'));
 });
