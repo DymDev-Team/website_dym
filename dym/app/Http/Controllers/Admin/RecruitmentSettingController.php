@@ -12,6 +12,7 @@ use App\Models\JobOffer;
 use App\Models\RecruitmentOption;
 use App\Models\RecruitmentSetting;
 use App\Models\RecruitmentStage;
+use App\Models\Setting;
 use App\Notifications\ApplicationReceived;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,7 +38,7 @@ class RecruitmentSettingController extends Controller
                 ...Arr::except($settings, 'api_key'),
                 'api_key_masked' => RecruitmentSetting::maskedApiKey(),
             ],
-            'mailFrom' => config('mail.from.address'),
+            'contactEmail' => Setting::values()['email'],
             'models' => collect(Config::array('recruitment.models'))->map(fn (array $model, string $id) => ['value' => $id, 'label' => $model['label']])->values(),
             'efforts' => config('recruitment.efforts'),
             'usage' => [

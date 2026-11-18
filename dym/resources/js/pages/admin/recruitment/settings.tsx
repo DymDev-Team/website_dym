@@ -67,7 +67,7 @@ type Props = {
         acknowledgment_body: string;
         acknowledgment_reply_to: string | null;
     };
-    mailFrom: string | null;
+    contactEmail: string | null;
     models: Option[];
     efforts: string[];
     usage: {
@@ -355,8 +355,8 @@ function AiSettings({
 
 function AcknowledgmentSettings({
     settings,
-    mailFrom,
-}: Pick<Props, 'settings' | 'mailFrom'>) {
+    contactEmail,
+}: Pick<Props, 'settings' | 'contactEmail'>) {
     const [sending, setSending] = useState(false);
 
     return (
@@ -419,7 +419,7 @@ function AcknowledgmentSettings({
                         <Field
                             id="acknowledgment_reply_to"
                             label="Adresse de réponse (facultatif)"
-                            hint={`Si le candidat répond à l’e-mail. Laissez vide pour recevoir sa réponse sur l’adresse d’envoi du site${mailFrom ? ` (${mailFrom})` : ''}.`}
+                            hint={`Si le candidat répond à l’e-mail. Laissez vide pour recevoir sa réponse sur l’e-mail de contact du site${contactEmail ? ` (${contactEmail})` : ''}.`}
                             error={errors.acknowledgment_reply_to}
                         >
                             <Input
@@ -737,7 +737,7 @@ function OptionList({
 
 export default function RecruitmentSettings({
     settings,
-    mailFrom,
+    contactEmail,
     models,
     efforts,
     usage,
@@ -759,7 +759,7 @@ export default function RecruitmentSettings({
                 />
                 <AcknowledgmentSettings
                     settings={settings}
-                    mailFrom={mailFrom}
+                    contactEmail={contactEmail}
                 />
                 <Stages stages={stages} kinds={stageKinds} />
                 <section className="space-y-4">

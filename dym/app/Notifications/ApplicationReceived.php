@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\JobApplication;
 use App\Models\RecruitmentSetting;
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -45,9 +46,13 @@ class ApplicationReceived extends Notification
             '{poste}' => $this->offerTitle ?? 'Candidature spontanée',
         ];
 
+        // Les réponses (demandes de suppression comprises) vont à une boîte lue
+        // par DYM, pas à l'adresse technique d'envoi.
+        $replyTo = $settings['acknowledgment_reply_to'] ?: Setting::values()['email'];
+
         return (new MailMessage)
             ->subject(strtr($settings['acknowledgment_subject'], $variables))
-            ->when($settings['acknowledgment_reply_to'], fn (MailMessage $mail, string $address) => $mail->replyTo($address))
+            ->when($replyTo, fn (MailMessage $mail, string $address) => $mail->replyTo($address))
             ->markdown('mail.application-received', [
                 'paragraphs' => self::paragraphs(strtr($settings['acknowledgment_body'], $variables)),
             ]);

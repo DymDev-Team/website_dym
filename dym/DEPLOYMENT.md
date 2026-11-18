@@ -59,21 +59,23 @@ par le workflow FTP, ensuite tout passe par le miroir Git.
    CACHE_STORE=database
    QUEUE_CONNECTION=sync
 
-   MAIL_MAILER=smtp
-   MAIL_HOST=ssl0.ovh.net
-   MAIL_PORT=465
-   MAIL_SCHEME=smtps
-   MAIL_USERNAME=info@dym.ci
-   MAIL_PASSWORD=mot-de-passe-de-la-boite
-   MAIL_FROM_ADDRESS=info@dym.ci
-   MAIL_FROM_NAME=DYM
+   MAIL_MAILER=resend
+   MAIL_FROM_ADDRESS="contact@dymora.dym-manufacture.com"
+   MAIL_FROM_NAME="${APP_NAME}"
+   RESEND_API_KEY=re_...
 
    DEPLOY_TOKEN=jeton-aleatoire
    ```
 
-   `MAIL_*` : la boîte info@dym.ci est hébergée chez **OVH** (MX `mx*.mail.ovh.net`),
-   pas chez LWS, qui ne gère que le site et la zone DNS. Le site envoie donc par le
-   SMTP d'OVH : `ssl0.ovh.net`, port 465 (offre MX Plan). Pour une offre Email Pro :
+   `MAIL_*` : le site envoie par **Resend** (API HTTPS, paquet `resend/resend-php`),
+   depuis le domaine `dymora.dym-manufacture.com`, validé dans Resend. Une clé
+   « Sending access » suffit. L'adresse d'envoi ne reçoit pas les réponses : celles
+   des candidats vont à l'e-mail de contact du site (ou à l'adresse de réponse
+   choisie dans *Recrutement > Réglages*).
+
+   Repli possible sur la boîte info@dym.ci, hébergée chez **OVH** (MX `mx*.mail.ovh.net`),
+   pas chez LWS, qui ne gère que le site et la zone DNS : `MAIL_MAILER=smtp`, SMTP
+   d'OVH `ssl0.ovh.net`, port 465, `MAIL_SCHEME=smtps` (offre MX Plan). Pour une offre Email Pro :
    `MAIL_HOST=pro1.mail.ovh.net`, `MAIL_PORT=587`, `MAIL_SCHEME=smtp`. Identifiant :
    l'adresse complète ; mot de passe : celui de la boîte (espace client OVH > *Web
    Cloud* > *E-mails*). `MAIL_FROM_ADDRESS` doit rester l'adresse de ce compte.

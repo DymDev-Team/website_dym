@@ -94,7 +94,8 @@ test('the candidate receives an acknowledgment of their application', function (
     );
 
     expect($sent->subject)->toBe('Nous avons bien reçu votre candidature')
-        ->and($sent->replyTo)->toBe([])
+        // Sans adresse de réponse saisie : l'e-mail de contact du site.
+        ->and($sent->replyTo)->toBe([[Setting::values()['email'], null]])
         ->and((string) $sent->render())->toContain('Bonjour Awa Koné,', 'Poste : Soudeur TIG', 'Cordialement,<br>');
 });
 

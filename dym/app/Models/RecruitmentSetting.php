@@ -56,7 +56,7 @@ class RecruitmentSetting extends Model
             Cordialement,
             L’équipe DYM Manufacture
             TEXT,
-        // Vide : les réponses du candidat arrivent sur l'adresse d'envoi du site.
+        // Vide : les réponses du candidat arrivent sur l'e-mail de contact du site.
         'acknowledgment_reply_to' => null,
     ];
 
