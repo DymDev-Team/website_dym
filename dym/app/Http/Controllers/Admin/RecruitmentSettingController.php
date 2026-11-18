@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -151,13 +152,22 @@ class RecruitmentSettingController extends Controller
             'test_email.email' => 'Cette adresse e-mail n’est pas valide.',
         ])['test_email'];
         $offer = JobOffer::query()->open()->latest()->first();
+        $mailer = (string) config('mail.default');
+
+        // « log » et « array » n'envoient rien : le test ne doit pas annoncer un envoi.
+        if (in_array($mailer, ['log', 'array'], true)) {
+            Inertia::flash('toast', ['type' => 'error', 'message' => "Aucun e-mail n’est parti : le serveur est réglé sur MAIL_MAILER={$mailer}. Corrigez le fichier .env du serveur."]);
+
+            return to_route('admin.recruitment.settings.edit');
+        }
 
         try {
             Notification::route('mail', $email)->notify(new ApplicationReceived($request->user()->name, $offer?->title));
-            $toast = ['type' => 'success', 'message' => "E-mail de test envoyé à {$email}."];
+            $toast = ['type' => 'success', 'message' => "E-mail de test envoyé à {$email} par {$mailer}. S’il n’arrive pas, regardez les courriers indésirables."];
         } catch (Throwable $e) {
             report($e);
-            $toast = ['type' => 'error', 'message' => 'L’envoi a échoué : vérifiez les réglages MAIL_* du serveur.'];
+            // Raison précise (clé refusée, domaine non validé…) : la page est réservée aux admins.
+            $toast = ['type' => 'error', 'message' => 'L’envoi a échoué : '.Str::limit($e->getMessage(), 300)];
         }
 
         Inertia::flash('toast', $toast);

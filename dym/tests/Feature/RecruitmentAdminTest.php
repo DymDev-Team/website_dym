@@ -18,6 +18,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Support\SessionKey;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\Support\FakeCandidateAnalyzer;
 
@@ -196,6 +197,7 @@ test('the AI settings keep the API key encrypted and never send it back', functi
 
 test('admins write the acknowledgment e-mail and send a test to the address of their choice', function () {
     Notification::fake();
+    config(['mail.default' => 'resend']);
     $this->admin->update(['name' => 'Fatou Bamba']);
     JobOffer::factory()->create(['title' => 'Soudeur TIG']);
 
@@ -215,7 +217,11 @@ test('admins write the acknowledgment e-mail and send a test to the address of t
 
     $this->actingAs($this->admin)
         ->post(route('admin.recruitment.settings.acknowledgment.test'), ['test_email' => 'fatou@example.com'])
-        ->assertRedirect(route('admin.recruitment.settings.edit'));
+        ->assertRedirect(route('admin.recruitment.settings.edit'))
+        ->assertInertiaFlash('toast', [
+            'type' => 'success',
+            'message' => 'E-mail de test envoyé à fatou@example.com par resend. S’il n’arrive pas, regardez les courriers indésirables.',
+        ]);
 
     Notification::assertSentOnDemand(
         ApplicationReceived::class,
@@ -250,6 +256,38 @@ test('the acknowledgment e-mail and its test need valid values', function () {
         ->assertSessionHasErrors(['test_email' => 'Cette adresse e-mail n’est pas valide.']);
 
     Notification::assertNothingSent();
+});
+
+test('the test e-mail says so when the server only writes e-mails to the log', function () {
+    Notification::fake();
+    config(['mail.default' => 'log']);
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.recruitment.settings.acknowledgment.test'), ['test_email' => 'fatou@example.com'])
+        ->assertInertiaFlash('toast', [
+            'type' => 'error',
+            'message' => 'Aucun e-mail n’est parti : le serveur est réglé sur MAIL_MAILER=log. Corrigez le fichier .env du serveur.',
+        ]);
+
+    Notification::assertNothingSent();
+});
+
+test('the test e-mail shows why sending failed', function () {
+    // Serveur SMTP injoignable : l'envoi échoue sans quitter la machine.
+    config([
+        'mail.default' => 'smtp',
+        'mail.mailers.smtp.host' => '127.0.0.1',
+        'mail.mailers.smtp.port' => 1,
+        'mail.mailers.smtp.timeout' => 2,
+    ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.recruitment.settings.acknowledgment.test'), ['test_email' => 'fatou@example.com'])
+        ->assertRedirect(route('admin.recruitment.settings.edit'));
+
+    $toast = session()->get(SessionKey::FLASH_DATA)['toast'];
+    expect($toast['type'])->toBe('error')
+        ->and($toast['message'])->toStartWith('L’envoi a échoué : ')->toContain('127.0.0.1');
 });
 
 test('CVs added by the team send no e-mail to the candidate', function () {

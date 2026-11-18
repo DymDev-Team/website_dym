@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Process;
+use Throwable;
 
 class DeployController extends Controller
 {
@@ -113,6 +117,9 @@ class DeployController extends Controller
         );
     }
 
+    /**
+     * @return array{0: array<string, string>, 1: array<string, string>}
+     */
     private function runPostDeployCommands(): array
     {
         $output = [];
@@ -130,7 +137,7 @@ class DeployController extends Controller
                 if ($exitCode !== 0) {
                     $errors[$key] = "Exit code {$exitCode}: {$output[$key]}";
                 }
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 $errors[$key] = $exception->getMessage();
             }
         }
@@ -138,11 +145,45 @@ class DeployController extends Controller
         try {
             Artisan::call('queue:restart');
             $output['queue:restart'] = trim(Artisan::output());
-        } catch (\Throwable) {
+        } catch (Throwable) {
             $output['queue:restart'] = 'skipped';
         }
 
         return [$output, $errors];
+    }
+
+    /**
+     * Mail diagnosis without access to the server: settings in use, secrets
+     * masked, and a real send to Resend's test address, which reaches nobody.
+     */
+    public function mailCheck(Request $request): JsonResponse
+    {
+        if (! $this->authorized($request)) {
+            return $this->unauthorized();
+        }
+
+        $key = (string) config('services.resend.key');
+        $report = [
+            'mailer' => config('mail.default'),
+            'from' => config('mail.from.address'),
+            'resend_key' => $key === '' ? null : substr($key, 0, 6).'…',
+            'resend_library' => class_exists(\Resend::class),
+        ];
+
+        try {
+            $report['resend_api'] = Http::timeout(15)->get('https://api.resend.com')->status();
+        } catch (Throwable $e) {
+            $report['resend_api'] = $e->getMessage();
+        }
+
+        try {
+            Mail::raw('Test technique du site dym.ci.', fn (Message $message) => $message->to('delivered@resend.dev')->subject('Test technique dym.ci'));
+            $report['send'] = 'ok';
+        } catch (Throwable $e) {
+            $report['send'] = $e::class.' : '.$e->getMessage();
+        }
+
+        return response()->json($report);
     }
 
     private function authorized(Request $request, bool $allowQueryToken = false): bool

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Process\PendingProcess;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
 
 beforeEach(function () {
@@ -10,7 +11,7 @@ beforeEach(function () {
 test('the webhooks refuse a missing or wrong token', function (string $uri) {
     $this->postJson($uri)->assertForbidden();
     $this->postJson($uri, [], ['X-Deploy-Token' => 'wrong'])->assertForbidden();
-})->with(['/api/deploy', '/api/deploy/git']);
+})->with(['/api/deploy', '/api/deploy/git', '/api/deploy/mail']);
 
 test('the webhooks are disabled when no token is configured', function () {
     config(['app.deploy_token' => '']);
@@ -42,4 +43,39 @@ test('the git mirror stops when the fetch fails', function () {
         ->assertJsonPath('errors.git_fetch', 'could not resolve host');
 
     Process::assertDidntRun(fn (PendingProcess $process) => ($process->command[1] ?? null) === 'reset');
+});
+
+test('the mail check reports the mailer in use and sends to the Resend test address', function () {
+    Http::fake(['api.resend.com' => Http::response('', 200)]);
+    config(['services.resend.key' => 're_secret123456']);
+
+    $this->postJson('/api/deploy/mail', [], ['X-Deploy-Token' => 'secret-token'])
+        ->assertOk()
+        ->assertExactJson([
+            'mailer' => 'array',
+            'from' => config('mail.from.address'),
+            'resend_key' => 're_sec…',
+            'resend_library' => true,
+            'resend_api' => 200,
+            'send' => 'ok',
+        ]);
+
+    $messages = app('mailer')->getSymfonyTransport()->messages();
+    expect($messages)->toHaveCount(1)
+        ->and($messages[0]->getEnvelope()->getRecipients()[0]->getAddress())->toBe('delivered@resend.dev');
+});
+
+test('the mail check returns the sending error', function () {
+    Http::fake(['api.resend.com' => Http::response('', 200)]);
+    config([
+        'mail.default' => 'smtp',
+        'mail.mailers.smtp.host' => '127.0.0.1',
+        'mail.mailers.smtp.port' => 1,
+        'mail.mailers.smtp.timeout' => 2,
+    ]);
+
+    $this->postJson('/api/deploy/mail', [], ['X-Deploy-Token' => 'secret-token'])
+        ->assertOk()
+        ->assertJsonPath('mailer', 'smtp')
+        ->assertJson(fn ($json) => $json->where('send', fn (string $send) => str_starts_with($send, 'Symfony\Component\Mailer\Exception\TransportException'))->etc());
 });
