@@ -357,7 +357,7 @@ function AcknowledgmentSettings({
     settings,
     contactEmail,
 }: Pick<Props, 'settings' | 'contactEmail'>) {
-    const [sending, setSending] = useState(false);
+    const userEmail = usePage().props.auth.user?.email ?? '';
 
     return (
         <section className="space-y-6">
@@ -434,36 +434,46 @@ function AcknowledgmentSettings({
                             />
                         </Field>
 
-                        <div className="flex flex-wrap items-center gap-3">
-                            <Button type="submit" disabled={processing}>
-                                {processing && <Spinner />}
-                                Enregistrer l’e-mail
-                            </Button>
+                        <Button type="submit" disabled={processing}>
+                            {processing && <Spinner />}
+                            Enregistrer l’e-mail
+                        </Button>
+                    </>
+                )}
+            </Form>
+
+            <Form
+                {...testAcknowledgment.form()}
+                options={{ preserveScroll: true }}
+                className="max-w-3xl border-t pt-6"
+            >
+                {({ errors, processing }) => (
+                    <Field
+                        id="test_email"
+                        label="Envoyer un e-mail de test à"
+                        hint="Le test reprend la version enregistrée : enregistrez d’abord vos modifications."
+                        error={errors.test_email}
+                    >
+                        <div className="flex flex-wrap gap-2">
+                            <Input
+                                id="test_email"
+                                name="test_email"
+                                type="email"
+                                maxLength={255}
+                                defaultValue={userEmail}
+                                required
+                                className="max-w-sm"
+                            />
                             <Button
-                                type="button"
+                                type="submit"
                                 variant="outline"
-                                disabled={sending}
-                                onClick={() =>
-                                    router.post(
-                                        testAcknowledgment.url(),
-                                        {},
-                                        {
-                                            preserveScroll: true,
-                                            onStart: () => setSending(true),
-                                            onFinish: () => setSending(false),
-                                        },
-                                    )
-                                }
+                                disabled={processing}
                             >
-                                {sending && <Spinner />}
-                                M’envoyer un e-mail de test
+                                {processing && <Spinner />}
+                                Envoyer le test
                             </Button>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                            Le test envoie la version enregistrée à votre propre
-                            adresse : enregistrez d’abord vos modifications.
-                        </p>
-                    </>
+                    </Field>
                 )}
             </Form>
         </section>

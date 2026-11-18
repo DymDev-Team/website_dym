@@ -15,6 +15,7 @@ use App\Recruitment\Ai\CandidateAnalyzer;
 use App\Recruitment\AnalysisRunner;
 use App\Recruitment\Exceptions\PermanentAnalysisError;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -193,7 +194,7 @@ test('the AI settings keep the API key encrypted and never send it back', functi
             ->missing('settings.api_key'));
 });
 
-test('admins write the acknowledgment e-mail and send themselves a test', function () {
+test('admins write the acknowledgment e-mail and send a test to the address of their choice', function () {
     Notification::fake();
     $this->admin->update(['name' => 'Fatou Bamba']);
     JobOffer::factory()->create(['title' => 'Soudeur TIG']);
@@ -213,25 +214,42 @@ test('admins write the acknowledgment e-mail and send themselves a test', functi
     ]);
 
     $this->actingAs($this->admin)
-        ->post(route('admin.recruitment.settings.acknowledgment.test'))
+        ->post(route('admin.recruitment.settings.acknowledgment.test'), ['test_email' => 'fatou@example.com'])
         ->assertRedirect(route('admin.recruitment.settings.edit'));
 
-    Notification::assertSentTo($this->admin, ApplicationReceived::class, function (ApplicationReceived $notification) {
-        $mail = $notification->toMail($this->admin);
+    Notification::assertSentOnDemand(
+        ApplicationReceived::class,
+        function (ApplicationReceived $notification, array $channels, AnonymousNotifiable $notifiable) {
+            $mail = $notification->toMail($notifiable);
 
-        return $mail->subject === 'Merci Fatou Bamba'
-            && str_contains((string) $mail->render(), 'merci pour : Soudeur TIG.');
-    });
+            return $notifiable->routes['mail'] === 'fatou@example.com'
+                && $mail->subject === 'Merci Fatou Bamba'
+                && str_contains((string) $mail->render(), 'merci pour : Soudeur TIG.');
+        },
+    );
+    Notification::assertNothingSentTo($this->admin);
 });
 
-test('the acknowledgment e-mail needs a subject, a text and a valid reply address', function () {
+test('the acknowledgment e-mail and its test need valid values', function () {
+    Notification::fake();
+
     $this->actingAs($this->admin)
         ->put(route('admin.recruitment.settings.acknowledgment.update'), [
             'acknowledgment_subject' => '',
             'acknowledgment_body' => '',
             'acknowledgment_reply_to' => 'pas-une-adresse',
         ])
-        ->assertSessionHasErrors(['acknowledgment_subject', 'acknowledgment_body', 'acknowledgment_reply_to']);
+        ->assertSessionHasErrors([
+            'acknowledgment_subject' => 'Indiquez l’objet de l’e-mail.',
+            'acknowledgment_body' => 'Indiquez le texte de l’e-mail.',
+            'acknowledgment_reply_to' => 'Cette adresse e-mail n’est pas valide.',
+        ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.recruitment.settings.acknowledgment.test'), ['test_email' => 'pas-une-adresse'])
+        ->assertSessionHasErrors(['test_email' => 'Cette adresse e-mail n’est pas valide.']);
+
+    Notification::assertNothingSent();
 });
 
 test('CVs added by the team send no e-mail to the candidate', function () {

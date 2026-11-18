@@ -18,6 +18,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -120,6 +121,10 @@ class RecruitmentSettingController extends Controller
             'acknowledgment_subject' => ['required', 'string', 'max:150'],
             'acknowledgment_body' => ['required', 'string', 'max:5000'],
             'acknowledgment_reply_to' => ['nullable', 'email', 'max:255'],
+        ], [
+            'acknowledgment_subject.required' => 'Indiquez l’objet de l’e-mail.',
+            'acknowledgment_body.required' => 'Indiquez le texte de l’e-mail.',
+            'acknowledgment_reply_to.email' => 'Cette adresse e-mail n’est pas valide.',
         ]);
 
         RecruitmentSetting::store([
@@ -135,17 +140,21 @@ class RecruitmentSettingController extends Controller
     }
 
     /**
-     * Send the saved acknowledgment to the signed-in admin, addressed to them
-     * and to the latest open offer, to check its wording and the mailer.
+     * Send the saved acknowledgment to the address typed by the admin (their
+     * own by default), addressed to them and to the latest open offer, to
+     * check its wording and the mailer.
      */
     public function testAcknowledgment(Request $request): RedirectResponse
     {
-        $user = $request->user();
+        $email = $request->validate(['test_email' => ['required', 'email', 'max:255']], [
+            'test_email.required' => 'Indiquez l’adresse qui recevra le test.',
+            'test_email.email' => 'Cette adresse e-mail n’est pas valide.',
+        ])['test_email'];
         $offer = JobOffer::query()->open()->latest()->first();
 
         try {
-            $user->notify(new ApplicationReceived($user->name, $offer?->title));
-            $toast = ['type' => 'success', 'message' => "E-mail de test envoyé à {$user->email}."];
+            Notification::route('mail', $email)->notify(new ApplicationReceived($request->user()->name, $offer?->title));
+            $toast = ['type' => 'success', 'message' => "E-mail de test envoyé à {$email}."];
         } catch (Throwable $e) {
             report($e);
             $toast = ['type' => 'error', 'message' => 'L’envoi a échoué : vérifiez les réglages MAIL_* du serveur.'];
