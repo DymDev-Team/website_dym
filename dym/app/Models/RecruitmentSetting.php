@@ -39,6 +39,25 @@ class RecruitmentSetting extends Model
         'consider_threshold' => '50',
         // Recherche web sur les écoles et entreprises citées dans les CV.
         'web_research' => '1',
+        // Accusé de réception envoyé au candidat qui postule sur le site.
+        'acknowledgment_enabled' => '1',
+        'acknowledgment_subject' => 'Nous avons bien reçu votre candidature',
+        'acknowledgment_body' => <<<'TEXT'
+            Bonjour {nom},
+
+            Nous avons bien reçu votre candidature et nous vous remercions de l’intérêt que vous portez à DYM Manufacture.
+
+            Poste : {poste}
+
+            Notre équipe va étudier votre dossier avec attention. Si votre profil correspond à nos besoins, nous vous contacterons pour la suite du recrutement.
+
+            Vos données sont conservées 2 ans à compter du dernier contact, puis supprimées. Vous pouvez à tout moment demander à les consulter ou à les faire supprimer en répondant à cet e-mail.
+
+            Cordialement,
+            L’équipe DYM Manufacture
+            TEXT,
+        // Vide : les réponses du candidat arrivent sur l'adresse d'envoi du site.
+        'acknowledgment_reply_to' => null,
     ];
 
     /**
@@ -55,7 +74,7 @@ class RecruitmentSetting extends Model
     /**
      * Every setting, defaults included, secrets decrypted.
      *
-     * @return array{ai_enabled: bool, auto_analyze: bool, api_key: string|null, model: string, effort: string, monthly_budget: float, custom_instructions: string|null, priority_threshold: int, consider_threshold: int, web_research: bool}
+     * @return array{ai_enabled: bool, auto_analyze: bool, api_key: string|null, model: string, effort: string, monthly_budget: float, custom_instructions: string|null, priority_threshold: int, consider_threshold: int, web_research: bool, acknowledgment_enabled: bool, acknowledgment_subject: string, acknowledgment_body: string, acknowledgment_reply_to: string|null}
      */
     public static function values(): array
     {
@@ -78,6 +97,10 @@ class RecruitmentSetting extends Model
             'priority_threshold' => (int) $values['priority_threshold'],
             'consider_threshold' => (int) $values['consider_threshold'],
             'web_research' => $values['web_research'] === '1',
+            'acknowledgment_enabled' => $values['acknowledgment_enabled'] === '1',
+            'acknowledgment_subject' => (string) ($values['acknowledgment_subject'] ?: self::DEFAULTS['acknowledgment_subject']),
+            'acknowledgment_body' => (string) ($values['acknowledgment_body'] ?: self::DEFAULTS['acknowledgment_body']),
+            'acknowledgment_reply_to' => $values['acknowledgment_reply_to'] ?: null,
         ];
     }
 

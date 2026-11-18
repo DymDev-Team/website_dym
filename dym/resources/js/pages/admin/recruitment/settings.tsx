@@ -37,6 +37,10 @@ import {
 } from '@/routes/admin/recruitment/options';
 import { edit, update } from '@/routes/admin/recruitment/settings';
 import {
+    test as testAcknowledgment,
+    update as updateAcknowledgment,
+} from '@/routes/admin/recruitment/settings/acknowledgment';
+import {
     destroy as destroyStage,
     reorder,
     store as storeStage,
@@ -58,7 +62,12 @@ type Props = {
         priority_threshold: number;
         consider_threshold: number;
         web_research: boolean;
+        acknowledgment_enabled: boolean;
+        acknowledgment_subject: string;
+        acknowledgment_body: string;
+        acknowledgment_reply_to: string | null;
     };
+    mailFrom: string | null;
     models: Option[];
     efforts: string[];
     usage: {
@@ -344,6 +353,123 @@ function AiSettings({
     );
 }
 
+function AcknowledgmentSettings({
+    settings,
+    mailFrom,
+}: Pick<Props, 'settings' | 'mailFrom'>) {
+    const [sending, setSending] = useState(false);
+
+    return (
+        <section className="space-y-6">
+            <Heading
+                variant="small"
+                title="E-mail de confirmation au candidat"
+                description="Envoyé automatiquement à chaque candidature reçue par le site, pas aux CV ajoutés par l’équipe."
+            />
+
+            <Form
+                {...updateAcknowledgment.form()}
+                options={{ preserveScroll: true }}
+                className="max-w-3xl space-y-6"
+            >
+                {({ errors, processing }) => (
+                    <>
+                        <div className="flex items-center gap-3">
+                            <Checkbox
+                                id="acknowledgment_enabled"
+                                name="acknowledgment_enabled"
+                                value="1"
+                                defaultChecked={settings.acknowledgment_enabled}
+                            />
+                            <Label htmlFor="acknowledgment_enabled">
+                                Envoyer un e-mail de confirmation au candidat
+                            </Label>
+                        </div>
+
+                        <Field
+                            id="acknowledgment_subject"
+                            label="Objet"
+                            error={errors.acknowledgment_subject}
+                        >
+                            <Input
+                                id="acknowledgment_subject"
+                                name="acknowledgment_subject"
+                                maxLength={150}
+                                defaultValue={settings.acknowledgment_subject}
+                                required
+                            />
+                        </Field>
+
+                        <Field
+                            id="acknowledgment_body"
+                            label="Texte"
+                            hint="{nom} : nom du candidat · {poste} : intitulé de l’offre, ou « Candidature spontanée ». Une ligne vide sépare deux paragraphes."
+                            error={errors.acknowledgment_body}
+                        >
+                            <Textarea
+                                id="acknowledgment_body"
+                                name="acknowledgment_body"
+                                rows={16}
+                                maxLength={5000}
+                                defaultValue={settings.acknowledgment_body}
+                                required
+                            />
+                        </Field>
+
+                        <Field
+                            id="acknowledgment_reply_to"
+                            label="Adresse de réponse (facultatif)"
+                            hint={`Si le candidat répond à l’e-mail. Laissez vide pour recevoir sa réponse sur l’adresse d’envoi du site${mailFrom ? ` (${mailFrom})` : ''}.`}
+                            error={errors.acknowledgment_reply_to}
+                        >
+                            <Input
+                                id="acknowledgment_reply_to"
+                                name="acknowledgment_reply_to"
+                                type="email"
+                                maxLength={255}
+                                defaultValue={
+                                    settings.acknowledgment_reply_to ?? ''
+                                }
+                                placeholder="rh@dym.ci"
+                            />
+                        </Field>
+
+                        <div className="flex flex-wrap items-center gap-3">
+                            <Button type="submit" disabled={processing}>
+                                {processing && <Spinner />}
+                                Enregistrer l’e-mail
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                disabled={sending}
+                                onClick={() =>
+                                    router.post(
+                                        testAcknowledgment.url(),
+                                        {},
+                                        {
+                                            preserveScroll: true,
+                                            onStart: () => setSending(true),
+                                            onFinish: () => setSending(false),
+                                        },
+                                    )
+                                }
+                            >
+                                {sending && <Spinner />}
+                                M’envoyer un e-mail de test
+                            </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            Le test envoie la version enregistrée à votre propre
+                            adresse : enregistrez d’abord vos modifications.
+                        </p>
+                    </>
+                )}
+            </Form>
+        </section>
+    );
+}
+
 function DeleteStage({ stage, stages }: { stage: Stage; stages: Stage[] }) {
     const [moveTo, setMoveTo] = useState('');
     const others = stages.filter((s) => s.id !== stage.id);
@@ -611,6 +737,7 @@ function OptionList({
 
 export default function RecruitmentSettings({
     settings,
+    mailFrom,
     models,
     efforts,
     usage,
@@ -621,7 +748,7 @@ export default function RecruitmentSettings({
     return (
         <AdminPage
             title="Réglages du recrutement"
-            description="Tout le module se personnalise ici : IA, étapes du pipeline et listes."
+            description="Tout le module se personnalise ici : IA, e-mail au candidat, étapes du pipeline et listes."
         >
             <div className="space-y-12">
                 <AiSettings
@@ -629,6 +756,10 @@ export default function RecruitmentSettings({
                     models={models}
                     efforts={efforts}
                     usage={usage}
+                />
+                <AcknowledgmentSettings
+                    settings={settings}
+                    mailFrom={mailFrom}
                 />
                 <Stages stages={stages} kinds={stageKinds} />
                 <section className="space-y-4">

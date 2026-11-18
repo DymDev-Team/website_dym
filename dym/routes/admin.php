@@ -58,6 +58,8 @@ Route::prefix('admin')
             Route::post('analyses/missing', [AnalysisQueueController::class, 'missing'])->name('analyses.missing');
             Route::get('settings', [RecruitmentSettingController::class, 'edit'])->name('settings.edit');
             Route::put('settings', [RecruitmentSettingController::class, 'update'])->name('settings.update');
+            Route::put('settings/acknowledgment', [RecruitmentSettingController::class, 'updateAcknowledgment'])->name('settings.acknowledgment.update');
+            Route::post('settings/acknowledgment/test', [RecruitmentSettingController::class, 'testAcknowledgment'])->middleware('throttle:5,1')->name('settings.acknowledgment.test');
             Route::put('stages/order', [RecruitmentStageController::class, 'reorder'])->name('stages.reorder');
             Route::resource('stages', RecruitmentStageController::class)->only(['store', 'update', 'destroy']);
             Route::resource('options', RecruitmentOptionController::class)->only(['store', 'update', 'destroy']);

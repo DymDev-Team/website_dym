@@ -10,10 +10,12 @@ use App\Models\RecruitmentOption;
 use App\Models\RecruitmentSetting;
 use App\Models\RecruitmentStage;
 use App\Models\User;
+use App\Notifications\ApplicationReceived;
 use App\Recruitment\Ai\CandidateAnalyzer;
 use App\Recruitment\AnalysisRunner;
 use App\Recruitment\Exceptions\PermanentAnalysisError;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\Support\FakeCandidateAnalyzer;
@@ -189,6 +191,60 @@ test('the AI settings keep the API key encrypted and never send it back', functi
             ->component('admin/recruitment/settings')
             ->where('settings.api_key_masked', '••••1234')
             ->missing('settings.api_key'));
+});
+
+test('admins write the acknowledgment e-mail and send themselves a test', function () {
+    Notification::fake();
+    $this->admin->update(['name' => 'Fatou Bamba']);
+    JobOffer::factory()->create(['title' => 'Soudeur TIG']);
+
+    $this->actingAs($this->admin)
+        ->put(route('admin.recruitment.settings.acknowledgment.update'), [
+            'acknowledgment_subject' => '  Merci {nom}  ',
+            'acknowledgment_body' => 'Bonjour {nom}, merci pour : {poste}.',
+            'acknowledgment_reply_to' => 'rh@dym.ci',
+        ])
+        ->assertRedirect(route('admin.recruitment.settings.edit'));
+
+    expect(RecruitmentSetting::values())->toMatchArray([
+        'acknowledgment_enabled' => false,
+        'acknowledgment_subject' => 'Merci {nom}',
+        'acknowledgment_reply_to' => 'rh@dym.ci',
+    ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.recruitment.settings.acknowledgment.test'))
+        ->assertRedirect(route('admin.recruitment.settings.edit'));
+
+    Notification::assertSentTo($this->admin, ApplicationReceived::class, function (ApplicationReceived $notification) {
+        $mail = $notification->toMail($this->admin);
+
+        return $mail->subject === 'Merci Fatou Bamba'
+            && str_contains((string) $mail->render(), 'merci pour : Soudeur TIG.');
+    });
+});
+
+test('the acknowledgment e-mail needs a subject, a text and a valid reply address', function () {
+    $this->actingAs($this->admin)
+        ->put(route('admin.recruitment.settings.acknowledgment.update'), [
+            'acknowledgment_subject' => '',
+            'acknowledgment_body' => '',
+            'acknowledgment_reply_to' => 'pas-une-adresse',
+        ])
+        ->assertSessionHasErrors(['acknowledgment_subject', 'acknowledgment_body', 'acknowledgment_reply_to']);
+});
+
+test('CVs added by the team send no e-mail to the candidate', function () {
+    Notification::fake();
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.applications.store'), [
+            'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
+            'email' => 'awa@example.com',
+        ])
+        ->assertRedirect();
+
+    Notification::assertNothingSent();
 });
 
 test('a fake API key is refused', function () {

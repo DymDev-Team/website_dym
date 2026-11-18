@@ -2,9 +2,11 @@
 
 use App\Models\JobApplication;
 use App\Models\JobOffer;
+use App\Models\RecruitmentSetting;
 use App\Models\RecruitmentStage;
 use App\Models\Setting;
 use App\Models\User;
+use App\Notifications\ApplicationReceived;
 use App\Notifications\NewJobApplication;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -74,6 +76,65 @@ test('a candidate can apply to an offer', function () {
         NewJobApplication::class,
         fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === Setting::values()['email'],
     );
+});
+
+test('the candidate receives an acknowledgment of their application', function () {
+    $offer = JobOffer::factory()->create(['title' => 'Soudeur TIG']);
+
+    $this->post(route('careers.apply'), applicationData(['job_offer_id' => $offer->id]))->assertSessionHasNoErrors();
+
+    $sent = null;
+    Notification::assertSentOnDemand(
+        ApplicationReceived::class,
+        function (ApplicationReceived $notification, array $channels, AnonymousNotifiable $notifiable) use (&$sent) {
+            $sent = $notification->toMail($notifiable);
+
+            return $notifiable->routes['mail'] === 'awa@example.com';
+        },
+    );
+
+    expect($sent->subject)->toBe('Nous avons bien reçu votre candidature')
+        ->and($sent->replyTo)->toBe([])
+        ->and((string) $sent->render())->toContain('Bonjour Awa Koné,', 'Poste : Soudeur TIG', 'Cordialement,<br>');
+});
+
+test('the acknowledgment follows the text written in the settings', function () {
+    RecruitmentSetting::store([
+        'acknowledgment_subject' => 'Candidature reçue, {nom}',
+        'acknowledgment_body' => "Bonjour {nom},\n\nMerci pour : {poste}.\nÀ bientôt,\r\n\r\n\r\nL’équipe RH",
+        'acknowledgment_reply_to' => 'rh@dym.ci',
+    ]);
+
+    $mail = (new ApplicationReceived('Awa Koné', null))->toMail(new AnonymousNotifiable);
+
+    expect($mail->subject)->toBe('Candidature reçue, Awa Koné')
+        ->and($mail->replyTo)->toBe([['rh@dym.ci', null]])
+        ->and(ApplicationReceived::paragraphs(RecruitmentSetting::values()['acknowledgment_body']))->toBe([
+            'Bonjour {nom},',
+            "Merci pour : {poste}.  \nÀ bientôt,",
+            'L’équipe RH',
+        ])
+        ->and((string) $mail->render())->toContain('Merci pour : Candidature spontanée.<br>');
+});
+
+test('no acknowledgment is sent once switched off', function () {
+    RecruitmentSetting::store(['acknowledgment_enabled' => '0']);
+
+    $this->post(route('careers.apply'), applicationData())->assertSessionHasNoErrors();
+
+    Notification::assertSentOnDemand(NewJobApplication::class);
+    Notification::assertSentTimes(ApplicationReceived::class, 0);
+});
+
+test('the name typed in the form cannot slip a link into the acknowledgment', function () {
+    $mail = (new ApplicationReceived('Gagnant [ici](https://evil.example) evil.example <b>', null))->toMail(new AnonymousNotifiable);
+
+    expect((string) $mail->render())
+        ->toContain('Bonjour Gagnant ici https evil example evil example b,')
+        ->not->toContain('evil.example', '<b>');
+
+    $anonymous = (new ApplicationReceived('://', null))->toMail(new AnonymousNotifiable);
+    expect((string) $anonymous->render())->toContain('Bonjour Madame, Monsieur,');
 });
 
 test('a spontaneous application has no offer', function () {

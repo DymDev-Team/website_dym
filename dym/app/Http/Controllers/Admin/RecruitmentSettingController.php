@@ -8,9 +8,11 @@ use App\Enums\StageKind;
 use App\Http\Controllers\Controller;
 use App\Models\AiCall;
 use App\Models\ApplicationAnalysis;
+use App\Models\JobOffer;
 use App\Models\RecruitmentOption;
 use App\Models\RecruitmentSetting;
 use App\Models\RecruitmentStage;
+use App\Notifications\ApplicationReceived;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -18,6 +20,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class RecruitmentSettingController extends Controller
 {
@@ -34,6 +37,7 @@ class RecruitmentSettingController extends Controller
                 ...Arr::except($settings, 'api_key'),
                 'api_key_masked' => RecruitmentSetting::maskedApiKey(),
             ],
+            'mailFrom' => config('mail.from.address'),
             'models' => collect(Config::array('recruitment.models'))->map(fn (array $model, string $id) => ['value' => $id, 'label' => $model['label']])->values(),
             'efforts' => config('recruitment.efforts'),
             'usage' => [
@@ -101,6 +105,52 @@ class RecruitmentSettingController extends Controller
         RecruitmentSetting::store($values);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Réglages du recrutement enregistrés.']);
+
+        return to_route('admin.recruitment.settings.edit');
+    }
+
+    /**
+     * Update the acknowledgment e-mail sent to candidates who apply on the site.
+     */
+    public function updateAcknowledgment(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'acknowledgment_enabled' => ['boolean'],
+            'acknowledgment_subject' => ['required', 'string', 'max:150'],
+            'acknowledgment_body' => ['required', 'string', 'max:5000'],
+            'acknowledgment_reply_to' => ['nullable', 'email', 'max:255'],
+        ]);
+
+        RecruitmentSetting::store([
+            'acknowledgment_enabled' => $request->boolean('acknowledgment_enabled') ? '1' : '0',
+            'acknowledgment_subject' => trim($validated['acknowledgment_subject']),
+            'acknowledgment_body' => trim($validated['acknowledgment_body']),
+            'acknowledgment_reply_to' => $validated['acknowledgment_reply_to'] ?? null,
+        ]);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'E-mail de confirmation enregistré.']);
+
+        return to_route('admin.recruitment.settings.edit');
+    }
+
+    /**
+     * Send the saved acknowledgment to the signed-in admin, addressed to them
+     * and to the latest open offer, to check its wording and the mailer.
+     */
+    public function testAcknowledgment(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $offer = JobOffer::query()->open()->latest()->first();
+
+        try {
+            $user->notify(new ApplicationReceived($user->name, $offer?->title));
+            $toast = ['type' => 'success', 'message' => "E-mail de test envoyé à {$user->email}."];
+        } catch (Throwable $e) {
+            report($e);
+            $toast = ['type' => 'error', 'message' => 'L’envoi a échoué : vérifiez les réglages MAIL_* du serveur.'];
+        }
+
+        Inertia::flash('toast', $toast);
 
         return to_route('admin.recruitment.settings.edit');
     }

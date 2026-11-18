@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreJobApplicationRequest;
 use App\Models\Activity;
-use App\Models\JobApplication;
 use App\Models\JobOffer;
+use App\Models\RecruitmentSetting;
 use App\Models\Setting;
+use App\Notifications\ApplicationReceived;
 use App\Notifications\NewJobApplication;
 use App\Recruitment\ApplicationIntake;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
@@ -42,7 +44,8 @@ class CareerController extends Controller
     }
 
     /**
-     * Store an application, start its analysis and notify the company.
+     * Store an application, start its analysis, notify the company and
+     * acknowledge receipt to the candidate.
      */
     public function apply(StoreJobApplicationRequest $request, ApplicationIntake $intake): RedirectResponse
     {
@@ -60,7 +63,14 @@ class CareerController extends Controller
             answers: $request->answers(),
         );
 
-        $this->notify($application);
+        // Après la réponse : le candidat n'attend pas le serveur d'envoi.
+        defer(function () use ($application) {
+            $this->send(Setting::values()['email'], new NewJobApplication($application));
+
+            if (RecruitmentSetting::values()['acknowledgment_enabled']) {
+                $this->send($application->candidate->email, ApplicationReceived::for($application));
+            }
+        });
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Candidature envoyée. Merci !']);
 
@@ -68,18 +78,16 @@ class CareerController extends Controller
     }
 
     /**
-     * Send the notification without failing the application if the mailer is down.
+     * Send an e-mail without failing the application if the mailer is down.
      */
-    private function notify(JobApplication $application): void
+    private function send(?string $email, Notification $notification): void
     {
-        $email = Setting::values()['email'];
-
         if (blank($email)) {
             return;
         }
 
         try {
-            Notification::route('mail', $email)->notify(new NewJobApplication($application));
+            NotificationFacade::route('mail', $email)->notify($notification);
         } catch (Throwable $e) {
             report($e);
         }
