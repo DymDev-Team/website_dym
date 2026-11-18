@@ -59,19 +59,27 @@ par le workflow FTP, ensuite tout passe par le miroir Git.
    CACHE_STORE=database
    QUEUE_CONNECTION=sync
 
-   MAIL_MAILER=resend
-   MAIL_FROM_ADDRESS="contact@dymora.dym-manufacture.com"
-   MAIL_FROM_NAME="${APP_NAME}"
-   RESEND_API_KEY=re_...
+   MAIL_MAILER=smtp
+   MAIL_HOST=mail.dym-manufacture.com
+   MAIL_PORT=465
+   MAIL_USERNAME=support.grh@dym-manufacture.com
+   MAIL_PASSWORD="mot-de-passe-de-la-boite"
+   MAIL_FROM_ADDRESS="support.grh@dym-manufacture.com"
+   MAIL_FROM_NAME="DYM GRH"
 
    DEPLOY_TOKEN=jeton-aleatoire
    ```
 
-   `MAIL_*` : le site envoie par **Resend** (API HTTPS, paquet `resend/resend-php`),
-   depuis le domaine `dymora.dym-manufacture.com`, validé dans Resend. Une clé
-   « Sending access » suffit. L'adresse d'envoi ne reçoit pas les réponses : celles
-   des candidats vont à l'e-mail de contact du site (ou à l'adresse de réponse
-   choisie dans *Recrutement > Réglages*).
+   `MAIL_*` : le site envoie par le SMTP de la boîte `support.grh@dym-manufacture.com`,
+   hébergée sur le même serveur LWS que le site (SPF et DKIM en place sur
+   `dym-manufacture.com`). Le port 465 active seul le chiffrement : `MAIL_ENCRYPTION`
+   n'est plus lu par Laravel. Les réponses des candidats vont à l'e-mail de contact
+   du site, ou à l'adresse de réponse choisie dans *Recrutement > Réglages*.
+   Contrôle depuis le serveur, sans envoyer d'e-mail :
+   `curl -X POST https://dym.ci/api/deploy/mail -H "X-Deploy-Token: LE_DEPLOY_TOKEN"`.
+
+   N'utilisez pas Resend avec la clé de dymora_app : son quota mensuel est partagé
+   entre les deux sites et, une fois atteint, plus aucun e-mail ne part.
 
    Repli possible sur la boîte info@dym.ci, hébergée chez **OVH** (MX `mx*.mail.ovh.net`),
    pas chez LWS, qui ne gère que le site et la zone DNS : `MAIL_MAILER=smtp`, SMTP

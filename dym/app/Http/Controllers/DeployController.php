@@ -7,9 +7,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Process;
+use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Throwable;
 
 class DeployController extends Controller
@@ -153,8 +153,9 @@ class DeployController extends Controller
     }
 
     /**
-     * Mail diagnosis without access to the server: settings in use, secrets
-     * masked, and a real send to Resend's test address, which reaches nobody.
+     * Mail diagnosis without access to the server: the mailer in use, then a
+     * login to the SMTP server, which sends nothing, or for an API mailer a
+     * send to Resend's test address, which reaches nobody.
      */
     public function mailCheck(Request $request): JsonResponse
     {
@@ -162,25 +163,24 @@ class DeployController extends Controller
             return $this->unauthorized();
         }
 
-        $key = (string) config('services.resend.key');
         $report = [
             'mailer' => config('mail.default'),
             'from' => config('mail.from.address'),
-            'resend_key' => $key === '' ? null : substr($key, 0, 6).'…',
-            'resend_library' => class_exists(\Resend::class),
         ];
 
         try {
-            $report['resend_api'] = Http::timeout(15)->get('https://api.resend.com')->status();
-        } catch (Throwable $e) {
-            $report['resend_api'] = $e->getMessage();
-        }
+            $transport = Mail::mailer()->getSymfonyTransport();
 
-        try {
-            Mail::raw('Test technique du site dym.ci.', fn (Message $message) => $message->to('delivered@resend.dev')->subject('Test technique dym.ci'));
-            $report['send'] = 'ok';
+            if ($transport instanceof SmtpTransport) {
+                $transport->start();
+                $transport->stop();
+                $report['check'] = 'connexion SMTP ok';
+            } else {
+                Mail::raw('Test technique du site dym.ci.', fn (Message $message) => $message->to('delivered@resend.dev')->subject('Test technique dym.ci'));
+                $report['check'] = 'envoi ok';
+            }
         } catch (Throwable $e) {
-            $report['send'] = $e::class.' : '.$e->getMessage();
+            $report['check'] = $e::class.' : '.$e->getMessage();
         }
 
         return response()->json($report);

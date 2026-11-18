@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Process\PendingProcess;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
 
 beforeEach(function () {
@@ -45,19 +44,13 @@ test('the git mirror stops when the fetch fails', function () {
     Process::assertDidntRun(fn (PendingProcess $process) => ($process->command[1] ?? null) === 'reset');
 });
 
-test('the mail check reports the mailer in use and sends to the Resend test address', function () {
-    Http::fake(['api.resend.com' => Http::response('', 200)]);
-    config(['services.resend.key' => 're_secret123456']);
-
+test('without SMTP the mail check sends to the Resend test address', function () {
     $this->postJson('/api/deploy/mail', [], ['X-Deploy-Token' => 'secret-token'])
         ->assertOk()
         ->assertExactJson([
             'mailer' => 'array',
             'from' => config('mail.from.address'),
-            'resend_key' => 're_sec…',
-            'resend_library' => true,
-            'resend_api' => 200,
-            'send' => 'ok',
+            'check' => 'envoi ok',
         ]);
 
     $messages = app('mailer')->getSymfonyTransport()->messages();
@@ -65,8 +58,7 @@ test('the mail check reports the mailer in use and sends to the Resend test addr
         ->and($messages[0]->getEnvelope()->getRecipients()[0]->getAddress())->toBe('delivered@resend.dev');
 });
 
-test('the mail check returns the sending error', function () {
-    Http::fake(['api.resend.com' => Http::response('', 200)]);
+test('with SMTP the mail check only logs in and returns the connection error', function () {
     config([
         'mail.default' => 'smtp',
         'mail.mailers.smtp.host' => '127.0.0.1',
@@ -77,5 +69,5 @@ test('the mail check returns the sending error', function () {
     $this->postJson('/api/deploy/mail', [], ['X-Deploy-Token' => 'secret-token'])
         ->assertOk()
         ->assertJsonPath('mailer', 'smtp')
-        ->assertJson(fn ($json) => $json->where('send', fn (string $send) => str_starts_with($send, 'Symfony\Component\Mailer\Exception\TransportException'))->etc());
+        ->assertJson(fn ($json) => $json->where('check', fn (string $check) => str_starts_with($check, 'Symfony\Component\Mailer\Exception\TransportException'))->etc());
 });
