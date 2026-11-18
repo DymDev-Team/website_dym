@@ -2,6 +2,7 @@ import { Form, Link, router } from '@inertiajs/react';
 import {
     AlertTriangle,
     Download,
+    FileDown,
     Loader2,
     Mail,
     MapPin,
@@ -38,6 +39,7 @@ import {
     cv,
     destroy,
     index,
+    report,
     show,
     update,
 } from '@/routes/admin/applications';
@@ -173,19 +175,29 @@ function Analysis({
         attempt?.status === 'pending' || attempt?.status === 'processing';
 
     const relaunch = (
-        <Button
-            variant="outline"
-            size="sm"
-            disabled={running}
-            onClick={() =>
-                router.post(analyze.url(application.id), undefined, {
-                    preserveScroll: true,
-                })
-            }
-        >
-            <RefreshCw />
-            {analysis || attempt ? 'Relancer l’analyse' : 'Analyser le CV'}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+            {analysis?.result && (
+                <Button variant="outline" size="sm" asChild>
+                    <a href={report(application.id).url}>
+                        <FileDown />
+                        Exporter en PDF
+                    </a>
+                </Button>
+            )}
+            <Button
+                variant="outline"
+                size="sm"
+                disabled={running}
+                onClick={() =>
+                    router.post(analyze.url(application.id), undefined, {
+                        preserveScroll: true,
+                    })
+                }
+            >
+                <RefreshCw />
+                {analysis || attempt ? 'Relancer l’analyse' : 'Analyser le CV'}
+            </Button>
+        </div>
     );
 
     const blocked = aiBlockedReason && (

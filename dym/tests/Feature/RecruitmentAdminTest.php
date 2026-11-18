@@ -128,6 +128,33 @@ test('the application page shows the analysis and accepts notes', function () {
             ->missing('application.cv_path'));
 });
 
+test('a completed AI analysis can be downloaded as a multi-page PDF report', function () {
+    Storage::disk('local')->put('applications/cv.pdf', '%PDF');
+    $offer = JobOffer::factory()->create(['title' => 'Soudeur industriel']);
+    $candidate = Candidate::factory()->create(['name' => 'Awa Koné']);
+    $application = JobApplication::factory()->for($candidate)->for($offer)->create();
+    $runner = app(AnalysisRunner::class);
+    $runner->run($runner->request($application, runAfterResponse: false));
+
+    $response = $this->actingAs($this->admin)
+        ->get(route('admin.applications.report', $application))
+        ->assertOk()
+        ->assertHeader('Content-Type', 'application/pdf')
+        ->assertHeader('Content-Disposition', 'attachment; filename="analyse-ia-awa-kone.pdf"');
+
+    expect($response->getContent())->toStartWith('%PDF')
+        ->and(substr_count($response->getContent(), '/Type /Page'))
+        ->toBeGreaterThanOrEqual(2);
+});
+
+test('an application without a completed analysis has no PDF report', function () {
+    $application = JobApplication::factory()->create();
+
+    $this->actingAs($this->admin)
+        ->get(route('admin.applications.report', $application))
+        ->assertNotFound();
+});
+
 test('changing the target offer starts a new analysis', function () {
     Storage::disk('local')->put('applications/cv.pdf', '%PDF');
     $application = JobApplication::factory()->create(['score' => 40]);

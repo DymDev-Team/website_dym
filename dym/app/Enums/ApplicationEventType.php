@@ -9,6 +9,7 @@ enum ApplicationEventType: string
     case Sourced = 'sourced';
     case StageChanged = 'stage_changed';
     case Note = 'note';
+    case EmailSent = 'email_sent';
     case AnalysisRequested = 'analysis_requested';
     case AnalysisCompleted = 'analysis_completed';
     case AnalysisFailed = 'analysis_failed';

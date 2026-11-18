@@ -19,11 +19,13 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $color
  * @property StageKind $kind
+ * @property string|null $email_subject
+ * @property string|null $email_body
  * @property int $position
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'color', 'kind', 'position'])]
+#[Fillable(['name', 'color', 'kind', 'email_subject', 'email_body', 'position'])]
 class RecruitmentStage extends Model
 {
     /** @use HasFactory<RecruitmentStageFactory> */
@@ -49,6 +51,14 @@ class RecruitmentStage extends Model
     protected function ordered(Builder $query): void
     {
         $query->orderBy('position')->orderBy('id');
+    }
+
+    /**
+     * Whether an e-mail is proposed to candidates entering this stage.
+     */
+    public function hasEmail(): bool
+    {
+        return filled($this->email_subject) && filled($this->email_body);
     }
 
     /**

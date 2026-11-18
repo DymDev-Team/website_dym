@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\ApplicationReceived;
 use App\Notifications\NewJobApplication;
+use App\Recruitment\CandidateMail;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
@@ -110,7 +111,7 @@ test('the acknowledgment follows the text written in the settings', function () 
 
     expect($mail->subject)->toBe('Candidature reçue, Awa Koné')
         ->and($mail->replyTo)->toBe([['rh@dym.ci', null]])
-        ->and(ApplicationReceived::paragraphs(RecruitmentSetting::values()['acknowledgment_body']))->toBe([
+        ->and(CandidateMail::paragraphs(RecruitmentSetting::values()['acknowledgment_body']))->toBe([
             'Bonjour {nom},',
             "Merci pour : {poste}.  \nÀ bientôt,",
             'L’équipe RH',

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\AnalysisQueueController;
+use App\Http\Controllers\Admin\ApplicationEmailController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CandidateController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -48,8 +49,11 @@ Route::prefix('admin')
         Route::post('job-offers/{job_offer}/sourcing/{candidate}', [SourcingController::class, 'add'])->name('job-offers.sourcing.add');
         Route::resource('job-offers', JobOfferController::class)->except('show');
         Route::get('applications/{application}/cv', [JobApplicationController::class, 'cv'])->name('applications.cv');
+        Route::get('applications/{application}/report', [JobApplicationController::class, 'report'])->name('applications.report');
         Route::post('applications/{application}/analyze', [JobApplicationController::class, 'analyze'])->name('applications.analyze');
         Route::post('applications/{application}/notes', [JobApplicationController::class, 'note'])->name('applications.notes.store');
+        Route::get('applications/{application}/email', [ApplicationEmailController::class, 'draft'])->name('applications.email.draft');
+        Route::post('applications/{application}/email', [ApplicationEmailController::class, 'send'])->middleware('throttle:30,1')->name('applications.email.send');
         Route::resource('applications', JobApplicationController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::resource('candidates', CandidateController::class)->only(['index', 'update', 'destroy']);
 
@@ -61,6 +65,7 @@ Route::prefix('admin')
             Route::put('settings/acknowledgment', [RecruitmentSettingController::class, 'updateAcknowledgment'])->name('settings.acknowledgment.update');
             Route::post('settings/acknowledgment/test', [RecruitmentSettingController::class, 'testAcknowledgment'])->middleware('throttle:5,1')->name('settings.acknowledgment.test');
             Route::put('stages/order', [RecruitmentStageController::class, 'reorder'])->name('stages.reorder');
+            Route::put('stages/{stage}/email', [RecruitmentStageController::class, 'updateEmail'])->name('stages.email.update');
             Route::resource('stages', RecruitmentStageController::class)->only(['store', 'update', 'destroy']);
             Route::resource('options', RecruitmentOptionController::class)->only(['store', 'update', 'destroy']);
         });

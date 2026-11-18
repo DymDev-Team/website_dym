@@ -41,6 +41,28 @@ class RecruitmentStageController extends Controller
     }
 
     /**
+     * E-mail proposed when a candidate enters the stage. Both fields empty
+     * remove it.
+     */
+    public function updateEmail(Request $request, RecruitmentStage $stage): RedirectResponse
+    {
+        $validated = $request->validate([
+            'email_subject' => ['nullable', 'required_with:email_body', 'string', 'max:150'],
+            'email_body' => ['nullable', 'required_with:email_subject', 'string', 'max:5000'],
+        ], [
+            'email_subject.required_with' => 'Indiquez l’objet, ou videz aussi le texte pour retirer l’e-mail.',
+            'email_body.required_with' => 'Indiquez le texte, ou videz aussi l’objet pour retirer l’e-mail.',
+        ]);
+
+        $stage->update([
+            'email_subject' => filled($validated['email_subject'] ?? null) ? trim($validated['email_subject']) : null,
+            'email_body' => filled($validated['email_body'] ?? null) ? trim($validated['email_body']) : null,
+        ]);
+
+        return $this->saved($stage->hasEmail() ? 'E-mail de l’étape enregistré.' : 'E-mail de l’étape retiré.');
+    }
+
+    /**
      * Save the order of the columns.
      */
     public function reorder(Request $request): RedirectResponse

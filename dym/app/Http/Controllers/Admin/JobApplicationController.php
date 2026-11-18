@@ -16,11 +16,15 @@ use App\Models\RecruitmentOption;
 use App\Models\RecruitmentStage;
 use App\Recruitment\AnalysisRunner;
 use App\Recruitment\ApplicationIntake;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -53,6 +57,7 @@ class JobApplicationController extends Controller
             'stages' => $stages->map(fn (RecruitmentStage $stage) => [
                 ...$stage->only(['id', 'name', 'color']),
                 'kind' => $stage->kind->value,
+                'has_email' => $stage->hasEmail(),
                 'total' => $query()->where('stage_id', $stage->id)->count(),
                 'applications' => $query()
                     ->where('stage_id', $stage->id)
@@ -146,7 +151,11 @@ class JobApplicationController extends Controller
                 ]),
             ],
             'matchedOffers' => $matchedOffers,
-            'stages' => RecruitmentStage::query()->ordered()->get(['id', 'name', 'color', 'kind']),
+            'stages' => RecruitmentStage::query()->ordered()->get()->map(fn (RecruitmentStage $stage) => [
+                ...$stage->only(['id', 'name', 'color']),
+                'kind' => $stage->kind->value,
+                'has_email' => $stage->hasEmail(),
+            ]),
             'offers' => JobOffer::query()->latest()->get(['id', 'title']),
             'sources' => RecruitmentOption::query()->ofType(RecruitmentOptionType::Source)->get(['id', 'label']),
             'recommendations' => $this->recommendationOptions(),
@@ -244,6 +253,60 @@ class JobApplicationController extends Controller
     public function cv(JobApplication $application): StreamedResponse
     {
         return Storage::disk(JobApplication::CV_DISK)->download($application->cv_path, $application->cv_name);
+    }
+
+    /**
+     * Download the latest completed AI analysis as a polished, multi-page PDF.
+     */
+    public function report(JobApplication $application): HttpResponse
+    {
+        $application->load([
+            'candidate.jobFamily:id,label',
+            'jobOffer:id,title',
+            'stage:id,name',
+            'source:id,label',
+            'latestCompletedAnalysis.jobOffer:id,title',
+        ]);
+
+        $analysis = $application->latestCompletedAnalysis;
+        abort_if($analysis === null || ! is_array($analysis->result), 404, 'Aucune analyse IA terminée à exporter.');
+
+        $matchedOffers = JobOffer::query()
+            ->whereIn('id', array_column($analysis->result['offer_matches'] ?? [], 'offer_id'))
+            ->pluck('title', 'id');
+
+        $options = new Options;
+        $options->set('defaultFont', 'DejaVu Sans');
+        $options->set('isRemoteEnabled', false);
+
+        $pdf = new Dompdf($options);
+        $pdf->loadHtml(view('admin.recruitment.application-report', [
+            'application' => $application,
+            'analysis' => $analysis,
+            'result' => $analysis->result,
+            'matchedOffers' => $matchedOffers,
+        ])->render(), 'UTF-8');
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->render();
+
+        $font = $pdf->getFontMetrics()->getFont('DejaVu Sans');
+        $pdf->getCanvas()->page_text(
+            486,
+            814,
+            'Page {PAGE_NUM} / {PAGE_COUNT}',
+            $font,
+            8,
+            [0.42, 0.42, 0.42],
+        );
+
+        $name = Str::slug($application->candidate->display_name) ?: 'candidat';
+        $filename = "analyse-ia-{$name}.pdf";
+
+        return response($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            'Cache-Control' => 'private, no-store, max-age=0',
+        ]);
     }
 
     /**
