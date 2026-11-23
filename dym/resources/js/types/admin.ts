@@ -191,11 +191,15 @@ export type Option = { value: string; label: string };
 
 export type StageKind = 'open' | 'hired' | 'rejected';
 
+export type StageRole = 'review' | 'psychotest' | 'dg_review';
+
 export type RecruitmentStage = {
     id: number;
     name: string;
     color: string;
     kind: StageKind;
+    // Présent sur le pipeline et la fiche : l'étape propose un e-mail.
+    has_email?: boolean;
 };
 
 export type Recommendation = 'priority' | 'consider' | 'not_matching';
@@ -214,6 +218,8 @@ export type PipelineCard = {
     stage_id: number;
     score: number | null;
     recommendation: Recommendation | null;
+    test_score: number | null;
+    dg_score: number | null;
     viewed: boolean;
     created_at: string;
     analysis_status: AnalysisStatus | null;
@@ -296,8 +302,12 @@ export type ApplicationEvent = {
         | 'analysis_requested'
         | 'analysis_completed'
         | 'analysis_failed'
-        | 'candidate_merged';
-    data: Record<string, string | number | null> | null;
+        | 'candidate_merged'
+        | 'email_sent'
+        | 'psychotest_sent'
+        | 'psychotest_completed'
+        | 'dg_reviewed';
+    data: Record<string, string | number | boolean | null> | null;
     user: string | null;
     created_at: string;
 };
@@ -364,6 +374,39 @@ export type ApplicationFile = {
         created_at: string;
     }[];
     events: ApplicationEvent[];
+    psychotest: Psychotest | null;
+    dg: {
+        criteria: string[];
+        review: { criterion: string; score: number }[] | null;
+        comment: string | null;
+        score: number | null;
+        reviewed_by: string | null;
+        reviewed_at: string | null;
+    };
+};
+
+export type PsychotestQuestion = {
+    id: string;
+    text: string;
+    options: string[];
+    answer: number;
+    category: string;
+    source: 'offer' | 'candidate' | 'manual';
+};
+
+export type Psychotest = {
+    status: 'draft' | 'sent' | 'started' | 'completed' | 'expired';
+    questions: PsychotestQuestion[];
+    answers: Record<string, number | null> | null;
+    score: number | null;
+    duration: number;
+    minutes: number | null;
+    sent_at: string | null;
+    expires_at: string | null;
+    started_at: string | null;
+    completed_at: string | null;
+    url: string;
+    whatsapp_url: string | null;
 };
 
 export type CandidateRow = {

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\StageKind;
+use App\Enums\StageRole;
 use Database\Factories\RecruitmentStageFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -19,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $color
  * @property StageKind $kind
+ * @property StageRole|null $role
  * @property string|null $email_subject
  * @property string|null $email_body
  * @property int $position
@@ -40,6 +42,7 @@ class RecruitmentStage extends Model
     {
         return [
             'kind' => StageKind::class,
+            'role' => StageRole::class,
             'position' => 'integer',
         ];
     }
@@ -59,6 +62,14 @@ class RecruitmentStage extends Model
     public function hasEmail(): bool
     {
         return filled($this->email_subject) && filled($this->email_body);
+    }
+
+    /**
+     * Stage holding the given role, if it still exists.
+     */
+    public static function withRole(StageRole $role): ?self
+    {
+        return static::query()->where('role', $role)->first();
     }
 
     /**

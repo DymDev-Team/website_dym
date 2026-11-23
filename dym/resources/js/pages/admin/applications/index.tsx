@@ -10,12 +10,14 @@ import {
 import { useEffect, useState } from 'react';
 import type { DragEvent, FormEvent } from 'react';
 import AdminPage from '@/components/admin/admin-page';
+import CandidateEmailDialog from '@/components/admin/candidate-email-dialog';
 import CvUploadDialog from '@/components/admin/cv-upload-dialog';
 import {
     AnalysisPending,
     RecommendationBadge,
     ScoreBadge,
     StageDot,
+    StepScore,
     seniorityLabels,
     useAnalysisDriver,
 } from '@/components/admin/recruitment';
@@ -117,6 +119,12 @@ function Card({ card }: { card: PipelineCard }) {
 
             <div className="flex flex-wrap items-center gap-2">
                 <RecommendationBadge recommendation={card.recommendation} />
+                {card.test_score !== null && (
+                    <StepScore label="Test" score={card.test_score} />
+                )}
+                {card.dg_score !== null && (
+                    <StepScore label="DG" score={card.dg_score} />
+                )}
                 <AnalysisPending status={card.analysis_status} />
                 {card.analysis_status === 'failed' && (
                     <span className="text-xs text-destructive">
@@ -141,6 +149,11 @@ export default function Pipeline({
     const [search, setSearch] = useState(filters.search);
     const selectedOffer = offers.find((o) => String(o.id) === filters.offer);
     const [dropTarget, setDropTarget] = useState<number | null>(null);
+    // E-mail proposé après un déplacement vers une étape qui en a un.
+    const [email, setEmail] = useState<{
+        applicationId: number;
+        stageId: number;
+    } | null>(null);
 
     const filter = (patch: Partial<Filters>) => {
         router.get(
@@ -184,7 +197,15 @@ export default function Pipeline({
         router.patch(
             update.url(id),
             { stage_id: stageId },
-            { preserveScroll: true, preserveState: true },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => {
+                    if (stages.find((s) => s.id === stageId)?.has_email) {
+                        setEmail({ applicationId: id, stageId });
+                    }
+                },
+            },
         );
     };
 
@@ -364,6 +385,15 @@ export default function Pipeline({
                     </section>
                 ))}
             </div>
+
+            {email && (
+                <CandidateEmailDialog
+                    applicationId={email.applicationId}
+                    stageId={email.stageId}
+                    open
+                    onOpenChange={(open) => !open && setEmail(null)}
+                />
+            )}
         </AdminPage>
     );
 }

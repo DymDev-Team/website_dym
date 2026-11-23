@@ -3,12 +3,14 @@
 use App\Enums\AnalysisStatus;
 use App\Enums\Recommendation;
 use App\Enums\Seniority;
+use App\Enums\StageRole;
 use App\Models\AiCall;
 use App\Models\ApplicationAnalysis;
 use App\Models\Candidate;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
 use App\Models\RecruitmentSetting;
+use App\Models\RecruitmentStage;
 use App\Recruitment\Ai\AnalysisPrompt;
 use App\Recruitment\Ai\AnalysisRequest;
 use App\Recruitment\Ai\CandidateAnalyzer;
@@ -89,6 +91,24 @@ test('the identity given by the candidate is never overwritten', function () {
     analyze($application);
 
     expect($application->candidate->refresh()->only(['name', 'email']))->toBe(['name' => 'Awa K.', 'email' => 'awa.k@example.com']);
+});
+
+test('an analysis reaching the threshold moves the new application to review', function () {
+    fakeAnalyzer();
+    $application = JobApplication::factory()->for(JobOffer::factory())->create();
+
+    analyze($application);
+
+    expect($application->refresh()->score)->toBe(82)
+        ->and($application->stage->role)->toBe(StageRole::Review)
+        ->and($application->events()->where('type', 'stage_changed')->sole()->data)->toMatchArray(['auto' => true, 'score' => 82]);
+
+    RecruitmentSetting::store(['auto_advance_threshold' => '90']);
+    $other = JobApplication::factory()->for(JobOffer::factory())->create();
+
+    analyze($other);
+
+    expect($other->refresh()->stage_id)->toBe(RecruitmentStage::initial()->id);
 });
 
 test('a spontaneous application gets offer matches but no score', function () {

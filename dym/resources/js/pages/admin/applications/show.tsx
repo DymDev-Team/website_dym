@@ -10,9 +10,14 @@ import {
     RefreshCw,
     Sparkles,
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import AdminPage from '@/components/admin/admin-page';
+import {
+    DgSection,
+    PsychotestSection,
+} from '@/components/admin/assessment-sections';
+import CandidateEmailDialog from '@/components/admin/candidate-email-dialog';
 import DeleteButton from '@/components/admin/delete-button';
 import Field from '@/components/admin/field';
 import {
@@ -144,7 +149,31 @@ function eventLabel(event: ApplicationEvent): ReactNode {
                 ? 'Ajouté depuis la base de CV'
                 : `Ajouté depuis la base de CV (correspondance ${data.score} / 100)`;
         case 'stage_changed':
-            return `Étape : ${data.from} → ${data.to}`;
+            return data.auto
+                ? `Étape : ${data.from} → ${data.to} (automatique, note IA ${data.score})`
+                : `Étape : ${data.from} → ${data.to}`;
+        case 'email_sent':
+            return (
+                <details>
+                    <summary className="cursor-pointer">
+                        E-mail envoyé{data.stage ? ` (${data.stage})` : ''} :{' '}
+                        {data.subject}
+                    </summary>
+                    <span className="mt-1 block whitespace-pre-line text-foreground">
+                        {data.body}
+                    </span>
+                </details>
+            );
+        case 'psychotest_sent':
+            return `Test psychotechnique envoyé (${
+                { whatsapp: 'WhatsApp', email: 'e-mail', link: 'lien copié' }[
+                    String(data.channel)
+                ] ?? data.channel
+            })`;
+        case 'psychotest_completed':
+            return `Test psychotechnique terminé : ${data.score} / 100 en ${data.minutes} min`;
+        case 'dg_reviewed':
+            return `Appréciation DG : ${data.score} / 100`;
         case 'note':
             return (
                 <span className="whitespace-pre-line text-foreground">
@@ -503,6 +532,33 @@ export default function ApplicationShow({
         );
     };
 
+    // E-mail au candidat : proposé après un changement d'étape, ou libre.
+    const [email, setEmail] = useState<{
+        stageId: number | null;
+        picker: boolean;
+    } | null>(null);
+    const templates = stages
+        .filter((s) => s.has_email)
+        .map((s) => ({ id: s.id, name: s.name }));
+
+    const changeStage = (value: string) => {
+        const stageId = Number(value);
+
+        router.patch(
+            update.url(application.id),
+            { stage_id: stageId },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => {
+                    if (stages.find((s) => s.id === stageId)?.has_email) {
+                        setEmail({ stageId, picker: false });
+                    }
+                },
+            },
+        );
+    };
+
     return (
         <AdminPage
             title={candidate.display_name}
@@ -529,6 +585,16 @@ export default function ApplicationShow({
                         application={application}
                         matchedOffers={matchedOffers}
                         aiBlockedReason={aiBlockedReason}
+                    />
+
+                    <PsychotestSection
+                        application={application}
+                        aiBlockedReason={aiBlockedReason}
+                    />
+
+                    <DgSection
+                        key={application.dg.reviewed_at ?? 'new'}
+                        application={application}
                     />
 
                     {(candidate.summary ||
@@ -735,6 +801,29 @@ export default function ApplicationShow({
                         <p className="truncate text-center text-xs text-muted-foreground">
                             {application.cv_name}
                         </p>
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            disabled={!candidate.email}
+                            title={
+                                candidate.email
+                                    ? undefined
+                                    : 'Pas d’adresse e-mail sur la fiche'
+                            }
+                            onClick={() =>
+                                setEmail({
+                                    stageId: stages.find(
+                                        (s) => s.id === application.stage_id,
+                                    )?.has_email
+                                        ? application.stage_id
+                                        : null,
+                                    picker: true,
+                                })
+                            }
+                        >
+                            <Mail />
+                            Envoyer un e-mail
+                        </Button>
                     </section>
 
                     <section className="space-y-4 rounded-xl border p-5">
@@ -742,7 +831,7 @@ export default function ApplicationShow({
                             <Label htmlFor="stage">Étape</Label>
                             <Select
                                 value={String(application.stage_id)}
-                                onValueChange={(v) => change('stage_id', v)}
+                                onValueChange={changeStage}
                             >
                                 <SelectTrigger id="stage" className="w-full">
                                     <SelectValue />
@@ -919,6 +1008,16 @@ export default function ApplicationShow({
                     </section>
                 </aside>
             </div>
+
+            {email && (
+                <CandidateEmailDialog
+                    applicationId={application.id}
+                    stageId={email.stageId}
+                    templates={email.picker ? templates : undefined}
+                    open
+                    onOpenChange={(open) => !open && setEmail(null)}
+                />
+            )}
         </AdminPage>
     );
 }

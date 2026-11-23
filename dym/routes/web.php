@@ -4,6 +4,7 @@ use App\Http\Controllers\CareerController;
 use App\Http\Controllers\CookieConsentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LegalPageController;
+use App\Http\Controllers\PsychotestController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\Teams\TeamInvitationController;
@@ -29,6 +30,11 @@ Route::post('cookie-consent', [CookieConsentController::class, 'store'])->middle
 Route::get('carriere', [CareerController::class, 'index'])->name('careers.index');
 Route::post('carriere/candidature', [CareerController::class, 'apply'])->middleware('throttle:5,10')->name('careers.apply');
 Route::get('carriere/{jobOffer}', [CareerController::class, 'show'])->name('careers.show');
+
+// Test psychotechnique, ouvert par le lien personnel envoyé au candidat.
+Route::get('test-psychotechnique/{token}', [PsychotestController::class, 'show'])->middleware('throttle:60,1')->name('psychotest.show');
+Route::post('test-psychotechnique/{token}/start', [PsychotestController::class, 'start'])->middleware('throttle:10,1')->name('psychotest.start');
+Route::post('test-psychotechnique/{token}', [PsychotestController::class, 'submit'])->middleware('throttle:10,1')->name('psychotest.submit');
 
 Route::get('{legalPage}', LegalPageController::class)
     ->whereIn('legalPage', LegalPage::SLUGS)

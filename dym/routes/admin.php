@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ApplicationEmailController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CandidateController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DgReviewController;
 use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Admin\JobApplicationController;
 use App\Http\Controllers\Admin\JobOfferController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Admin\OfferAssistantController;
 use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\PsychotestController;
 use App\Http\Controllers\Admin\QuoteRequestController;
 use App\Http\Controllers\Admin\RecruitmentOptionController;
 use App\Http\Controllers\Admin\RecruitmentSettingController;
@@ -54,6 +56,11 @@ Route::prefix('admin')
         Route::post('applications/{application}/notes', [JobApplicationController::class, 'note'])->name('applications.notes.store');
         Route::get('applications/{application}/email', [ApplicationEmailController::class, 'draft'])->name('applications.email.draft');
         Route::post('applications/{application}/email', [ApplicationEmailController::class, 'send'])->middleware('throttle:30,1')->name('applications.email.send');
+        Route::post('applications/{application}/psychotest', [PsychotestController::class, 'prepare'])->name('applications.psychotest.prepare');
+        Route::put('applications/{application}/psychotest', [PsychotestController::class, 'update'])->name('applications.psychotest.update');
+        Route::post('applications/{application}/psychotest/send', [PsychotestController::class, 'send'])->name('applications.psychotest.send');
+        Route::delete('applications/{application}/psychotest', [PsychotestController::class, 'destroy'])->name('applications.psychotest.destroy');
+        Route::put('applications/{application}/dg-review', [DgReviewController::class, 'update'])->name('applications.dg-review.update');
         Route::resource('applications', JobApplicationController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::resource('candidates', CandidateController::class)->only(['index', 'update', 'destroy']);
 
@@ -63,6 +70,8 @@ Route::prefix('admin')
             Route::get('settings', [RecruitmentSettingController::class, 'edit'])->name('settings.edit');
             Route::put('settings', [RecruitmentSettingController::class, 'update'])->name('settings.update');
             Route::put('settings/acknowledgment', [RecruitmentSettingController::class, 'updateAcknowledgment'])->name('settings.acknowledgment.update');
+            Route::put('settings/process', [RecruitmentSettingController::class, 'updateProcess'])->name('settings.process.update');
+            Route::post('settings/process/auto-advance', [RecruitmentSettingController::class, 'applyAutoAdvance'])->name('settings.process.apply');
             Route::post('settings/acknowledgment/test', [RecruitmentSettingController::class, 'testAcknowledgment'])->middleware('throttle:5,1')->name('settings.acknowledgment.test');
             Route::put('stages/order', [RecruitmentStageController::class, 'reorder'])->name('stages.reorder');
             Route::put('stages/{stage}/email', [RecruitmentStageController::class, 'updateEmail'])->name('stages.email.update');

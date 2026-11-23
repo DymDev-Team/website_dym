@@ -88,9 +88,9 @@ class ApplicationEmailController extends Controller
             Notification::route('mail', $email)->notify(new CandidateMessage($subject, $body));
         } catch (Throwable $e) {
             report($e);
-            Inertia::flash('toast', ['type' => 'error', 'message' => 'L’envoi a échoué : '.Str::limit($e->getMessage(), 300)]);
 
-            return back();
+            // Erreur de validation : la fenêtre reste ouverte avec le texte écrit.
+            throw ValidationException::withMessages(['send' => 'L’envoi a échoué : '.Str::limit($e->getMessage(), 300)]);
         }
 
         $application->record(ApplicationEventType::EmailSent, [
@@ -106,9 +106,9 @@ class ApplicationEmailController extends Controller
         return back();
     }
 
-    private function stage(mixed $id): ?RecruitmentStage
+    private function stage(int|string|null $id): ?RecruitmentStage
     {
-        return $id === null ? null : RecruitmentStage::query()->find($id);
+        return $id === null ? null : RecruitmentStage::query()->whereKey($id)->first();
     }
 
     private function lastSent(JobApplication $application, RecruitmentStage $stage): ?ApplicationEvent

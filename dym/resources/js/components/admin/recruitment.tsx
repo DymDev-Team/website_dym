@@ -86,6 +86,15 @@ export function RecommendationBadge({
     );
 }
 
+// Note d'une phase du parcours (test psychotechnique, appréciation DG).
+export function StepScore({ label, score }: { label: string; score: number }) {
+    return (
+        <span className="rounded border px-1.5 py-0.5 text-xs tabular-nums">
+            {label} <span className="font-semibold">{score}</span>
+        </span>
+    );
+}
+
 export function StageDot({ color }: { color: string }) {
     return (
         <span

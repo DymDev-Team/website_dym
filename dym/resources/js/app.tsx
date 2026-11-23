@@ -24,6 +24,7 @@ const publicPages = [
     'offre',
     'legal',
     'devis',
+    'test-psychotechnique',
 ];
 
 void createInertiaApp({

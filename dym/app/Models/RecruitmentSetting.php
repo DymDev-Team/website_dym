@@ -58,6 +58,14 @@ class RecruitmentSetting extends Model
             TEXT,
         // Vide : les réponses du candidat arrivent sur l'e-mail de contact du site.
         'acknowledgment_reply_to' => null,
+        // Note IA à partir de laquelle une nouvelle candidature passe en étude.
+        'auto_advance' => '1',
+        'auto_advance_threshold' => '75',
+        // Test psychotechnique : temps pour répondre, validité du lien.
+        'psychotest_duration' => '30',
+        'psychotest_validity_days' => '7',
+        // Grille de l'appréciation DG, un critère par ligne, chacun noté sur 5.
+        'dg_criteria' => "Présentation et communication\nMotivation\nCompétences techniques\nPotentiel d’évolution\nAdéquation avec l’équipe",
     ];
 
     /**
@@ -74,7 +82,7 @@ class RecruitmentSetting extends Model
     /**
      * Every setting, defaults included, secrets decrypted.
      *
-     * @return array{ai_enabled: bool, auto_analyze: bool, api_key: string|null, model: string, effort: string, monthly_budget: float, custom_instructions: string|null, priority_threshold: int, consider_threshold: int, web_research: bool, acknowledgment_enabled: bool, acknowledgment_subject: string, acknowledgment_body: string, acknowledgment_reply_to: string|null}
+     * @return array{ai_enabled: bool, auto_analyze: bool, api_key: string|null, model: string, effort: string, monthly_budget: float, custom_instructions: string|null, priority_threshold: int, consider_threshold: int, web_research: bool, acknowledgment_enabled: bool, acknowledgment_subject: string, acknowledgment_body: string, acknowledgment_reply_to: string|null, auto_advance: bool, auto_advance_threshold: int, psychotest_duration: int, psychotest_validity_days: int, dg_criteria: list<string>}
      */
     public static function values(): array
     {
@@ -101,7 +109,22 @@ class RecruitmentSetting extends Model
             'acknowledgment_subject' => (string) ($values['acknowledgment_subject'] ?: self::DEFAULTS['acknowledgment_subject']),
             'acknowledgment_body' => (string) ($values['acknowledgment_body'] ?: self::DEFAULTS['acknowledgment_body']),
             'acknowledgment_reply_to' => $values['acknowledgment_reply_to'] ?: null,
+            'auto_advance' => $values['auto_advance'] === '1',
+            'auto_advance_threshold' => (int) $values['auto_advance_threshold'],
+            'psychotest_duration' => max(5, (int) $values['psychotest_duration']),
+            'psychotest_validity_days' => max(1, (int) $values['psychotest_validity_days']),
+            'dg_criteria' => self::lines((string) ($values['dg_criteria'] ?: self::DEFAULTS['dg_criteria'])),
         ];
+    }
+
+    /**
+     * Non-empty lines of a text, trimmed, without duplicates.
+     *
+     * @return list<string>
+     */
+    public static function lines(string $text): array
+    {
+        return array_values(array_unique(array_filter(array_map('trim', preg_split('/\R/', $text) ?: []), 'filled')));
     }
 
     /**

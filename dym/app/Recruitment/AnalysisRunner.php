@@ -367,6 +367,8 @@ class AnalysisRunner
             'recommendation' => $evaluation['recommendation'] ?? null,
         ]);
 
+        AutoAdvance::apply($application);
+
         $this->mergeDuplicate($candidate, $application);
     }
 

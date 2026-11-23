@@ -32,6 +32,12 @@ use Illuminate\Support\Carbon;
  * @property string|null $cv_mime
  * @property int|null $score
  * @property Recommendation|null $recommendation
+ * @property int|null $test_score
+ * @property int|null $dg_score
+ * @property list<array{criterion: string, score: int}>|null $dg_review
+ * @property string|null $dg_comment
+ * @property int|null $dg_reviewed_by_id
+ * @property Carbon|null $dg_reviewed_at
  * @property Carbon|null $viewed_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -40,12 +46,14 @@ use Illuminate\Support\Carbon;
  * @property-read RecruitmentStage $stage
  * @property-read RecruitmentOption|null $source
  * @property-read User|null $addedBy
+ * @property-read User|null $dgReviewedBy
+ * @property-read Psychotest|null $psychotest
  * @property-read ApplicationAnalysis|null $latestAnalysis
  * @property-read ApplicationAnalysis|null $latestCompletedAnalysis
  * @property-read Collection<int, ApplicationAnalysis> $analyses
  * @property-read Collection<int, ApplicationEvent> $events
  */
-#[Fillable(['candidate_id', 'job_offer_id', 'stage_id', 'source_id', 'added_by_id', 'message', 'answers', 'cv_path', 'cv_name', 'cv_mime', 'score', 'recommendation', 'viewed_at'])]
+#[Fillable(['candidate_id', 'job_offer_id', 'stage_id', 'source_id', 'added_by_id', 'message', 'answers', 'cv_path', 'cv_name', 'cv_mime', 'score', 'recommendation', 'test_score', 'dg_score', 'dg_review', 'dg_comment', 'dg_reviewed_by_id', 'dg_reviewed_at', 'viewed_at'])]
 #[Hidden(['cv_path'])]
 class JobApplication extends Model
 {
@@ -68,6 +76,10 @@ class JobApplication extends Model
             'score' => 'integer',
             'recommendation' => Recommendation::class,
             'answers' => 'json:unicode',
+            'test_score' => 'integer',
+            'dg_score' => 'integer',
+            'dg_review' => 'json:unicode',
+            'dg_reviewed_at' => 'datetime',
             'viewed_at' => 'datetime',
         ];
     }
@@ -138,6 +150,22 @@ class JobApplication extends Model
     public function addedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'added_by_id');
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function dgReviewedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'dg_reviewed_by_id');
+    }
+
+    /**
+     * @return HasOne<Psychotest, $this>
+     */
+    public function psychotest(): HasOne
+    {
+        return $this->hasOne(Psychotest::class);
     }
 
     /**

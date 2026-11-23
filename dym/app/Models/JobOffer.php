@@ -26,6 +26,7 @@ use Illuminate\Support\Str;
  * @property string|null $requirements
  * @property list<array{name: string, weight: int, essential: bool}>|null $criteria
  * @property list<array{id: string, label: string, type: string, options: list<string>, required: bool}>|null $questions
+ * @property list<array{id: string, text: string, options: list<string>, answer: int, category: string, source: string}>|null $psychotest_questions
  * @property Carbon|null $sourcing_started_at
  * @property Carbon|null $closes_at
  * @property bool $is_published
@@ -34,9 +35,9 @@ use Illuminate\Support\Str;
  * @property-read Collection<int, JobApplication> $applications
  * @property-read Collection<int, CandidateMatch> $matches
  */
-#[Fillable(['title', 'slug', 'department', 'location', 'contract_type', 'summary', 'description', 'requirements', 'criteria', 'questions', 'closes_at', 'is_published'])]
+#[Fillable(['title', 'slug', 'department', 'location', 'contract_type', 'summary', 'description', 'requirements', 'criteria', 'questions', 'psychotest_questions', 'closes_at', 'is_published'])]
 // La grille d'évaluation est interne : l'admin la rend visible quand il en a besoin.
-#[Hidden(['criteria', 'sourcing_started_at'])]
+#[Hidden(['criteria', 'sourcing_started_at', 'psychotest_questions'])]
 class JobOffer extends Model
 {
     /** @use HasFactory<JobOfferFactory> */
@@ -54,6 +55,7 @@ class JobOffer extends Model
             'is_published' => 'boolean',
             'criteria' => 'json:unicode',
             'questions' => 'json:unicode',
+            'psychotest_questions' => 'json:unicode',
             'sourcing_started_at' => 'datetime',
         ];
     }

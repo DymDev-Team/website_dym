@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\AnalysisStatus;
 use App\Enums\RecruitmentOptionType;
 use App\Enums\StageKind;
+use App\Enums\StageRole;
 use App\Http\Controllers\Controller;
 use App\Models\AiCall;
 use App\Models\ApplicationAnalysis;
@@ -14,6 +15,7 @@ use App\Models\RecruitmentSetting;
 use App\Models\RecruitmentStage;
 use App\Models\Setting;
 use App\Notifications\ApplicationReceived;
+use App\Recruitment\AutoAdvance;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -57,6 +59,12 @@ class RecruitmentSettingController extends Controller
             ],
             'stages' => RecruitmentStage::query()->ordered()->withCount('applications')->get(),
             'stageKinds' => StageKind::options(),
+            'stageRoles' => collect(StageRole::cases())->mapWithKeys(fn (StageRole $role) => [$role->value => $role->label()]),
+            'autoAdvance' => [
+                'from' => RecruitmentStage::initial()->name,
+                'to' => RecruitmentStage::withRole(StageRole::Review)?->name,
+                'pending' => AutoAdvance::pending(),
+            ],
             'options' => collect(RecruitmentOptionType::cases())->map(fn (RecruitmentOptionType $type) => [
                 'type' => $type->value,
                 'label' => $type->label(),
@@ -108,6 +116,55 @@ class RecruitmentSettingController extends Controller
         RecruitmentSetting::store($values);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Réglages du recrutement enregistrés.']);
+
+        return to_route('admin.recruitment.settings.edit');
+    }
+
+    /**
+     * Assessment process: automatic move to review, psychotechnical test and
+     * the criteria of the managing director's appraisal.
+     */
+    public function updateProcess(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'auto_advance' => ['boolean'],
+            'auto_advance_threshold' => ['required', 'integer', 'between:1,100'],
+            'psychotest_duration' => ['required', 'integer', 'between:5,180'],
+            'psychotest_validity_days' => ['required', 'integer', 'between:1,60'],
+            'dg_criteria' => ['required', 'string', 'max:2000', function (string $attribute, mixed $value, \Closure $fail) {
+                $lines = RecruitmentSetting::lines((string) $value);
+
+                if ($lines === [] || count($lines) > 10 || collect($lines)->contains(fn (string $line) => mb_strlen($line) > 80)) {
+                    $fail('Indiquez de 1 à 10 critères, un par ligne, de 80 caractères au plus.');
+                }
+            }],
+        ], [
+            'dg_criteria.required' => 'Indiquez au moins un critère.',
+        ]);
+
+        RecruitmentSetting::store([
+            'auto_advance' => $request->boolean('auto_advance') ? '1' : '0',
+            'auto_advance_threshold' => (string) $validated['auto_advance_threshold'],
+            'psychotest_duration' => (string) $validated['psychotest_duration'],
+            'psychotest_validity_days' => (string) $validated['psychotest_validity_days'],
+            'dg_criteria' => implode("\n", RecruitmentSetting::lines($validated['dg_criteria'])),
+        ]);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Parcours de recrutement enregistré.']);
+
+        return to_route('admin.recruitment.settings.edit');
+    }
+
+    /**
+     * Move now the applications already waiting that reach the threshold.
+     */
+    public function applyAutoAdvance(): RedirectResponse
+    {
+        $moved = AutoAdvance::applyToAll();
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $moved === 0
+            ? 'Aucune candidature à déplacer.'
+            : "{$moved} candidature(s) déplacée(s)."]);
 
         return to_route('admin.recruitment.settings.edit');
     }

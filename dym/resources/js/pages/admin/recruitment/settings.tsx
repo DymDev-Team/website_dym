@@ -1,5 +1,5 @@
 import { Form, router, usePage } from '@inertiajs/react';
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Mail, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import AdminPage from '@/components/admin/admin-page';
 import Field from '@/components/admin/field';
@@ -41,14 +41,29 @@ import {
     update as updateAcknowledgment,
 } from '@/routes/admin/recruitment/settings/acknowledgment';
 import {
+    apply as applyAutoAdvance,
+    update as updateProcess,
+} from '@/routes/admin/recruitment/settings/process';
+import {
     destroy as destroyStage,
     reorder,
     store as storeStage,
     update as updateStage,
 } from '@/routes/admin/recruitment/stages';
-import type { Labelled, Option, RecruitmentStage } from '@/types/admin';
+import { update as updateStageEmail } from '@/routes/admin/recruitment/stages/email';
+import type {
+    Labelled,
+    Option,
+    RecruitmentStage,
+    StageRole,
+} from '@/types/admin';
 
-type Stage = RecruitmentStage & { applications_count: number };
+type Stage = RecruitmentStage & {
+    applications_count: number;
+    role: StageRole | null;
+    email_subject: string | null;
+    email_body: string | null;
+};
 
 type Props = {
     settings: {
@@ -66,6 +81,11 @@ type Props = {
         acknowledgment_subject: string;
         acknowledgment_body: string;
         acknowledgment_reply_to: string | null;
+        auto_advance: boolean;
+        auto_advance_threshold: number;
+        psychotest_duration: number;
+        psychotest_validity_days: number;
+        dg_criteria: string[];
     };
     contactEmail: string | null;
     models: Option[];
@@ -78,6 +98,8 @@ type Props = {
     };
     stages: Stage[];
     stageKinds: Option[];
+    stageRoles: Record<StageRole, string>;
+    autoAdvance: { from: string; to: string | null; pending: number };
     options: { type: string; label: string; items: Labelled[] }[];
 };
 
@@ -92,6 +114,7 @@ const taskLabels: Record<string, string> = {
     offer_criteria: 'Grilles d’évaluation',
     offer_draft: 'Rédaction d’offres',
     sourcing: 'Recherche dans la base',
+    psychotest: 'Tests psychotechniques',
 };
 
 const money = new Intl.NumberFormat('fr-FR', {
@@ -580,7 +603,258 @@ function StageFields({ stage, kinds }: { stage?: Stage; kinds: Option[] }) {
     );
 }
 
-function Stages({ stages, kinds }: { stages: Stage[]; kinds: Option[] }) {
+function StageEmail({ stage }: { stage: Stage }) {
+    const [open, setOpen] = useState(false);
+    const hasEmail = Boolean(stage.email_subject && stage.email_body);
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`E-mail de l’étape ${stage.name}`}
+                    title={
+                        hasEmail
+                            ? 'E-mail proposé à l’arrivée dans cette étape'
+                            : 'Aucun e-mail pour cette étape'
+                    }
+                >
+                    <Mail
+                        className={
+                            hasEmail
+                                ? 'text-foreground'
+                                : 'text-muted-foreground/40'
+                        }
+                    />
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>
+                        E-mail de l’étape « {stage.name} »
+                    </DialogTitle>
+                    <DialogDescription>
+                        Proposé quand un candidat arrive dans cette étape, et
+                        modifiable avant l’envoi : rien ne part sans votre clic.
+                        Videz les deux champs pour le retirer.
+                    </DialogDescription>
+                </DialogHeader>
+                <Form
+                    {...updateStageEmail.form(stage.id)}
+                    options={{ preserveScroll: true }}
+                    onSuccess={() => setOpen(false)}
+                    className="space-y-4"
+                >
+                    {({ errors, processing }) => (
+                        <>
+                            <Field
+                                id={`email_subject_${stage.id}`}
+                                label="Objet"
+                                error={errors.email_subject}
+                            >
+                                <Input
+                                    id={`email_subject_${stage.id}`}
+                                    name="email_subject"
+                                    maxLength={150}
+                                    defaultValue={stage.email_subject ?? ''}
+                                />
+                            </Field>
+                            <Field
+                                id={`email_body_${stage.id}`}
+                                label="Texte"
+                                hint="{nom} : nom du candidat · {poste} : intitulé de l’offre, ou « Candidature spontanée ». Une ligne vide sépare deux paragraphes."
+                                error={errors.email_body}
+                            >
+                                <Textarea
+                                    id={`email_body_${stage.id}`}
+                                    name="email_body"
+                                    rows={12}
+                                    maxLength={5000}
+                                    defaultValue={stage.email_body ?? ''}
+                                />
+                            </Field>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button type="button" variant="ghost">
+                                        Annuler
+                                    </Button>
+                                </DialogClose>
+                                <Button type="submit" disabled={processing}>
+                                    {processing && <Spinner />}
+                                    Enregistrer
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    )}
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function ProcessSettings({
+    settings,
+    autoAdvance,
+}: Pick<Props, 'settings' | 'autoAdvance'>) {
+    return (
+        <section className="space-y-6">
+            <Heading
+                variant="small"
+                title="Parcours de recrutement"
+                description="Passage automatique après l’analyse IA, test psychotechnique, puis appréciation du DG."
+            />
+
+            <Form
+                {...updateProcess.form()}
+                options={{ preserveScroll: true }}
+                className="max-w-3xl space-y-6"
+            >
+                {({ errors, processing }) => (
+                    <>
+                        <div className="space-y-3 rounded-xl border p-4">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <Checkbox
+                                    id="auto_advance"
+                                    name="auto_advance"
+                                    value="1"
+                                    defaultChecked={settings.auto_advance}
+                                />
+                                <Label htmlFor="auto_advance">
+                                    Passer automatiquement de «{' '}
+                                    {autoAdvance.from} » à «{' '}
+                                    {autoAdvance.to ?? '—'} » à partir de
+                                </Label>
+                                <Input
+                                    name="auto_advance_threshold"
+                                    type="number"
+                                    min={1}
+                                    max={100}
+                                    defaultValue={
+                                        settings.auto_advance_threshold
+                                    }
+                                    className="w-20"
+                                    aria-label="Note IA minimale"
+                                    required
+                                />
+                                <span className="text-sm">/ 100 (note IA)</span>
+                            </div>
+                            <InputError
+                                message={errors.auto_advance_threshold}
+                            />
+                            {autoAdvance.to === null && (
+                                <p className="text-sm text-destructive">
+                                    L’étape de destination a été supprimée :
+                                    aucun passage automatique n’est possible.
+                                </p>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                                Chaque CV analysé qui atteint la note change de
+                                colonne tout seul. Un candidat déjà déplacé par
+                                l’équipe n’est jamais touché.
+                            </p>
+                        </div>
+
+                        <div className="grid gap-6 sm:grid-cols-2">
+                            <Field
+                                id="psychotest_duration"
+                                label="Durée du test psychotechnique (minutes)"
+                                error={errors.psychotest_duration}
+                            >
+                                <Input
+                                    id="psychotest_duration"
+                                    name="psychotest_duration"
+                                    type="number"
+                                    min={5}
+                                    max={180}
+                                    defaultValue={settings.psychotest_duration}
+                                    required
+                                />
+                            </Field>
+                            <Field
+                                id="psychotest_validity_days"
+                                label="Validité du lien envoyé (jours)"
+                                error={errors.psychotest_validity_days}
+                            >
+                                <Input
+                                    id="psychotest_validity_days"
+                                    name="psychotest_validity_days"
+                                    type="number"
+                                    min={1}
+                                    max={60}
+                                    defaultValue={
+                                        settings.psychotest_validity_days
+                                    }
+                                    required
+                                />
+                            </Field>
+                        </div>
+
+                        <Field
+                            id="dg_criteria"
+                            label="Critères de l’appréciation DG"
+                            hint="Un critère par ligne (10 au plus), chacun noté de 1 à 5 : la note DG est sur 100."
+                            error={errors.dg_criteria}
+                        >
+                            <Textarea
+                                id="dg_criteria"
+                                name="dg_criteria"
+                                rows={6}
+                                defaultValue={settings.dg_criteria.join('\n')}
+                                required
+                            />
+                        </Field>
+
+                        <Button type="submit" disabled={processing}>
+                            {processing && <Spinner />}
+                            Enregistrer le parcours
+                        </Button>
+                    </>
+                )}
+            </Form>
+
+            {autoAdvance.to !== null && (
+                <Form
+                    {...applyAutoAdvance.form()}
+                    options={{ preserveScroll: true }}
+                    className="flex max-w-3xl flex-wrap items-center gap-3 border-t pt-6"
+                >
+                    {({ processing }) => (
+                        <>
+                            <p className="text-sm">
+                                {autoAdvance.pending === 0
+                                    ? `Aucune candidature de « ${autoAdvance.from} » n’atteint ${settings.auto_advance_threshold} / 100.`
+                                    : `${autoAdvance.pending} candidature(s) de « ${autoAdvance.from} » atteignent déjà ${settings.auto_advance_threshold} / 100.`}
+                            </p>
+                            <Button
+                                type="submit"
+                                variant="outline"
+                                disabled={
+                                    processing ||
+                                    autoAdvance.pending === 0 ||
+                                    !settings.auto_advance
+                                }
+                            >
+                                {processing && <Spinner />}
+                                Les déplacer maintenant
+                            </Button>
+                        </>
+                    )}
+                </Form>
+            )}
+        </section>
+    );
+}
+
+function Stages({
+    stages,
+    kinds,
+    roles,
+}: {
+    stages: Stage[];
+    kinds: Option[];
+    roles: Record<StageRole, string>;
+}) {
     const errors = usePage().props.errors as Record<string, string>;
 
     const move = (index: number, offset: number) => {
@@ -620,12 +894,21 @@ function Stages({ stages, kinds }: { stages: Stage[]; kinds: Option[] }) {
                                 </>
                             )}
                         </Form>
+                        {stage.role && (
+                            <span
+                                className="rounded bg-muted px-1.5 py-0.5 text-xs whitespace-nowrap text-muted-foreground"
+                                title="Étape utilisée par le parcours de recrutement"
+                            >
+                                {roles[stage.role]}
+                            </span>
+                        )}
                         <span
                             className="w-8 text-center text-xs text-muted-foreground tabular-nums"
                             title="Candidatures dans cette étape"
                         >
                             {stage.applications_count}
                         </span>
+                        <StageEmail stage={stage} />
                         <Button
                             variant="ghost"
                             size="icon"
@@ -753,12 +1036,14 @@ export default function RecruitmentSettings({
     usage,
     stages,
     stageKinds,
+    stageRoles,
+    autoAdvance,
     options,
 }: Props) {
     return (
         <AdminPage
             title="Réglages du recrutement"
-            description="Tout le module se personnalise ici : IA, e-mail au candidat, étapes du pipeline et listes."
+            description="Tout le module se personnalise ici : IA, parcours, e-mails au candidat, étapes du pipeline et listes."
         >
             <div className="space-y-12">
                 <AiSettings
@@ -767,11 +1052,15 @@ export default function RecruitmentSettings({
                     efforts={efforts}
                     usage={usage}
                 />
+                <ProcessSettings
+                    settings={settings}
+                    autoAdvance={autoAdvance}
+                />
                 <AcknowledgmentSettings
                     settings={settings}
                     contactEmail={contactEmail}
                 />
-                <Stages stages={stages} kinds={stageKinds} />
+                <Stages stages={stages} kinds={stageKinds} roles={stageRoles} />
                 <section className="space-y-4">
                     <Heading
                         variant="small"

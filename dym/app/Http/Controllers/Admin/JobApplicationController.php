@@ -13,9 +13,11 @@ use App\Models\ApplicationEvent;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
 use App\Models\RecruitmentOption;
+use App\Models\RecruitmentSetting;
 use App\Models\RecruitmentStage;
 use App\Recruitment\AnalysisRunner;
 use App\Recruitment\ApplicationIntake;
+use App\Recruitment\PsychotestInvitation;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Database\Eloquent\Builder;
@@ -101,6 +103,8 @@ class JobApplicationController extends Controller
             'stage:id,name,color,kind',
             'source:id,label',
             'addedBy:id,name',
+            'dgReviewedBy:id,name',
+            'psychotest',
             'latestAnalysis',
             'latestCompletedAnalysis.jobOffer:id,title',
             'events' => fn ($query) => $query->with('user:id,name')->latest()->latest('id'),
@@ -149,6 +153,15 @@ class JobApplicationController extends Controller
                     'user' => $event->user?->name,
                     'created_at' => $event->created_at,
                 ]),
+                'psychotest' => $this->psychotest($application),
+                'dg' => [
+                    'criteria' => RecruitmentSetting::values()['dg_criteria'],
+                    'review' => $application->dg_review,
+                    'comment' => $application->dg_comment,
+                    'score' => $application->dg_score,
+                    'reviewed_by' => $application->dgReviewedBy?->name,
+                    'reviewed_at' => $application->dg_reviewed_at,
+                ],
             ],
             'matchedOffers' => $matchedOffers,
             'stages' => RecruitmentStage::query()->ordered()->get()->map(fn (RecruitmentStage $stage) => [
@@ -358,6 +371,8 @@ class JobApplicationController extends Controller
             'stage_id' => $application->stage_id,
             'score' => $application->score,
             'recommendation' => $application->recommendation?->value,
+            'test_score' => $application->test_score,
+            'dg_score' => $application->dg_score,
             'viewed' => $application->viewed_at !== null,
             'created_at' => $application->created_at,
             'analysis_status' => $application->latestAnalysis?->status->value,
@@ -369,6 +384,37 @@ class JobApplicationController extends Controller
                 'seniority' => $candidate->seniority?->value,
                 'years_experience' => $candidate->years_experience,
             ],
+        ];
+    }
+
+    /**
+     * Test as the team sees it: right answers and the candidate's ones.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function psychotest(JobApplication $application): ?array
+    {
+        $test = $application->psychotest;
+
+        if ($test === null) {
+            return null;
+        }
+
+        return [
+            'status' => $test->status(),
+            'questions' => $test->questions,
+            'answers' => $test->answers,
+            'score' => $test->score,
+            'duration' => $test->duration_minutes,
+            'minutes' => $test->completed_at !== null && $test->started_at !== null
+                ? (int) ceil($test->started_at->diffInSeconds($test->completed_at) / 60)
+                : null,
+            'sent_at' => $test->sent_at,
+            'expires_at' => $test->expires_at,
+            'started_at' => $test->started_at,
+            'completed_at' => $test->completed_at,
+            'url' => $test->url(),
+            'whatsapp_url' => PsychotestInvitation::whatsappUrl($test->setRelation('application', $application)),
         ];
     }
 
