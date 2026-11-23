@@ -107,24 +107,26 @@ test('the process settings are saved', function () {
         ->put(route('admin.recruitment.settings.process.update'), [
             'auto_advance' => '1',
             'auto_advance_threshold' => '60',
-            'psychotest_duration' => '20',
+            'psychotest_question_seconds' => '45',
             'psychotest_validity_days' => '3',
             'dg_criteria' => "Motivation\n\n  Rigueur \nMotivation",
+            'ai_knowledge' => '  Montants en FCFA.  ',
         ])
         ->assertRedirect(route('admin.recruitment.settings.edit'));
 
     expect(RecruitmentSetting::values())->toMatchArray([
         'auto_advance' => true,
         'auto_advance_threshold' => 60,
-        'psychotest_duration' => 20,
+        'psychotest_question_seconds' => 45,
         'psychotest_validity_days' => 3,
         'dg_criteria' => ['Motivation', 'Rigueur'],
+        'ai_knowledge' => 'Montants en FCFA.',
     ]);
 
     $this->actingAs($this->admin)
         ->put(route('admin.recruitment.settings.process.update'), [
             'auto_advance_threshold' => '101',
-            'psychotest_duration' => '20',
+            'psychotest_question_seconds' => '45',
             'psychotest_validity_days' => '3',
             'dg_criteria' => '',
         ])
@@ -163,7 +165,7 @@ test('the team moves at once the waiting applications that reach the threshold',
 });
 
 test('the AI prepares a test from the base of the offer and the analysis of the candidate', function () {
-    $gateway = new FakeModelGateway([psychotestReply(15, 'Base'), psychotestReply(5, 'Perso'), psychotestReply(5, 'Autre')]);
+    $gateway = new FakeModelGateway([psychotestReply(25, 'Base'), psychotestReply(5, 'Perso'), psychotestReply(5, 'Autre')]);
     app()->instance(ModelGateway::class, $gateway);
     $offer = JobOffer::factory()->create(['title' => 'Soudeur TIG']);
     $application = analysedApplication($offer);
@@ -171,16 +173,21 @@ test('the AI prepares a test from the base of the offer and the analysis of the 
     $this->actingAs($this->admin)
         ->post(route('admin.applications.psychotest.prepare', $application))
         ->assertRedirect()
-        ->assertInertiaFlash('toast', ['type' => 'success', 'message' => '20 questions préparées : relisez-les avant d’envoyer le test.']);
+        ->assertInertiaFlash('toast', ['type' => 'success', 'message' => '17 questions préparées : relisez-les avant d’envoyer le test.']);
 
+    // 12 questions tirées de la réserve de 25 du poste, plus 5 personnalisées.
     $test = $application->psychotest()->sole();
-    expect($test->questions)->toHaveCount(20)
-        ->and(collect($test->questions)->countBy('source')->all())->toBe(['offer' => 15, 'candidate' => 5])
+    expect($test->questions)->toHaveCount(17)
+        ->and(collect($test->questions)->countBy('source')->sortKeys()->all())->toBe(['candidate' => 5, 'offer' => 12])
         ->and($test->sent_at)->toBeNull()
-        ->and($test->duration_minutes)->toBe(30)
-        ->and($offer->refresh()->psychotest_questions)->toHaveCount(15)
+        ->and($test->question_seconds)->toBe(60)
+        ->and($test->duration_minutes)->toBe(17)
+        ->and($offer->refresh()->psychotest_questions)->toHaveCount(25)
         // Réponses mélangées : la bonne reste repérée.
         ->and(collect($test->questions)->every(fn (array $q) => is_numeric($q['options'][$q['answer']])))->toBeTrue();
+
+    // La base de connaissances accompagne chaque demande à l'IA.
+    expect($gateway->calls[0]->system)->toContain('francs CFA (FCFA)', 'sous-traitant', 'cadre du poste');
 
     // Les questions personnalisées partent de l'analyse, sans identifier le candidat.
     expect($gateway->text(1))->toContain('Expérience TIG', 'Quelles épaisseurs soudez-vous ?', 'Poste visé : Soudeur TIG')
@@ -190,7 +197,7 @@ test('the AI prepares a test from the base of the offer and the analysis of the 
     $this->actingAs($this->admin)->post(route('admin.applications.psychotest.prepare', analysedApplication($offer, ['email' => 'kofi@example.com'])));
 
     expect($gateway->calls)->toHaveCount(3)
-        ->and(Psychotest::query()->latest('id')->first()->questions)->toHaveCount(20);
+        ->and(Psychotest::query()->latest('id')->first()->questions)->toHaveCount(17);
 });
 
 test('a test cannot be prepared again once sent', function () {
@@ -269,11 +276,20 @@ test('the test link can be e-mailed', function () {
         fn (CandidateMessage $message, array $channels, AnonymousNotifiable $notifiable) => $notifiable->routes['mail'] === 'awa@example.com'
             && $message->subject === PsychotestInvitation::SUBJECT
             && str_contains($message->body, $test->url())
-            && str_contains($message->body, '2 questions, 30 minutes'),
+            && str_contains($message->body, '2 questions, une à la fois, 60 secondes chacune'),
     );
 });
 
-test('the candidate sees the questions but never the right answers nor the score', function () {
+/**
+ * Start the test as the candidate's browser does, keeping its device cookie.
+ */
+function startTest(Psychotest $test): void
+{
+    $cookie = test()->post(route('psychotest.start', $test->token))->getCookie('psychotest_'.$test->id)->getValue();
+    test()->withCookie('psychotest_'.$test->id, $cookie);
+}
+
+test('the candidate answers one question at a time without ever seeing the right answers nor the score', function () {
     $test = sentTest();
 
     $this->get(route('psychotest.show', $test->token))
@@ -283,44 +299,102 @@ test('the candidate sees the questions but never the right answers nor the score
             ->where('status', 'sent')
             ->where('greeting', 'Awa Koné')
             ->where('count', 2)
-            ->where('questions', []));
+            ->where('question_seconds', 60)
+            ->where('question', null));
 
-    $this->post(route('psychotest.start', $test->token))->assertRedirect();
+    startTest($test);
 
     $this->get(route('psychotest.show', $test->token))
         ->assertInertia(fn (Assert $page) => $page
             ->where('status', 'started')
-            ->has('questions', 2)
-            ->where('questions.0', ['id' => 'q1', 'text' => 'Combien font 2 + 2 ?', 'options' => ['4', '5', '6', '7']])
+            ->where('index', 0)
+            ->where('question', ['id' => 'q1', 'text' => 'Combien font 2 + 2 ?', 'options' => ['4', '5', '6', '7']])
+            ->where('seconds_left', fn (int $seconds) => $seconds >= 59 && $seconds <= 60)
             ->missing('score'));
 
-    $this->post(route('psychotest.submit', $test->token), ['answers' => ['q1' => 0, 'q2' => 3]])->assertRedirect();
+    $this->post(route('psychotest.answer', $test->token), ['question_id' => 'q1', 'option' => 0])->assertRedirect();
+
+    // Pas de retour en arrière : une réponse à la question passée est ignorée.
+    $this->post(route('psychotest.answer', $test->token), ['question_id' => 'q1', 'option' => 1]);
+    $this->get(route('psychotest.show', $test->token))
+        ->assertInertia(fn (Assert $page) => $page->where('index', 1)->where('question.id', 'q2'));
+
+    $this->post(route('psychotest.answer', $test->token), ['question_id' => 'q2', 'option' => 3]);
 
     $this->get(route('psychotest.show', $test->token))
-        ->assertInertia(fn (Assert $page) => $page->where('status', 'completed')->where('questions', [])->missing('score'));
+        ->assertInertia(fn (Assert $page) => $page->where('status', 'completed')->where('question', null)->missing('score'));
 
     $test->refresh();
     expect($test->score)->toBe(50)
         ->and($test->answers)->toBe(['q1' => 0, 'q2' => 3])
         ->and($test->application->test_score)->toBe(50)
-        ->and($test->application->events()->where('type', 'psychotest_completed')->sole()->data)->toMatchArray(['score' => 50]);
-
-    // Une seule tentative : un second envoi ne change rien.
-    $this->post(route('psychotest.submit', $test->token), ['answers' => ['q1' => 0, 'q2' => 1]]);
-    expect($test->refresh()->score)->toBe(50);
+        ->and($test->application->events()->where('type', 'psychotest_completed')->sole()->data)->toMatchArray(['score' => 50, 'exits' => 0, 'stopped' => null]);
 });
 
-test('a draft test is unreachable and late answers are not recorded', function () {
+test('the test only goes on on the device where it started', function () {
+    $test = sentTest();
+
+    // Démarré ailleurs : ce navigateur n'a pas le cookie de l'appareil.
+    $this->post(route('psychotest.start', $test->token));
+
+    $this->get(route('psychotest.show', $test->token))
+        ->assertInertia(fn (Assert $page) => $page->where('status', 'other_device')->where('question', null));
+
+    $this->post(route('psychotest.answer', $test->token), ['question_id' => 'q1', 'option' => 0]);
+    $this->post(route('psychotest.start', $test->token));
+
+    expect($test->refresh()->current_question)->toBe(0)
+        ->and($test->answers)->toBe([]);
+});
+
+test('leaving the page brings a warning, then stops the test', function () {
+    $test = sentTest();
+    startTest($test);
+
+    $this->post(route('psychotest.leave', $test->token), ['seconds' => 8])->assertRedirect();
+    $this->get(route('psychotest.show', $test->token))
+        ->assertInertia(fn (Assert $page) => $page->where('status', 'started')->where('exits', 1));
+
+    $this->post(route('psychotest.answer', $test->token), ['question_id' => 'q1', 'option' => 0]);
+    $this->post(route('psychotest.leave', $test->token), ['seconds' => 5]);
+
+    $test->refresh();
+    expect($test->completed_at)->not->toBeNull()
+        ->and($test->stopped_reason)->toBe('exits')
+        ->and($test->exits)->toBe(2)
+        ->and($test->away_seconds)->toBe(13)
+        // La question restante compte comme fausse.
+        ->and($test->answers)->toBe(['q1' => 0, 'q2' => null])
+        ->and($test->score)->toBe(50)
+        ->and($test->application->events()->where('type', 'psychotest_completed')->sole()->data)->toMatchArray(['stopped' => 'exits', 'exits' => 2]);
+});
+
+test('the clock runs on the server: questions whose time ran out count as unanswered', function () {
     $draft = sentTest(['sent_at' => null, 'expires_at' => null]);
     $this->get(route('psychotest.show', $draft->token))->assertNotFound();
 
-    $late = sentTest(['started_at' => now()->subMinutes(40)], ['email' => 'kofi@example.com']);
+    $test = sentTest([], ['email' => 'kofi@example.com']);
+    startTest($test);
 
-    $this->post(route('psychotest.submit', $late->token), ['answers' => ['q1' => 0]])->assertRedirect();
-    $this->get(route('psychotest.show', $late->token))->assertInertia(fn (Assert $page) => $page->where('status', 'expired'));
+    // 70 secondes plus tard : la première question est perdue.
+    $this->travel(70)->seconds();
+    $this->get(route('psychotest.show', $test->token))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('index', 1)
+            ->where('question.id', 'q2')
+            ->where('seconds_left', fn (int $seconds) => $seconds >= 54 && $seconds <= 55));
 
-    expect($late->refresh()->completed_at)->toBeNull()
-        ->and($late->application->test_score)->toBeNull();
+    $this->post(route('psychotest.answer', $test->token), ['question_id' => 'q1', 'option' => 0]);
+
+    // Page fermée : le temps continue de courir et le test se termine seul.
+    $this->travel(2)->minutes();
+    $this->get(route('psychotest.show', $test->token))
+        ->assertInertia(fn (Assert $page) => $page->where('status', 'completed'));
+
+    $test->refresh();
+    expect($test->answers)->toBe(['q1' => null, 'q2' => null])
+        ->and($test->score)->toBe(0)
+        ->and($test->application->test_score)->toBe(0);
 });
 
 test('phone numbers are written the way WhatsApp expects them', function (?string $phone, ?string $expected) {

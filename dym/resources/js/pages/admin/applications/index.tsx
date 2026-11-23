@@ -30,6 +30,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes/admin';
 import { index, show, update } from '@/routes/admin/applications';
@@ -61,6 +62,7 @@ type Props = {
     activeAnalyses: number;
     missingAnalyses: number;
     aiBlockedReason: string | null;
+    perStage: number;
 };
 
 const ALL = 'all';
@@ -145,8 +147,34 @@ export default function Pipeline({
     activeAnalyses,
     missingAnalyses,
     aiBlockedReason,
+    perStage,
 }: Props) {
     const [search, setSearch] = useState(filters.search);
+    const [loadingStage, setLoadingStage] = useState<number | null>(null);
+
+    // Charge la suite d'une colonne ; les autres gardent leurs cartes.
+    const showMore = (stageId: number) => {
+        const shown = Object.fromEntries(
+            stages
+                .filter((s) => s.applications.length > perStage)
+                .map((s) => [s.id, s.applications.length]),
+        );
+        shown[stageId] =
+            (stages.find((s) => s.id === stageId)?.applications.length ?? 0) +
+            perStage;
+
+        router.get(
+            index.url(),
+            { ...filters, shown },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                only: ['stages'],
+                onStart: () => setLoadingStage(stageId),
+                onFinish: () => setLoadingStage(null),
+            },
+        );
+    };
     const selectedOffer = offers.find((o) => String(o.id) === filters.offer);
     const [dropTarget, setDropTarget] = useState<number | null>(null);
     // E-mail proposé après un déplacement vers une étape qui en a un.
@@ -376,10 +404,24 @@ export default function Pipeline({
                                 <Card key={card.id} card={card} />
                             ))}
                             {stage.total > stage.applications.length && (
-                                <p className="px-2 py-1 text-xs text-muted-foreground">
-                                    + {stage.total - stage.applications.length}{' '}
-                                    autres : affinez avec les filtres.
-                                </p>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    disabled={loadingStage === stage.id}
+                                    onClick={() => showMore(stage.id)}
+                                    className="text-muted-foreground"
+                                >
+                                    {loadingStage === stage.id && <Spinner />}
+                                    Voir{' '}
+                                    {Math.min(
+                                        stage.total - stage.applications.length,
+                                        perStage,
+                                    )}{' '}
+                                    de plus (
+                                    {stage.total - stage.applications.length}{' '}
+                                    restants)
+                                </Button>
                             )}
                         </div>
                     </section>

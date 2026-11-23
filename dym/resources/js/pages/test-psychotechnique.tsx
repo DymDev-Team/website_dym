@@ -1,56 +1,29 @@
 import { Head, router } from '@inertiajs/react';
-import { Clock } from 'lucide-react';
+import { AlertTriangle, Clock } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { start, submit } from '@/routes/psychotest';
+import { answer, leave, start } from '@/routes/psychotest';
 
 type Question = { id: string; text: string; options: string[] };
 
 type Props = {
     token: string;
-    status: 'sent' | 'started' | 'completed' | 'expired';
+    status: 'sent' | 'started' | 'completed' | 'expired' | 'other_device';
     greeting: string;
     offer: string | null;
     count: number;
-    duration: number;
+    question_seconds: number;
     expires_at: string | null;
+    exits: number;
+    index: number;
+    question: Question | null;
     seconds_left: number;
-    questions: Question[];
 };
-
-type Answers = Record<string, number>;
 
 const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' });
 
-// Réponses gardées sur l'appareil : un rechargement de page ne les perd pas.
-function storageKey(token: string) {
-    return `psychotest:${token}`;
-}
-
-function readAnswers(token: string): Answers {
-    try {
-        return JSON.parse(
-            window.localStorage.getItem(storageKey(token)) ?? '{}',
-        );
-    } catch {
-        return {};
-    }
-}
-
-function writeAnswers(token: string, answers: Answers | null) {
-    try {
-        if (answers === null) {
-            window.localStorage.removeItem(storageKey(token));
-        } else {
-            window.localStorage.setItem(
-                storageKey(token),
-                JSON.stringify(answers),
-            );
-        }
-    } catch {
-        // Stockage indisponible (navigation privée) : les réponses restent en mémoire.
-    }
-}
+// Absence plus courte (notification balayée) : pas une sortie.
+const TOLERANCE_MS = 3000;
 
 function Shell({ children }: { children: ReactNode }) {
     return (
@@ -68,32 +41,45 @@ function Shell({ children }: { children: ReactNode }) {
     );
 }
 
+function Message({ title, children }: { title: string; children: ReactNode }) {
+    return (
+        <Shell>
+            <h1 className="text-2xl font-semibold">{title}</h1>
+            <p className="mt-4 text-neutral-700">{children}</p>
+        </Shell>
+    );
+}
+
 export default function PsychotestPage(props: Props) {
-    const { status, greeting, offer, count, duration, expires_at } = props;
+    const { status, greeting, offer, count, question_seconds, expires_at } =
+        props;
 
     if (status === 'completed') {
         return (
-            <Shell>
-                <h1 className="text-2xl font-semibold">Merci, {greeting}</h1>
-                <p className="mt-4 text-neutral-700">
-                    Vos réponses ont bien été envoyées à l’équipe de DYM
-                    Manufacture, qui reviendra vers vous pour la suite du
-                    recrutement.
-                </p>
-            </Shell>
+            <Message title={`Merci, ${greeting}`}>
+                Le test est terminé et vos réponses ont été transmises à
+                l’équipe de DYM Manufacture, qui reviendra vers vous pour la
+                suite du recrutement.
+            </Message>
         );
     }
 
     if (status === 'expired') {
         return (
-            <Shell>
-                <h1 className="text-2xl font-semibold">Test indisponible</h1>
-                <p className="mt-4 text-neutral-700">
-                    Le délai prévu pour ce test est dépassé. Si vous pensez
-                    qu’il s’agit d’une erreur, répondez au message qui vous a
-                    transmis ce lien.
-                </p>
-            </Shell>
+            <Message title="Test indisponible">
+                Le délai prévu pour ce test est dépassé. Si vous pensez qu’il
+                s’agit d’une erreur, répondez au message qui vous a transmis ce
+                lien.
+            </Message>
+        );
+    }
+
+    if (status === 'other_device') {
+        return (
+            <Message title="Test commencé sur un autre appareil">
+                Ce test ne peut se poursuivre que sur l’appareil et le
+                navigateur où il a été commencé.
+            </Message>
         );
     }
 
@@ -106,17 +92,23 @@ export default function PsychotestPage(props: Props) {
                 </p>
                 <ul className="mt-6 space-y-2 rounded-xl border border-neutral-200 bg-white p-5 text-neutral-800">
                     <li>
-                        <strong>{count} questions</strong> à choix multiples :
+                        <strong>{count} questions</strong> à choix multiples,
                         une seule bonne réponse par question.
                     </li>
                     <li>
-                        <strong>{duration} minutes</strong> à partir du moment
-                        où vous commencez ; vos réponses sont envoyées
-                        automatiquement à la fin du temps.
+                        <strong>Une question à la fois</strong>,{' '}
+                        <strong>{question_seconds} secondes</strong> chacune,
+                        sans retour en arrière : une question sans réponse à la
+                        fin du temps compte comme fausse.
                     </li>
                     <li>
-                        <strong>Une seule tentative</strong> : installez-vous au
-                        calme et gardez cette page ouverte.
+                        <strong>Restez sur cette page</strong> : si vous la
+                        quittez (autre application, autre onglet), vous recevez
+                        un avertissement ; la deuxième fois, le test s’arrête.
+                    </li>
+                    <li>
+                        <strong>Une seule tentative</strong>, sur cet appareil
+                        uniquement. Installez-vous au calme avant de commencer.
                     </li>
                     {expires_at && (
                         <li>
@@ -127,13 +119,7 @@ export default function PsychotestPage(props: Props) {
                 </ul>
                 <button
                     type="button"
-                    onClick={() =>
-                        router.post(
-                            start.url(props.token),
-                            {},
-                            { preserveScroll: true },
-                        )
-                    }
+                    onClick={() => router.post(start.url(props.token))}
                     className="mt-8 w-full rounded-lg bg-neutral-900 px-6 py-4 text-lg font-medium text-white hover:bg-neutral-700 sm:w-auto"
                 >
                     Commencer le test
@@ -142,39 +128,41 @@ export default function PsychotestPage(props: Props) {
         );
     }
 
-    return <Questions {...props} />;
+    return props.question ? (
+        <QuestionScreen
+            key={props.question.id}
+            {...props}
+            question={props.question}
+        />
+    ) : null;
 }
 
-function Questions({ token, questions, seconds_left }: Props) {
-    const [answers, setAnswers] = useState<Answers>(() => readAnswers(token));
+function QuestionScreen({
+    token,
+    count,
+    exits,
+    index,
+    question,
+    seconds_left,
+}: Props & { question: Question }) {
+    const [choice, setChoice] = useState<number | null>(null);
     const [deadline] = useState(() => Date.now() + seconds_left * 1000);
     const [left, setLeft] = useState(seconds_left);
     const [sending, setSending] = useState(false);
     const sent = useRef(false);
-    // Lu par le minuteur : l'envoi automatique part avec les dernières réponses.
-    const latest = useRef(answers);
+    const chosen = useRef<number | null>(null);
 
-    const answered = questions.filter(
-        (q) => answers[q.id] !== undefined,
-    ).length;
-
-    const send = () => {
+    const send = (option: number | null) => {
         if (sent.current) {
             return;
         }
 
         sent.current = true;
         setSending(true);
-        router.post(
-            submit.url(token),
-            { answers: latest.current },
-            {
-                onSuccess: () => writeAnswers(token, null),
-                onFinish: () => setSending(false),
-            },
-        );
+        router.post(answer.url(token), { question_id: question.id, option });
     };
 
+    // Fin du temps : la réponse choisie (ou aucune) part toute seule.
     useEffect(() => {
         const timer = window.setInterval(() => {
             const remaining = Math.max(
@@ -185,108 +173,147 @@ function Questions({ token, questions, seconds_left }: Props) {
 
             if (remaining === 0) {
                 window.clearInterval(timer);
-                send();
+                send(chosen.current);
             }
-        }, 1000);
+        }, 500);
 
         return () => window.clearInterval(timer);
     }, [deadline]);
 
-    useEffect(() => {
-        const warn = (event: BeforeUnloadEvent) => {
-            if (!sent.current) {
-                event.preventDefault();
-            }
-        };
-        window.addEventListener('beforeunload', warn);
-
-        return () => window.removeEventListener('beforeunload', warn);
-    }, []);
-
-    const choose = (id: string, option: number) => {
-        const next = { ...latest.current, [id]: option };
-        latest.current = next;
-        setAnswers(next);
-        writeAnswers(token, next);
-    };
-
-    const minutes = Math.floor(left / 60);
-    const seconds = String(left % 60).padStart(2, '0');
+    useLeaveWatcher(token);
+    useWakeLock();
 
     return (
         <Shell>
             <div className="sticky top-0 z-10 -mx-4 mb-6 flex items-center justify-between border-b border-neutral-200 bg-neutral-50/95 px-4 py-3 backdrop-blur">
+                <span className="text-sm text-neutral-600">
+                    Question {index + 1} / {count}
+                </span>
                 <span
-                    className={`flex items-center gap-2 font-semibold tabular-nums ${left < 120 ? 'text-red-600' : ''}`}
+                    className={`flex items-center gap-2 font-semibold tabular-nums ${left <= 10 ? 'text-red-600' : ''}`}
                 >
                     <Clock className="size-5" />
-                    {minutes}:{seconds}
-                </span>
-                <span className="text-sm text-neutral-600">
-                    {answered} / {questions.length} réponses
+                    {left} s
                 </span>
             </div>
 
-            <ol className="space-y-6">
-                {questions.map((question, index) => (
-                    <li
-                        key={question.id}
-                        className="rounded-xl border border-neutral-200 bg-white p-5"
-                    >
-                        <p className="font-medium">
-                            {index + 1}. {question.text}
-                        </p>
-                        <div className="mt-4 grid gap-2">
-                            {question.options.map((option, o) => {
-                                const checked = answers[question.id] === o;
+            {exits > 0 && (
+                <p className="mb-6 flex items-start gap-2 rounded-lg bg-amber-100 p-3 text-sm text-amber-900">
+                    <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                    Vous avez quitté la page. À la prochaine sortie, le test
+                    s’arrêtera.
+                </p>
+            )}
 
-                                return (
-                                    <label
-                                        key={o}
-                                        className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${checked ? 'border-neutral-900 bg-neutral-100' : 'border-neutral-200 hover:bg-neutral-50'}`}
-                                    >
-                                        <input
-                                            type="radio"
-                                            name={question.id}
-                                            checked={checked}
-                                            onChange={() =>
-                                                choose(question.id, o)
-                                            }
-                                            className="mt-1"
-                                        />
-                                        <span>{option}</span>
-                                    </label>
-                                );
-                            })}
-                        </div>
-                    </li>
-                ))}
-            </ol>
-
-            <div className="mt-8 space-y-3">
-                {answered < questions.length && (
-                    <p className="text-sm text-neutral-600">
-                        {questions.length - answered} question(s) sans réponse.
-                    </p>
-                )}
-                <button
-                    type="button"
-                    disabled={sending}
-                    onClick={() => {
-                        if (
-                            answered === questions.length ||
-                            window.confirm(
-                                'Certaines questions sont sans réponse. Envoyer quand même ? Vous ne pourrez plus modifier vos réponses.',
-                            )
-                        ) {
-                            send();
-                        }
-                    }}
-                    className="w-full rounded-lg bg-neutral-900 px-6 py-4 text-lg font-medium text-white hover:bg-neutral-700 disabled:opacity-60"
-                >
-                    {sending ? 'Envoi…' : 'Envoyer mes réponses'}
-                </button>
+            <div className="rounded-xl border border-neutral-200 bg-white p-5 select-none">
+                <p className="text-lg font-medium">{question.text}</p>
+                <div className="mt-5 grid gap-2">
+                    {question.options.map((option, o) => (
+                        <label
+                            key={o}
+                            className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${choice === o ? 'border-neutral-900 bg-neutral-100' : 'border-neutral-200 hover:bg-neutral-50'}`}
+                        >
+                            <input
+                                type="radio"
+                                name={question.id}
+                                checked={choice === o}
+                                onChange={() => {
+                                    chosen.current = o;
+                                    setChoice(o);
+                                }}
+                                className="mt-1"
+                            />
+                            <span>{option}</span>
+                        </label>
+                    ))}
+                </div>
             </div>
+
+            <button
+                type="button"
+                disabled={choice === null || sending}
+                onClick={() => send(choice)}
+                className="mt-6 w-full rounded-lg bg-neutral-900 px-6 py-4 text-lg font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
+            >
+                {sending
+                    ? 'Envoi…'
+                    : index + 1 === count
+                      ? 'Valider et terminer'
+                      : 'Valider et passer à la suite'}
+            </button>
         </Shell>
     );
+}
+
+/**
+ * Reports each time the candidate leaves the page (other tab, other app,
+ * other window) for more than a few seconds; the server decides.
+ */
+function useLeaveWatcher(token: string) {
+    useEffect(() => {
+        let awaySince: number | null = null;
+
+        const away = () => {
+            awaySince ??= Date.now();
+        };
+
+        const back = () => {
+            if (document.hidden || !document.hasFocus() || awaySince === null) {
+                return;
+            }
+
+            const duration = Date.now() - awaySince;
+            awaySince = null;
+
+            if (duration >= TOLERANCE_MS) {
+                router.post(leave.url(token), {
+                    seconds: Math.round(duration / 1000),
+                });
+            }
+        };
+
+        const visibility = () => (document.hidden ? away() : back());
+
+        document.addEventListener('visibilitychange', visibility);
+        window.addEventListener('blur', away);
+        window.addEventListener('focus', back);
+
+        return () => {
+            document.removeEventListener('visibilitychange', visibility);
+            window.removeEventListener('blur', away);
+            window.removeEventListener('focus', back);
+        };
+    }, [token]);
+}
+
+/**
+ * Keeps the phone screen on during the test, where the browser allows it:
+ * a screen going to sleep would count as leaving the page.
+ */
+function useWakeLock() {
+    useEffect(() => {
+        let lock: WakeLockSentinel | null = null;
+
+        const request = () => {
+            if (
+                document.visibilityState === 'visible' &&
+                'wakeLock' in navigator
+            ) {
+                navigator.wakeLock
+                    .request('screen')
+                    .then((sentinel) => {
+                        lock = sentinel;
+                    })
+                    .catch(() => {});
+            }
+        };
+
+        request();
+        document.addEventListener('visibilitychange', request);
+
+        return () => {
+            document.removeEventListener('visibilitychange', request);
+            void lock?.release();
+        };
+    }, []);
 }

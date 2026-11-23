@@ -117,7 +117,7 @@ export function PsychotestSection({
                                 Supprimez-le pour en préparer un autre.
                             </span>
                         ) : test.status === 'started' ? (
-                            `Le candidat a commencé le test le ${dateTime.format(new Date(test.started_at!))}.`
+                            `Le candidat passe le test : question ${test.current + 1} sur ${test.questions.length}${test.exits > 0 ? ` · ${test.exits} sortie(s) de page` : ''}.`
                         ) : (
                             `Envoyé le ${dateTime.format(new Date(test.sent_at!))}, valable jusqu’au ${dateFormat.format(new Date(test.expires_at!))}. En attente du candidat.`
                         )}
@@ -430,8 +430,9 @@ function SendTest({
             )}
             <p className="text-xs text-muted-foreground">
                 WhatsApp s’ouvre avec le message et le lien déjà écrits : il ne
-                reste qu’à l’envoyer. Le candidat a {test.duration} minutes et
-                une seule tentative.
+                reste qu’à l’envoyer. Le candidat a {test.questions.length}{' '}
+                questions, {test.question_seconds} secondes chacune, une seule
+                tentative, sur un seul appareil.
             </p>
             <InputError message={errors.psychotest} />
         </div>
@@ -456,12 +457,26 @@ function TestResult({ test }: { test: Psychotest }) {
                 </p>
                 <p className="text-sm text-muted-foreground">
                     {correct} bonne(s) réponse(s) sur {test.questions.length}
-                    {test.minutes !== null &&
-                        ` · ${test.minutes} min (limite ${test.duration})`}
+                    {test.minutes !== null && ` · ${test.minutes} min`}
                     {test.completed_at &&
                         ` · ${dateTime.format(new Date(test.completed_at))}`}
                 </p>
             </div>
+
+            {test.exits > 0 && (
+                <p
+                    className={cn(
+                        'text-sm',
+                        test.stopped_reason === 'exits'
+                            ? 'text-destructive'
+                            : 'text-amber-700 dark:text-amber-400',
+                    )}
+                >
+                    {test.stopped_reason === 'exits'
+                        ? `Test arrêté : le candidat a quitté la page ${test.exits} fois (${test.away_seconds} s au total). Les questions restantes comptent comme fausses.`
+                        : `Le candidat a quitté la page une fois (${test.away_seconds} s) et a reçu un avertissement.`}
+                </p>
+            )}
 
             <details>
                 <summary className="cursor-pointer text-sm font-medium">

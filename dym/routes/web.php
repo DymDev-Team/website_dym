@@ -32,9 +32,10 @@ Route::post('carriere/candidature', [CareerController::class, 'apply'])->middlew
 Route::get('carriere/{jobOffer}', [CareerController::class, 'show'])->name('careers.show');
 
 // Test psychotechnique, ouvert par le lien personnel envoyé au candidat.
-Route::get('test-psychotechnique/{token}', [PsychotestController::class, 'show'])->middleware('throttle:60,1')->name('psychotest.show');
+Route::get('test-psychotechnique/{token}', [PsychotestController::class, 'show'])->middleware('throttle:120,1')->name('psychotest.show');
 Route::post('test-psychotechnique/{token}/start', [PsychotestController::class, 'start'])->middleware('throttle:10,1')->name('psychotest.start');
-Route::post('test-psychotechnique/{token}', [PsychotestController::class, 'submit'])->middleware('throttle:10,1')->name('psychotest.submit');
+Route::post('test-psychotechnique/{token}/answer', [PsychotestController::class, 'answer'])->middleware('throttle:60,1')->name('psychotest.answer');
+Route::post('test-psychotechnique/{token}/exit', [PsychotestController::class, 'leave'])->middleware('throttle:30,1')->name('psychotest.leave');
 
 Route::get('{legalPage}', LegalPageController::class)
     ->whereIn('legalPage', LegalPage::SLUGS)

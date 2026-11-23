@@ -5,6 +5,7 @@ namespace App\Recruitment;
 use Anthropic\Beta\Messages\BetaTextBlockParam;
 use App\Enums\QuestionType;
 use App\Models\AiCall;
+use App\Models\RecruitmentSetting;
 use App\Recruitment\Ai\AnalysisSchema;
 use App\Recruitment\Ai\ModelGateway;
 use App\Recruitment\Exceptions\PermanentAnalysisError;
@@ -65,7 +66,7 @@ class OfferAssistant
             ->implode("\n");
 
         $reply = $this->gateway->json($this->guard->call(
-            system: self::RULES,
+            system: self::RULES.RecruitmentSetting::knowledge(),
             content: [BetaTextBlockParam::with(text: "<offre>\n{$text}\n</offre>\n\nPropose la grille d'évaluation de cette offre.")],
             schema: AnalysisSchema::object(['criteria' => self::criteriaSchema()]),
             effort: 'low',
@@ -88,7 +89,7 @@ class OfferAssistant
         $string = ['type' => 'string'];
 
         $reply = $this->gateway->json($this->guard->call(
-            system: self::RULES."\n\n".self::DRAFT_RULES,
+            system: self::RULES."\n\n".self::DRAFT_RULES.RecruitmentSetting::knowledge(),
             content: [BetaTextBlockParam::with(text: "<brief>\n".trim($brief)."\n</brief>\n\nRédige l'offre.")],
             schema: AnalysisSchema::object([
                 'title' => $string,

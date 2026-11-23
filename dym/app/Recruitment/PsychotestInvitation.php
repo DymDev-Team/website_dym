@@ -29,7 +29,7 @@ final class PsychotestInvitation
             Merci pour votre candidature chez DYM Manufacture.
             Poste : {poste}
 
-            Nous vous invitons à passer un test psychotechnique en ligne : {$count} questions, {$test->duration_minutes} minutes, une seule tentative. Prévoyez un moment au calme avant de commencer.
+            Nous vous invitons à passer un test psychotechnique en ligne : {$count} questions, une à la fois, {$test->question_seconds} secondes chacune, une seule tentative. Prévoyez un moment au calme et restez sur la page pendant tout le test.
 
             {$test->url()}
 

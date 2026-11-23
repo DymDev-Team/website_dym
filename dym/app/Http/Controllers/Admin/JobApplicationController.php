@@ -34,8 +34,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class JobApplicationController extends Controller
 {
-    // Cartes affichées par colonne du pipeline.
+    // Cartes affichées par colonne du pipeline, puis ajoutées par « Voir plus ».
     private const PER_STAGE = 60;
+
+    private const MAX_PER_STAGE = 1000;
 
     public function __construct(private AnalysisRunner $runner) {}
 
@@ -48,12 +50,16 @@ class JobApplicationController extends Controller
             'offer' => ['nullable', 'string'],
             'search' => ['nullable', 'string', 'max:100'],
             'recommendation' => ['nullable', Rule::enum(Recommendation::class)],
+            // Cartes demandées par colonne, l'identifiant de l'étape en clé.
+            'shown' => ['nullable', 'array'],
+            'shown.*' => ['integer', 'min:1'],
         ]);
 
         $this->runner->resumeStale();
 
         $stages = RecruitmentStage::query()->ordered()->get();
         $query = fn () => $this->filtered($filters);
+        $shown = fn (RecruitmentStage $stage) => min(max((int) ($filters['shown'][$stage->id] ?? 0), self::PER_STAGE), self::MAX_PER_STAGE);
 
         return Inertia::render('admin/applications/index', [
             'stages' => $stages->map(fn (RecruitmentStage $stage) => [
@@ -67,10 +73,11 @@ class JobApplicationController extends Controller
                     ->orderByRaw('score IS NULL')
                     ->orderByDesc('score')
                     ->latest()
-                    ->limit(self::PER_STAGE)
+                    ->limit($shown($stage))
                     ->get()
                     ->map(fn (JobApplication $application) => $this->card($application)),
             ]),
+            'perStage' => self::PER_STAGE,
             'offers' => JobOffer::query()->latest()->get(['id', 'title', 'slug', 'is_published', 'closes_at']),
             'sources' => RecruitmentOption::query()->ofType(RecruitmentOptionType::Source)->get(['id', 'label']),
             'recommendations' => $this->recommendationOptions(),
@@ -400,12 +407,20 @@ class JobApplicationController extends Controller
             return null;
         }
 
+        // Le temps des questions écoulées est compté, page ouverte ou non.
+        $test->setRelation('application', $application)->catchUp();
+
         return [
             'status' => $test->status(),
             'questions' => $test->questions,
             'answers' => $test->answers,
             'score' => $test->score,
             'duration' => $test->duration_minutes,
+            'question_seconds' => $test->question_seconds,
+            'current' => $test->current_question,
+            'exits' => $test->exits,
+            'away_seconds' => $test->away_seconds,
+            'stopped_reason' => $test->stopped_reason,
             'minutes' => $test->completed_at !== null && $test->started_at !== null
                 ? (int) ceil($test->started_at->diffInSeconds($test->completed_at) / 60)
                 : null,
@@ -414,7 +429,7 @@ class JobApplicationController extends Controller
             'started_at' => $test->started_at,
             'completed_at' => $test->completed_at,
             'url' => $test->url(),
-            'whatsapp_url' => PsychotestInvitation::whatsappUrl($test->setRelation('application', $application)),
+            'whatsapp_url' => PsychotestInvitation::whatsappUrl($test),
         ];
     }
 

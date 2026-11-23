@@ -400,6 +400,11 @@ export type Psychotest = {
     answers: Record<string, number | null> | null;
     score: number | null;
     duration: number;
+    question_seconds: number;
+    current: number;
+    exits: number;
+    away_seconds: number;
+    stopped_reason: 'exits' | null;
     minutes: number | null;
     sent_at: string | null;
     expires_at: string | null;

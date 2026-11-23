@@ -129,8 +129,9 @@ class RecruitmentSettingController extends Controller
         $validated = $request->validate([
             'auto_advance' => ['boolean'],
             'auto_advance_threshold' => ['required', 'integer', 'between:1,100'],
-            'psychotest_duration' => ['required', 'integer', 'between:5,180'],
+            'psychotest_question_seconds' => ['required', 'integer', 'between:15,300'],
             'psychotest_validity_days' => ['required', 'integer', 'between:1,60'],
+            'ai_knowledge' => ['nullable', 'string', 'max:5000'],
             'dg_criteria' => ['required', 'string', 'max:2000', function (string $attribute, mixed $value, \Closure $fail) {
                 $lines = RecruitmentSetting::lines((string) $value);
 
@@ -145,9 +146,10 @@ class RecruitmentSettingController extends Controller
         RecruitmentSetting::store([
             'auto_advance' => $request->boolean('auto_advance') ? '1' : '0',
             'auto_advance_threshold' => (string) $validated['auto_advance_threshold'],
-            'psychotest_duration' => (string) $validated['psychotest_duration'],
+            'psychotest_question_seconds' => (string) $validated['psychotest_question_seconds'],
             'psychotest_validity_days' => (string) $validated['psychotest_validity_days'],
             'dg_criteria' => implode("\n", RecruitmentSetting::lines($validated['dg_criteria'])),
+            'ai_knowledge' => trim((string) ($validated['ai_knowledge'] ?? '')),
         ]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Parcours de recrutement enregistré.']);

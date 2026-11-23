@@ -83,9 +83,10 @@ type Props = {
         acknowledgment_reply_to: string | null;
         auto_advance: boolean;
         auto_advance_threshold: number;
-        psychotest_duration: number;
+        psychotest_question_seconds: number;
         psychotest_validity_days: number;
         dg_criteria: string[];
+        ai_knowledge: string;
     };
     contactEmail: string | null;
     models: Option[];
@@ -757,17 +758,19 @@ function ProcessSettings({
 
                         <div className="grid gap-6 sm:grid-cols-2">
                             <Field
-                                id="psychotest_duration"
-                                label="Durée du test psychotechnique (minutes)"
-                                error={errors.psychotest_duration}
+                                id="psychotest_question_seconds"
+                                label="Temps par question du test (secondes)"
+                                error={errors.psychotest_question_seconds}
                             >
                                 <Input
-                                    id="psychotest_duration"
-                                    name="psychotest_duration"
+                                    id="psychotest_question_seconds"
+                                    name="psychotest_question_seconds"
                                     type="number"
-                                    min={5}
-                                    max={180}
-                                    defaultValue={settings.psychotest_duration}
+                                    min={15}
+                                    max={300}
+                                    defaultValue={
+                                        settings.psychotest_question_seconds
+                                    }
                                     required
                                 />
                             </Field>
@@ -789,6 +792,21 @@ function ProcessSettings({
                                 />
                             </Field>
                         </div>
+
+                        <Field
+                            id="ai_knowledge"
+                            label="Base de connaissances de l’IA"
+                            hint="Règles et informations que l’IA respecte quand elle rédige les tests psychotechniques et les offres, une par ligne."
+                            error={errors.ai_knowledge}
+                        >
+                            <Textarea
+                                id="ai_knowledge"
+                                name="ai_knowledge"
+                                rows={5}
+                                maxLength={5000}
+                                defaultValue={settings.ai_knowledge}
+                            />
+                        </Field>
 
                         <Field
                             id="dg_criteria"

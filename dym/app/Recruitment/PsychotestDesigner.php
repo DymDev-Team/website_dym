@@ -6,6 +6,7 @@ use Anthropic\Beta\Messages\BetaTextBlockParam;
 use App\Models\AiCall;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
+use App\Models\RecruitmentSetting;
 use App\Recruitment\Ai\AnalysisSchema;
 use App\Recruitment\Ai\ModelGateway;
 use App\Recruitment\Exceptions\PermanentAnalysisError;
@@ -21,7 +22,10 @@ use Illuminate\Validation\ValidationException;
  */
 class PsychotestDesigner
 {
-    public const OFFER_QUESTIONS = 15;
+    // Réserve du poste : chaque candidat en reçoit une partie, tirée au hasard.
+    public const OFFER_QUESTIONS = 25;
+
+    public const OFFER_DRAWN = 12;
 
     public const CANDIDATE_QUESTIONS = 5;
 
@@ -63,7 +67,7 @@ class PsychotestDesigner
             ])->filter(fn (?string $value) => filled($value))->map(fn (string $value, string $label) => "{$label} : ".trim($value))->implode("\n")."\n</offre>";
 
         return $this->ask(
-            $context."\n\nPrépare ".self::OFFER_QUESTIONS.' questions communes à tous les candidats de ce poste : environ 4 de logique, 3 de calcul, 2 de compréhension et 6 mises en situation ou questions de rigueur et de sécurité propres au métier.',
+            $context."\n\nPrépare ".self::OFFER_QUESTIONS.' questions communes aux candidats de ce poste : environ 6 de logique, 5 de calcul, 4 de compréhension et 10 mises en situation ou questions de rigueur et de sécurité propres au métier.',
             'offer',
             $offer?->id,
         );
@@ -114,7 +118,7 @@ class PsychotestDesigner
         $string = ['type' => 'string'];
 
         $reply = $this->gateway->json($this->guard->call(
-            system: self::RULES,
+            system: self::RULES.RecruitmentSetting::knowledge(),
             content: [BetaTextBlockParam::with(text: $prompt)],
             schema: AnalysisSchema::object(['questions' => ['type' => 'array', 'items' => AnalysisSchema::object([
                 'text' => $string,
@@ -140,7 +144,7 @@ class PsychotestDesigner
             throw new TransientAnalysisError('Réponse de l’IA non conforme : '.collect($e->errors())->flatten()->first());
         }
 
-        return array_values(array_map(fn (array $question) => self::shuffled([
+        return array_values(array_map(fn (array $question) => self::withShuffledOptions([
             'id' => self::newId(),
             'text' => trim($question['text']),
             'options' => array_values(array_map(trim(...), $question['options'])),
@@ -156,12 +160,13 @@ class PsychotestDesigner
     }
 
     /**
-     * The model tends to put the right answer first: the options are mixed.
+     * Options mixed for each candidate (the model also tends to put the
+     * right answer first): an answer passed around helps nobody.
      *
      * @param  array{id: string, text: string, options: list<string>, answer: int, category: string, source: string}  $question
      * @return array{id: string, text: string, options: list<string>, answer: int, category: string, source: string}
      */
-    private static function shuffled(array $question): array
+    public static function withShuffledOptions(array $question): array
     {
         $right = $question['options'][$question['answer']];
         $options = $question['options'];

@@ -222,6 +222,28 @@ test('opening a new application marks it as viewed', function () {
     expect($application->refresh()->viewed_at)->not->toBeNull();
 });
 
+test('each column of the pipeline loads more cards on demand', function () {
+    $admin = User::factory()->admin()->create();
+    JobApplication::factory()->count(65)->create();
+    $first = RecruitmentStage::initial();
+
+    $this->actingAs($admin)
+        ->get(route('admin.applications.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('perStage', 60)
+            ->where('stages.0.total', 65)
+            ->has('stages.0.applications', 60));
+
+    $this->actingAs($admin)
+        ->get(route('admin.applications.index', ['shown' => [$first->id => 120]]))
+        ->assertInertia(fn (Assert $page) => $page->has('stages.0.applications', 65));
+
+    // Une valeur trop petite ne descend pas sous la page par défaut.
+    $this->actingAs($admin)
+        ->get(route('admin.applications.index', ['shown' => [$first->id => 5]]))
+        ->assertInertia(fn (Assert $page) => $page->has('stages.0.applications', 60));
+});
+
 test('the pipeline can be filtered and an application moved to another stage', function () {
     $admin = User::factory()->admin()->create();
     $offer = JobOffer::factory()->create();

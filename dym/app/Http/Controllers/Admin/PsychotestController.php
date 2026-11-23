@@ -57,19 +57,22 @@ class PsychotestController extends Controller
                 $offer?->update(['psychotest_questions' => $base]);
             }
 
-            // Chaque question garde son propre identifiant dans ce test.
-            $questions = [
-                ...array_map(fn (array $question) => [...$question, 'id' => PsychotestDesigner::newId()], $base),
-                ...$this->designer->forCandidate($application),
-            ];
+            // Tirage dans la réserve du poste, réponses et ordre mélangés pour
+            // ce candidat ; chaque question a son propre identifiant ici.
+            $drawn = collect($base)->shuffle()->take(PsychotestDesigner::OFFER_DRAWN)
+                ->map(fn (array $question) => [...PsychotestDesigner::withShuffledOptions($question), 'id' => PsychotestDesigner::newId()]);
+            $questions = $drawn->concat($this->designer->forCandidate($application))->shuffle()->values()->all();
         } catch (PermanentAnalysisError|TransientAnalysisError $e) {
             return $this->toast('error', $e->getMessage());
         }
 
+        $seconds = RecruitmentSetting::values()['psychotest_question_seconds'];
+
         Psychotest::query()->updateOrCreate(['job_application_id' => $application->id], [
             'token' => $application->psychotest->token ?? Psychotest::newToken(),
             'questions' => $questions,
-            'duration_minutes' => RecruitmentSetting::values()['psychotest_duration'],
+            'question_seconds' => $seconds,
+            'duration_minutes' => (int) ceil(count($questions) * $seconds / 60),
         ]);
 
         return $this->toast('success', count($questions).' questions préparées : relisez-les avant d’envoyer le test.');
@@ -98,14 +101,17 @@ class PsychotestController extends Controller
             'questions.*.options.*.distinct' => 'Les 4 réponses d’une question doivent être différentes.',
         ]);
 
-        $test->update(['questions' => array_values(array_map(fn (array $question) => [
-            'id' => filled($question['id'] ?? null) ? $question['id'] : PsychotestDesigner::newId(),
-            'text' => trim($question['text']),
-            'options' => array_values(array_map(fn ($option) => trim((string) $option), $question['options'])),
-            'answer' => (int) $question['answer'],
-            'category' => trim((string) ($question['category'] ?? '')),
-            'source' => $question['source'] ?? 'manual',
-        ], $validated['questions']))]);
+        $test->update([
+            'questions' => array_values(array_map(fn (array $question) => [
+                'id' => filled($question['id'] ?? null) ? $question['id'] : PsychotestDesigner::newId(),
+                'text' => trim($question['text']),
+                'options' => array_values(array_map(fn ($option) => trim((string) $option), $question['options'])),
+                'answer' => (int) $question['answer'],
+                'category' => trim((string) ($question['category'] ?? '')),
+                'source' => $question['source'] ?? 'manual',
+            ], $validated['questions'])),
+            'duration_minutes' => (int) ceil(count($validated['questions']) * $test->question_seconds / 60),
+        ]);
 
         return $this->toast('success', 'Questions du test enregistrées.');
     }

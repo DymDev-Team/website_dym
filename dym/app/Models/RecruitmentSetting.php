@@ -61,11 +61,17 @@ class RecruitmentSetting extends Model
         // Note IA à partir de laquelle une nouvelle candidature passe en étude.
         'auto_advance' => '1',
         'auto_advance_threshold' => '75',
-        // Test psychotechnique : temps pour répondre, validité du lien.
-        'psychotest_duration' => '30',
+        // Test psychotechnique : temps par question, validité du lien.
+        'psychotest_question_seconds' => '60',
         'psychotest_validity_days' => '7',
         // Grille de l'appréciation DG, un critère par ligne, chacun noté sur 5.
         'dg_criteria' => "Présentation et communication\nMotivation\nCompétences techniques\nPotentiel d’évolution\nAdéquation avec l’équipe",
+        // Base de connaissances transmise à l'IA quand elle rédige tests et offres.
+        'ai_knowledge' => <<<'TEXT'
+            Tous les montants sont exprimés en francs CFA (FCFA), jamais en euros ni en dollars.
+            Ne cite aucune autre entreprise, aucun client, fournisseur ni sous-traitant : seule DYM Manufacture apparaît.
+            Reste dans le cadre du poste : ses missions, ses outils, ses matériaux et les situations réellement rencontrées chez DYM Manufacture.
+            TEXT,
     ];
 
     /**
@@ -82,7 +88,7 @@ class RecruitmentSetting extends Model
     /**
      * Every setting, defaults included, secrets decrypted.
      *
-     * @return array{ai_enabled: bool, auto_analyze: bool, api_key: string|null, model: string, effort: string, monthly_budget: float, custom_instructions: string|null, priority_threshold: int, consider_threshold: int, web_research: bool, acknowledgment_enabled: bool, acknowledgment_subject: string, acknowledgment_body: string, acknowledgment_reply_to: string|null, auto_advance: bool, auto_advance_threshold: int, psychotest_duration: int, psychotest_validity_days: int, dg_criteria: list<string>}
+     * @return array{ai_enabled: bool, auto_analyze: bool, api_key: string|null, model: string, effort: string, monthly_budget: float, custom_instructions: string|null, priority_threshold: int, consider_threshold: int, web_research: bool, acknowledgment_enabled: bool, acknowledgment_subject: string, acknowledgment_body: string, acknowledgment_reply_to: string|null, auto_advance: bool, auto_advance_threshold: int, psychotest_question_seconds: int, psychotest_validity_days: int, dg_criteria: list<string>, ai_knowledge: string}
      */
     public static function values(): array
     {
@@ -111,10 +117,21 @@ class RecruitmentSetting extends Model
             'acknowledgment_reply_to' => $values['acknowledgment_reply_to'] ?: null,
             'auto_advance' => $values['auto_advance'] === '1',
             'auto_advance_threshold' => (int) $values['auto_advance_threshold'],
-            'psychotest_duration' => max(5, (int) $values['psychotest_duration']),
+            'psychotest_question_seconds' => max(15, (int) $values['psychotest_question_seconds']),
             'psychotest_validity_days' => max(1, (int) $values['psychotest_validity_days']),
             'dg_criteria' => self::lines((string) ($values['dg_criteria'] ?: self::DEFAULTS['dg_criteria'])),
+            'ai_knowledge' => trim((string) $values['ai_knowledge']),
         ];
+    }
+
+    /**
+     * Knowledge base added to the instructions of the AI, when filled.
+     */
+    public static function knowledge(): string
+    {
+        $knowledge = self::values()['ai_knowledge'];
+
+        return $knowledge === '' ? '' : "\n\nBase de connaissances de DYM Manufacture, à respecter impérativement :\n{$knowledge}";
     }
 
     /**
