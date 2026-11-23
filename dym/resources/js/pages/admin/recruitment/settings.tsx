@@ -87,6 +87,9 @@ type Props = {
         psychotest_validity_days: number;
         dg_criteria: string[];
         ai_knowledge: string;
+        weight_ai: number;
+        weight_test: number;
+        weight_dg: number;
     };
     contactEmail: string | null;
     models: Option[];
@@ -116,6 +119,7 @@ const taskLabels: Record<string, string> = {
     offer_draft: 'Rédaction d’offres',
     sourcing: 'Recherche dans la base',
     psychotest: 'Tests psychotechniques',
+    verdict: 'Avis de recrutement',
 };
 
 const money = new Intl.NumberFormat('fr-FR', {
@@ -791,6 +795,43 @@ function ProcessSettings({
                                     required
                                 />
                             </Field>
+                        </div>
+
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium">
+                                Poids de chaque note dans la note globale
+                            </p>
+                            <div className="grid gap-4 sm:grid-cols-3">
+                                {(
+                                    [
+                                        ['weight_ai', 'Note IA (CV)'],
+                                        ['weight_test', 'Test psychotechnique'],
+                                        ['weight_dg', 'Appréciation DG'],
+                                    ] as const
+                                ).map(([name, label]) => (
+                                    <Field
+                                        key={name}
+                                        id={name}
+                                        label={label}
+                                        error={errors[name]}
+                                    >
+                                        <Input
+                                            id={name}
+                                            name={name}
+                                            type="number"
+                                            min={0}
+                                            max={10}
+                                            defaultValue={settings[name]}
+                                            required
+                                        />
+                                    </Field>
+                                ))}
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                1, 1, 1 : moyenne simple. Mettez 2 au DG pour
+                                que sa note compte double ; 0 pour ignorer une
+                                note.
+                            </p>
                         </div>
 
                         <Field

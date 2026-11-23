@@ -2,7 +2,7 @@ import { Loader2 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { next } from '@/routes/admin/recruitment/analyses';
-import type { AnalysisStatus, Recommendation } from '@/types/admin';
+import type { AnalysisStatus, Recommendation, Verdict } from '@/types/admin';
 
 export const recommendationLabels: Record<Recommendation, string> = {
     priority: 'À rencontrer en priorité',
@@ -82,6 +82,34 @@ export function RecommendationBadge({
             )}
         >
             {recommendationLabels[recommendation]}
+        </span>
+    );
+}
+
+export const verdictLabels: Record<Verdict, string> = {
+    hire: 'Recruter',
+    discuss: 'À discuter',
+    reject: 'Ne pas recruter',
+};
+
+// Avis de l'IA une fois les trois notes connues : une aide, pas la décision.
+export function VerdictBadge({ verdict }: { verdict: Verdict | null }) {
+    if (!verdict) {
+        return null;
+    }
+
+    return (
+        <span
+            className={cn(
+                'rounded px-1.5 py-0.5 text-xs font-medium',
+                verdict === 'hire' &&
+                    'bg-emerald-600/15 text-emerald-700 dark:text-emerald-400',
+                verdict === 'discuss' &&
+                    'bg-amber-500/15 text-amber-700 dark:text-amber-400',
+                verdict === 'reject' && 'bg-muted text-muted-foreground',
+            )}
+        >
+            IA : {verdictLabels[verdict]}
         </span>
     );
 }

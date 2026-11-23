@@ -2,6 +2,7 @@
 
 use App\Enums\AnalysisStatus;
 use App\Enums\StageRole;
+use App\Enums\Verdict;
 use App\Models\Candidate;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
@@ -111,6 +112,9 @@ test('the process settings are saved', function () {
             'psychotest_validity_days' => '3',
             'dg_criteria' => "Motivation\n\n  Rigueur \nMotivation",
             'ai_knowledge' => '  Montants en FCFA.  ',
+            'weight_ai' => '1',
+            'weight_test' => '1',
+            'weight_dg' => '2',
         ])
         ->assertRedirect(route('admin.recruitment.settings.edit'));
 
@@ -121,7 +125,7 @@ test('the process settings are saved', function () {
         'psychotest_validity_days' => 3,
         'dg_criteria' => ['Motivation', 'Rigueur'],
         'ai_knowledge' => 'Montants en FCFA.',
-    ]);
+    ])->and(RecruitmentSetting::weights())->toBe(['ai' => 1, 'test' => 1, 'dg' => 2]);
 
     $this->actingAs($this->admin)
         ->put(route('admin.recruitment.settings.process.update'), [
@@ -434,4 +438,74 @@ test('the managing director scores each criterion of the grid', function () {
     $this->actingAs($this->admin)
         ->put(route('admin.applications.dg-review.update', $application), ['scores' => [6, 1]])
         ->assertSessionHasErrors('scores.0');
+});
+
+test('the global score weighs the AI, test and DG scores known so far', function () {
+    $equal = ['ai' => 1, 'test' => 1, 'dg' => 1];
+    $application = JobApplication::factory()->create(['score' => 20, 'test_score' => 55, 'dg_score' => 76]);
+
+    expect($application->globalScore($equal))->toBe(50)
+        // (20 + 55 + 2 × 76) / 4
+        ->and($application->globalScore(['ai' => 1, 'test' => 1, 'dg' => 2]))->toBe(57)
+        ->and($application->globalScore(['ai' => 0, 'test' => 0, 'dg' => 0]))->toBeNull()
+        // Sans note IA (candidature spontanée) : moyenne des deux autres.
+        ->and(JobApplication::factory()->create(['score' => null, 'test_score' => 60, 'dg_score' => 80])->globalScore($equal))->toBe(70)
+        ->and(JobApplication::factory()->create()->globalScore($equal))->toBeNull();
+});
+
+test('the AI gives its hiring advice from the three scores', function () {
+    $gateway = new FakeModelGateway([['verdict' => 'discuss', 'comment' => 'Bon test et bonne impression du DG, mais un CV éloigné du poste.']]);
+    app()->instance(ModelGateway::class, $gateway);
+    $application = analysedApplication(JobOffer::factory()->create(['title' => 'Soudeur TIG']));
+    $application->update([
+        'score' => 20,
+        'test_score' => 55,
+        'dg_score' => 76,
+        'dg_review' => [['criterion' => 'Motivation', 'score' => 4]],
+        'dg_comment' => 'Très motivé',
+    ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.applications.verdict.store', $application))
+        ->assertInertiaFlash('toast', ['type' => 'success', 'message' => 'Avis de l’IA : À discuter.']);
+
+    $application->refresh();
+    expect($application->verdict)->toBe(Verdict::Discuss)
+        ->and($application->verdict_comment)->toBe('Bon test et bonne impression du DG, mais un CV éloigné du poste.')
+        ->and($application->verdict_at)->not->toBeNull()
+        ->and($application->events()->where('type', 'verdict')->sole()->data)->toBe(['verdict' => 'discuss', 'label' => 'À discuter']);
+
+    expect($gateway->text(0))->toContain(
+        'Note IA (adéquation du CV au poste) : 20 / 100',
+        'Test psychotechnique : 55 / 100',
+        'Appréciation DG : 76 / 100 (Motivation 4/5)',
+        'Commentaire du DG : Très motivé',
+        'Note globale : 50 / 100',
+    )->not->toContain('Awa')
+        ->and($gateway->calls[0]->system)->toContain('francs CFA (FCFA)');
+
+    $this->actingAs($this->admin)
+        ->get(route('admin.applications.show', $application))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('application.dg.global', 50)
+            ->where('application.dg.verdict.value', 'discuss')
+            ->where('application.dg.verdict.label', 'À discuter'));
+
+    $this->actingAs($this->admin)
+        ->get(route('admin.applications.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('stages.0.applications.0.global_score', 50)
+            ->where('stages.0.applications.0.verdict', 'discuss'));
+});
+
+test('no hiring advice before the DG appraisal', function () {
+    app()->instance(ModelGateway::class, $gateway = new FakeModelGateway);
+    $application = JobApplication::factory()->create(['score' => 80, 'test_score' => 70]);
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.applications.verdict.store', $application))
+        ->assertInertiaFlash('toast', ['type' => 'error', 'message' => 'Enregistrez d’abord l’appréciation DG.']);
+
+    expect($gateway->calls)->toBe([])
+        ->and($application->refresh()->verdict)->toBeNull();
 });

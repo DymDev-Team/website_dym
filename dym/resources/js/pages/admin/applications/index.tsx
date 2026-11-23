@@ -18,6 +18,7 @@ import {
     ScoreBadge,
     StageDot,
     StepScore,
+    VerdictBadge,
     seniorityLabels,
     useAnalysisDriver,
 } from '@/components/admin/recruitment';
@@ -127,6 +128,10 @@ function Card({ card }: { card: PipelineCard }) {
                 {card.dg_score !== null && (
                     <StepScore label="DG" score={card.dg_score} />
                 )}
+                {card.global_score !== null && (
+                    <StepScore label="Global" score={card.global_score} />
+                )}
+                <VerdictBadge verdict={card.verdict} />
                 <AnalysisPending status={card.analysis_status} />
                 {card.analysis_status === 'failed' && (
                     <span className="text-xs text-destructive">

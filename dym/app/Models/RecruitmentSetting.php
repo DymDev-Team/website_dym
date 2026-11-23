@@ -66,6 +66,10 @@ class RecruitmentSetting extends Model
         'psychotest_validity_days' => '7',
         // Grille de l'appréciation DG, un critère par ligne, chacun noté sur 5.
         'dg_criteria' => "Présentation et communication\nMotivation\nCompétences techniques\nPotentiel d’évolution\nAdéquation avec l’équipe",
+        // Poids des notes IA, test et DG dans la note globale.
+        'weight_ai' => '1',
+        'weight_test' => '1',
+        'weight_dg' => '1',
         // Base de connaissances transmise à l'IA quand elle rédige tests et offres.
         'ai_knowledge' => <<<'TEXT'
             Tous les montants sont exprimés en francs CFA (FCFA), jamais en euros ni en dollars.
@@ -88,7 +92,7 @@ class RecruitmentSetting extends Model
     /**
      * Every setting, defaults included, secrets decrypted.
      *
-     * @return array{ai_enabled: bool, auto_analyze: bool, api_key: string|null, model: string, effort: string, monthly_budget: float, custom_instructions: string|null, priority_threshold: int, consider_threshold: int, web_research: bool, acknowledgment_enabled: bool, acknowledgment_subject: string, acknowledgment_body: string, acknowledgment_reply_to: string|null, auto_advance: bool, auto_advance_threshold: int, psychotest_question_seconds: int, psychotest_validity_days: int, dg_criteria: list<string>, ai_knowledge: string}
+     * @return array{ai_enabled: bool, auto_analyze: bool, api_key: string|null, model: string, effort: string, monthly_budget: float, custom_instructions: string|null, priority_threshold: int, consider_threshold: int, web_research: bool, acknowledgment_enabled: bool, acknowledgment_subject: string, acknowledgment_body: string, acknowledgment_reply_to: string|null, auto_advance: bool, auto_advance_threshold: int, psychotest_question_seconds: int, psychotest_validity_days: int, dg_criteria: list<string>, ai_knowledge: string, weight_ai: int, weight_test: int, weight_dg: int}
      */
     public static function values(): array
     {
@@ -121,7 +125,22 @@ class RecruitmentSetting extends Model
             'psychotest_validity_days' => max(1, (int) $values['psychotest_validity_days']),
             'dg_criteria' => self::lines((string) ($values['dg_criteria'] ?: self::DEFAULTS['dg_criteria'])),
             'ai_knowledge' => trim((string) $values['ai_knowledge']),
+            'weight_ai' => max(0, (int) $values['weight_ai']),
+            'weight_test' => max(0, (int) $values['weight_test']),
+            'weight_dg' => max(0, (int) $values['weight_dg']),
         ];
+    }
+
+    /**
+     * Weights of the AI, test and DG scores in the global score.
+     *
+     * @return array{ai: int, test: int, dg: int}
+     */
+    public static function weights(): array
+    {
+        $values = self::values();
+
+        return ['ai' => $values['weight_ai'], 'test' => $values['weight_test'], 'dg' => $values['weight_dg']];
     }
 
     /**

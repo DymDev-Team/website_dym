@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\AnalysisStatus;
 use App\Enums\ApplicationEventType;
 use App\Enums\Recommendation;
+use App\Enums\Verdict;
 use Database\Factories\JobApplicationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -38,6 +39,9 @@ use Illuminate\Support\Carbon;
  * @property string|null $dg_comment
  * @property int|null $dg_reviewed_by_id
  * @property Carbon|null $dg_reviewed_at
+ * @property Verdict|null $verdict
+ * @property string|null $verdict_comment
+ * @property Carbon|null $verdict_at
  * @property Carbon|null $viewed_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -53,7 +57,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, ApplicationAnalysis> $analyses
  * @property-read Collection<int, ApplicationEvent> $events
  */
-#[Fillable(['candidate_id', 'job_offer_id', 'stage_id', 'source_id', 'added_by_id', 'message', 'answers', 'cv_path', 'cv_name', 'cv_mime', 'score', 'recommendation', 'test_score', 'dg_score', 'dg_review', 'dg_comment', 'dg_reviewed_by_id', 'dg_reviewed_at', 'viewed_at'])]
+#[Fillable(['candidate_id', 'job_offer_id', 'stage_id', 'source_id', 'added_by_id', 'message', 'answers', 'cv_path', 'cv_name', 'cv_mime', 'score', 'recommendation', 'test_score', 'dg_score', 'dg_review', 'dg_comment', 'dg_reviewed_by_id', 'dg_reviewed_at', 'verdict', 'verdict_comment', 'verdict_at', 'viewed_at'])]
 #[Hidden(['cv_path'])]
 class JobApplication extends Model
 {
@@ -80,8 +84,30 @@ class JobApplication extends Model
             'dg_score' => 'integer',
             'dg_review' => 'json:unicode',
             'dg_reviewed_at' => 'datetime',
+            'verdict' => Verdict::class,
+            'verdict_at' => 'datetime',
             'viewed_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Weighted mean of the AI, test and DG scores known so far, out of 100.
+     *
+     * @param  array{ai: int, test: int, dg: int}  $weights
+     */
+    public function globalScore(array $weights): ?int
+    {
+        $sum = 0;
+        $total = 0;
+
+        foreach (['ai' => $this->score, 'test' => $this->test_score, 'dg' => $this->dg_score] as $key => $score) {
+            if ($score !== null && $weights[$key] > 0) {
+                $sum += $score * $weights[$key];
+                $total += $weights[$key];
+            }
+        }
+
+        return $total === 0 ? null : (int) round($sum / $total);
     }
 
     /**

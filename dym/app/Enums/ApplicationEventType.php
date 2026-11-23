@@ -13,6 +13,7 @@ enum ApplicationEventType: string
     case PsychotestSent = 'psychotest_sent';
     case PsychotestCompleted = 'psychotest_completed';
     case DgReviewed = 'dg_reviewed';
+    case Verdict = 'verdict';
     case AnalysisRequested = 'analysis_requested';
     case AnalysisCompleted = 'analysis_completed';
     case AnalysisFailed = 'analysis_failed';

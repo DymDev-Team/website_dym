@@ -176,6 +176,8 @@ function eventLabel(event: ApplicationEvent): ReactNode {
                 : `Test psychotechnique terminé : ${data.score} / 100 en ${data.minutes} min${data.exits ? `, ${data.exits} sortie de page` : ''}`;
         case 'dg_reviewed':
             return `Appréciation DG : ${data.score} / 100`;
+        case 'verdict':
+            return `Avis de l’IA : ${data.label}`;
         case 'note':
             return (
                 <span className="whitespace-pre-line text-foreground">
@@ -595,8 +597,8 @@ export default function ApplicationShow({
                     />
 
                     <DgSection
-                        key={application.dg.reviewed_at ?? 'new'}
                         application={application}
+                        aiBlockedReason={aiBlockedReason}
                     />
 
                     {(candidate.summary ||

@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\SiteTextController;
 use App\Http\Controllers\Admin\SourcingController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\VerdictController;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Support\Facades\Route;
 
@@ -61,6 +62,7 @@ Route::prefix('admin')
         Route::post('applications/{application}/psychotest/send', [PsychotestController::class, 'send'])->name('applications.psychotest.send');
         Route::delete('applications/{application}/psychotest', [PsychotestController::class, 'destroy'])->name('applications.psychotest.destroy');
         Route::put('applications/{application}/dg-review', [DgReviewController::class, 'update'])->name('applications.dg-review.update');
+        Route::post('applications/{application}/verdict', [VerdictController::class, 'store'])->name('applications.verdict.store');
         Route::resource('applications', JobApplicationController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::resource('candidates', CandidateController::class)->only(['index', 'update', 'destroy']);
 

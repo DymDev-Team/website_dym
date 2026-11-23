@@ -132,6 +132,9 @@ class RecruitmentSettingController extends Controller
             'psychotest_question_seconds' => ['required', 'integer', 'between:15,300'],
             'psychotest_validity_days' => ['required', 'integer', 'between:1,60'],
             'ai_knowledge' => ['nullable', 'string', 'max:5000'],
+            'weight_ai' => ['required', 'integer', 'between:0,10'],
+            'weight_test' => ['required', 'integer', 'between:0,10'],
+            'weight_dg' => ['required', 'integer', 'between:0,10'],
             'dg_criteria' => ['required', 'string', 'max:2000', function (string $attribute, mixed $value, \Closure $fail) {
                 $lines = RecruitmentSetting::lines((string) $value);
 
@@ -150,6 +153,9 @@ class RecruitmentSettingController extends Controller
             'psychotest_validity_days' => (string) $validated['psychotest_validity_days'],
             'dg_criteria' => implode("\n", RecruitmentSetting::lines($validated['dg_criteria'])),
             'ai_knowledge' => trim((string) ($validated['ai_knowledge'] ?? '')),
+            'weight_ai' => (string) $validated['weight_ai'],
+            'weight_test' => (string) $validated['weight_test'],
+            'weight_dg' => (string) $validated['weight_dg'],
         ]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Parcours de recrutement enregistré.']);

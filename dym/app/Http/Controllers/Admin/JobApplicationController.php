@@ -60,6 +60,7 @@ class JobApplicationController extends Controller
         $stages = RecruitmentStage::query()->ordered()->get();
         $query = fn () => $this->filtered($filters);
         $shown = fn (RecruitmentStage $stage) => min(max((int) ($filters['shown'][$stage->id] ?? 0), self::PER_STAGE), self::MAX_PER_STAGE);
+        $weights = RecruitmentSetting::weights();
 
         return Inertia::render('admin/applications/index', [
             'stages' => $stages->map(fn (RecruitmentStage $stage) => [
@@ -75,7 +76,7 @@ class JobApplicationController extends Controller
                     ->latest()
                     ->limit($shown($stage))
                     ->get()
-                    ->map(fn (JobApplication $application) => $this->card($application)),
+                    ->map(fn (JobApplication $application) => $this->card($application, $weights)),
             ]),
             'perStage' => self::PER_STAGE,
             'offers' => JobOffer::query()->latest()->get(['id', 'title', 'slug', 'is_published', 'closes_at']),
@@ -168,6 +169,14 @@ class JobApplicationController extends Controller
                     'score' => $application->dg_score,
                     'reviewed_by' => $application->dgReviewedBy?->name,
                     'reviewed_at' => $application->dg_reviewed_at,
+                    'global' => $application->globalScore($weights = RecruitmentSetting::weights()),
+                    'weights' => $weights,
+                    'verdict' => $application->verdict === null ? null : [
+                        'value' => $application->verdict->value,
+                        'label' => $application->verdict->label(),
+                        'comment' => $application->verdict_comment,
+                        'at' => $application->verdict_at,
+                    ],
                 ],
             ],
             'matchedOffers' => $matchedOffers,
@@ -367,9 +376,10 @@ class JobApplicationController extends Controller
     /**
      * Data of a pipeline card.
      *
+     * @param  array{ai: int, test: int, dg: int}  $weights
      * @return array<string, mixed>
      */
-    private function card(JobApplication $application): array
+    private function card(JobApplication $application, array $weights): array
     {
         $candidate = $application->candidate;
 
@@ -380,6 +390,9 @@ class JobApplicationController extends Controller
             'recommendation' => $application->recommendation?->value,
             'test_score' => $application->test_score,
             'dg_score' => $application->dg_score,
+            // Note globale montrée une fois le DG passé : avant, elle répète la note IA.
+            'global_score' => $application->dg_score === null ? null : $application->globalScore($weights),
+            'verdict' => $application->verdict?->value,
             'viewed' => $application->viewed_at !== null,
             'created_at' => $application->created_at,
             'analysis_status' => $application->latestAnalysis?->status->value,

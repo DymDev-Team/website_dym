@@ -204,6 +204,8 @@ export type RecruitmentStage = {
 
 export type Recommendation = 'priority' | 'consider' | 'not_matching';
 
+export type Verdict = 'hire' | 'discuss' | 'reject';
+
 export type AnalysisStatus =
     | 'pending'
     | 'processing'
@@ -220,6 +222,8 @@ export type PipelineCard = {
     recommendation: Recommendation | null;
     test_score: number | null;
     dg_score: number | null;
+    global_score: number | null;
+    verdict: Verdict | null;
     viewed: boolean;
     created_at: string;
     analysis_status: AnalysisStatus | null;
@@ -306,7 +310,8 @@ export type ApplicationEvent = {
         | 'email_sent'
         | 'psychotest_sent'
         | 'psychotest_completed'
-        | 'dg_reviewed';
+        | 'dg_reviewed'
+        | 'verdict';
     data: Record<string, string | number | boolean | null> | null;
     user: string | null;
     created_at: string;
@@ -382,6 +387,14 @@ export type ApplicationFile = {
         score: number | null;
         reviewed_by: string | null;
         reviewed_at: string | null;
+        global: number | null;
+        weights: { ai: number; test: number; dg: number };
+        verdict: {
+            value: Verdict;
+            label: string;
+            comment: string | null;
+            at: string | null;
+        } | null;
     };
 };
 

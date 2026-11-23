@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { VerdictBadge } from '@/components/admin/recruitment';
 import { update as updateDgReview } from '@/routes/admin/applications/dg-review';
 import {
     destroy as destroyTest,
@@ -25,6 +26,7 @@ import {
     send,
     update as updateTest,
 } from '@/routes/admin/applications/psychotest';
+import { store as storeVerdict } from '@/routes/admin/applications/verdict';
 import type {
     ApplicationFile,
     Psychotest,
@@ -516,8 +518,27 @@ function TestResult({ test }: { test: Psychotest }) {
 /**
  * Managing director's appraisal: each criterion scored from 1 to 5.
  */
-export function DgSection({ application }: { application: ApplicationFile }) {
+export function DgSection({
+    application,
+    aiBlockedReason,
+}: {
+    application: ApplicationFile;
+    aiBlockedReason: string | null;
+}) {
     const { dg } = application;
+    const [advising, setAdvising] = useState(false);
+
+    // Avis de l'IA, demandé après chaque appréciation enregistrée.
+    const advise = () =>
+        router.post(
+            storeVerdict.url(application.id),
+            {},
+            {
+                preserveScroll: true,
+                onStart: () => setAdvising(true),
+                onFinish: () => setAdvising(false),
+            },
+        );
     const [scores, setScores] = useState(() =>
         dg.criteria.map(
             (criterion) =>
@@ -540,6 +561,11 @@ export function DgSection({ application }: { application: ApplicationFile }) {
                 preserveScroll: true,
                 onStart: () => setSaving(true),
                 onFinish: () => setSaving(false),
+                onSuccess: () => {
+                    if (!aiBlockedReason) {
+                        advise();
+                    }
+                },
             },
         );
 
@@ -625,6 +651,69 @@ export function DgSection({ application }: { application: ApplicationFile }) {
                         ? 'Notez chaque critère de 1 à 5.'
                         : `Note DG : ${preview} / 100`}
                 </span>
+            </div>
+
+            <div className="space-y-3 border-t pt-4">
+                <div className="flex items-baseline justify-between gap-3">
+                    <p className="font-medium">Note globale</p>
+                    <p className="text-2xl font-semibold tabular-nums">
+                        {dg.score === null ? '—' : (dg.global ?? '—')}
+                        <span className="text-sm font-normal text-muted-foreground">
+                            {' '}
+                            / 100
+                        </span>
+                    </p>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                    IA {application.score ?? '—'} · Test{' '}
+                    {application.psychotest?.score ?? '—'} · DG{' '}
+                    {dg.score ?? '—'} · poids {dg.weights.ai} /{' '}
+                    {dg.weights.test} / {dg.weights.dg}
+                    {dg.score === null &&
+                        ' · calculée une fois l’appréciation DG enregistrée'}
+                </p>
+
+                {advising ? (
+                    <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Spinner /> L’IA rédige son avis…
+                    </p>
+                ) : (
+                    dg.verdict && (
+                        <div className="space-y-2 rounded-lg bg-muted/50 p-3">
+                            <VerdictBadge verdict={dg.verdict.value} />
+                            <p className="text-sm whitespace-pre-line">
+                                {dg.verdict.comment}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                                Avis de l’IA
+                                {dg.verdict.at &&
+                                    ` du ${dateTime.format(new Date(dg.verdict.at))}`}{' '}
+                                : une aide à la décision, qui reste la vôtre.
+                            </p>
+                        </div>
+                    )
+                )}
+
+                <Button
+                    type="button"
+                    variant="outline"
+                    disabled={
+                        dg.score === null ||
+                        advising ||
+                        aiBlockedReason !== null
+                    }
+                    onClick={advise}
+                >
+                    <Sparkles />
+                    {dg.verdict
+                        ? 'Mettre à jour l’avis de l’IA'
+                        : 'Demander l’avis de l’IA'}
+                </Button>
+                {aiBlockedReason && (
+                    <p className="text-xs text-destructive">
+                        {aiBlockedReason}
+                    </p>
+                )}
             </div>
         </Box>
     );

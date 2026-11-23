@@ -36,6 +36,8 @@ class AiCall extends Model
 
     public const PSYCHOTEST = 'psychotest';
 
+    public const VERDICT = 'verdict';
+
     protected $table = 'recruitment_ai_calls';
 
     /**
