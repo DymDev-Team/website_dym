@@ -6,7 +6,9 @@ import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+// Nom affiché dans l'onglet, écrit en dur : APP_NAME vaut encore « Laravel »
+// dans certains .env et le build reprendrait cette valeur.
+const appName = 'DYM Manufacture';
 
 // Pages du site vitrine : elles ont leur propre en-tête/pied de page et ne
 // doivent pas hériter du layout (sidebar) de l'application.
@@ -28,7 +30,13 @@ const publicPages = [
 ];
 
 void createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    // Les titres du site vitrine contiennent déjà le nom : pas de doublon.
+    title: (title) =>
+        !title
+            ? appName
+            : title.includes(appName)
+              ? title
+              : `${title} — ${appName}`,
     layout: (name) => {
         switch (true) {
             case publicPages.includes(name):
