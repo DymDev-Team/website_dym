@@ -53,6 +53,21 @@ class DashboardController extends Controller
                 ],
             ],
             'latestPosts' => Post::query()->latest('updated_at')->limit(5)->get(),
+            'latestApplications' => JobApplication::query()
+                ->with(['candidate:id,name,email', 'jobOffer:id,title', 'stage:id,name,color'])
+                ->latest()
+                ->latest('id')
+                ->limit(8)
+                ->get()
+                ->map(fn (JobApplication $application) => [
+                    'id' => $application->id,
+                    'name' => $application->candidate->display_name,
+                    'offer' => $application->jobOffer?->title,
+                    'stage' => $application->stage->only(['name', 'color']),
+                    'score' => $application->score,
+                    'viewed' => $application->viewed_at !== null,
+                    'created_at' => $application->created_at,
+                ]),
         ]);
     }
 

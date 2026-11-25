@@ -17,12 +17,16 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import AdminPage from '@/components/admin/admin-page';
 import { postStatus } from '@/components/admin/post-status';
+import { ScoreBadge, StageDot } from '@/components/admin/recruitment';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { home } from '@/routes';
 import { dashboard } from '@/routes/admin';
 import { index as activities } from '@/routes/admin/activities';
-import { index as applications } from '@/routes/admin/applications';
+import {
+    index as applications,
+    show as showApplication,
+} from '@/routes/admin/applications';
 import { index as equipment } from '@/routes/admin/equipment';
 import { index as partners } from '@/routes/admin/partners';
 import { index as brands } from '@/routes/admin/brands';
@@ -53,7 +57,21 @@ type Props = {
         users: { total: number; admins: number };
     };
     latestPosts: Post[];
+    latestApplications: {
+        id: number;
+        name: string;
+        offer: string | null;
+        stage: { name: string; color: string };
+        score: number | null;
+        viewed: boolean;
+        created_at: string;
+    }[];
 };
+
+const receivedAt = new Intl.DateTimeFormat('fr-FR', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+});
 
 function StatCard({
     title,
@@ -88,7 +106,11 @@ const visible = (c: Count) =>
         ? 'Tous visibles'
         : `${c.published} visibles sur le site`;
 
-export default function AdminDashboard({ stats, latestPosts }: Props) {
+export default function AdminDashboard({
+    stats,
+    latestPosts,
+    latestApplications,
+}: Props) {
     return (
         <AdminPage
             title="Administration du site"
@@ -174,6 +196,70 @@ export default function AdminDashboard({ stats, latestPosts }: Props) {
                     detail={`${stats.users.admins} administrateurs`}
                 />
             </div>
+
+            <section className="rounded-xl border">
+                <div className="flex items-center justify-between border-b p-4">
+                    <h3 className="font-medium">Dernières candidatures</h3>
+                    <Button size="sm" variant="outline" asChild>
+                        <Link
+                            href={applications({ query: { sort: 'recent' } })}
+                        >
+                            Tout voir
+                        </Link>
+                    </Button>
+                </div>
+                {latestApplications.length === 0 ? (
+                    <p className="p-6 text-sm text-muted-foreground">
+                        Aucune candidature pour le moment.
+                    </p>
+                ) : (
+                    <ul className="divide-y">
+                        {latestApplications.map((application) => (
+                            <li key={application.id}>
+                                <Link
+                                    href={showApplication(application.id)}
+                                    className="flex items-center gap-4 p-4 hover:bg-muted/40"
+                                >
+                                    <div className="min-w-0 flex-1">
+                                        <p
+                                            className={
+                                                application.viewed
+                                                    ? 'truncate'
+                                                    : 'truncate font-semibold'
+                                            }
+                                        >
+                                            {!application.viewed && (
+                                                <span
+                                                    className="mr-2 inline-block size-2 rounded-full bg-primary align-middle"
+                                                    title="Pas encore ouverte"
+                                                />
+                                            )}
+                                            {application.name}
+                                        </p>
+                                        <p className="truncate text-xs text-muted-foreground">
+                                            {application.offer ??
+                                                'Sans poste visé'}{' '}
+                                            ·{' '}
+                                            {receivedAt.format(
+                                                new Date(
+                                                    application.created_at,
+                                                ),
+                                            )}
+                                        </p>
+                                    </div>
+                                    <span className="hidden items-center gap-2 text-xs text-muted-foreground sm:inline-flex">
+                                        <StageDot
+                                            color={application.stage.color}
+                                        />
+                                        {application.stage.name}
+                                    </span>
+                                    <ScoreBadge score={application.score} />
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </section>
 
             <section className="rounded-xl border">
                 <div className="flex items-center justify-between border-b p-4">

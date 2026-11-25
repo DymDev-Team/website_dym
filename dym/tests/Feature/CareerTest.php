@@ -244,6 +244,44 @@ test('each column of the pipeline loads more cards on demand', function () {
         ->assertInertia(fn (Assert $page) => $page->has('stages.0.applications', 60));
 });
 
+test('the pipeline can show the latest applications first', function () {
+    $admin = User::factory()->admin()->create();
+    $best = JobApplication::factory()->create(['score' => 90, 'created_at' => now()->subDays(3)]);
+    $latest = JobApplication::factory()->create(['score' => 40, 'created_at' => now()]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.applications.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('filters.sort', 'score')
+            ->where('stages.0.applications.0.id', $best->id));
+
+    $this->actingAs($admin)
+        ->get(route('admin.applications.index', ['sort' => 'recent']))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('filters.sort', 'recent')
+            ->where('stages.0.applications.0.id', $latest->id)
+            ->where('stages.0.applications.1.id', $best->id));
+});
+
+test('the admin overview lists the latest applications', function () {
+    $admin = User::factory()->admin()->create();
+    $older = JobApplication::factory()->create(['created_at' => now()->subDay()]);
+    $latest = JobApplication::factory()->for(JobOffer::factory())->create(['viewed_at' => now()]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.dashboard'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('admin/dashboard')
+            ->has('latestApplications', 2)
+            ->where('latestApplications.0.id', $latest->id)
+            ->where('latestApplications.0.name', $latest->candidate->display_name)
+            ->where('latestApplications.0.offer', $latest->jobOffer->title)
+            ->where('latestApplications.0.viewed', true)
+            ->where('latestApplications.1.id', $older->id)
+            ->where('latestApplications.1.offer', null)
+            ->where('latestApplications.1.viewed', false));
+});
+
 test('the pipeline can be filtered and an application moved to another stage', function () {
     $admin = User::factory()->admin()->create();
     $offer = JobOffer::factory()->create();

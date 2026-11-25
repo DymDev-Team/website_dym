@@ -50,6 +50,8 @@ class JobApplicationController extends Controller
             'offer' => ['nullable', 'string'],
             'search' => ['nullable', 'string', 'max:100'],
             'recommendation' => ['nullable', Rule::enum(Recommendation::class)],
+            // Ordre des cartes : meilleure note (par défaut) ou dernières reçues.
+            'sort' => ['nullable', Rule::in(['score', 'recent'])],
             // Cartes demandées par colonne, l'identifiant de l'étape en clé.
             'shown' => ['nullable', 'array'],
             'shown.*' => ['integer', 'min:1'],
@@ -61,6 +63,7 @@ class JobApplicationController extends Controller
         $query = fn () => $this->filtered($filters);
         $shown = fn (RecruitmentStage $stage) => min(max((int) ($filters['shown'][$stage->id] ?? 0), self::PER_STAGE), self::MAX_PER_STAGE);
         $weights = RecruitmentSetting::weights();
+        $recent = ($filters['sort'] ?? null) === 'recent';
 
         return Inertia::render('admin/applications/index', [
             'stages' => $stages->map(fn (RecruitmentStage $stage) => [
@@ -71,9 +74,9 @@ class JobApplicationController extends Controller
                 'applications' => $query()
                     ->where('stage_id', $stage->id)
                     ->with(['candidate.jobFamily:id,label', 'jobOffer:id,title,slug', 'latestAnalysis:id,job_application_id,status'])
-                    ->orderByRaw('score IS NULL')
-                    ->orderByDesc('score')
+                    ->unless($recent, fn (Builder $q) => $q->orderByRaw('score IS NULL')->orderByDesc('score'))
                     ->latest()
+                    ->latest('id')
                     ->limit($shown($stage))
                     ->get()
                     ->map(fn (JobApplication $application) => $this->card($application, $weights)),
@@ -86,6 +89,7 @@ class JobApplicationController extends Controller
                 'offer' => $filters['offer'] ?? '',
                 'search' => $filters['search'] ?? '',
                 'recommendation' => $filters['recommendation'] ?? '',
+                'sort' => $recent ? 'recent' : 'score',
             ],
             'activeAnalyses' => $this->runner->active(),
             'missingAnalyses' => JobApplication::query()->withoutAnalysis()->count(),

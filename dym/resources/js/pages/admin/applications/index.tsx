@@ -46,7 +46,12 @@ import type {
     PipelineStage,
 } from '@/types/admin';
 
-type Filters = { offer: string; search: string; recommendation: string };
+type Filters = {
+    offer: string;
+    search: string;
+    recommendation: string;
+    sort: 'score' | 'recent';
+};
 
 type Props = {
     stages: PipelineStage[];
@@ -342,6 +347,23 @@ export default function Pipeline({
                                 {r.label}
                             </SelectItem>
                         ))}
+                    </SelectContent>
+                </Select>
+
+                <Select
+                    value={filters.sort}
+                    onValueChange={(v) =>
+                        filter({ sort: v as Filters['sort'] })
+                    }
+                >
+                    <SelectTrigger className="w-52" aria-label="Trier par">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="score">Meilleure note</SelectItem>
+                        <SelectItem value="recent">
+                            Dernières candidatures
+                        </SelectItem>
                     </SelectContent>
                 </Select>
 
