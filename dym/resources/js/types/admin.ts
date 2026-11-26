@@ -307,6 +307,7 @@ export type ApplicationEvent = {
         | 'analysis_completed'
         | 'analysis_failed'
         | 'candidate_merged'
+        | 'contacts_exported'
         | 'email_sent'
         | 'psychotest_sent'
         | 'psychotest_completed'

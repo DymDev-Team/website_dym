@@ -1,16 +1,23 @@
 import { Link, router } from '@inertiajs/react';
 import {
     AlertTriangle,
+    Copy,
+    Download,
     Library,
+    ListChecks,
     Search,
     Settings2,
     Sparkles,
     UserSearch,
+    X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { DragEvent, FormEvent } from 'react';
+import { toast } from 'sonner';
 import AdminPage from '@/components/admin/admin-page';
 import CandidateEmailDialog from '@/components/admin/candidate-email-dialog';
+import { copyRows, downloadCsv } from '@/components/admin/contacts-export';
+import type { ContactRow } from '@/components/admin/contacts-export';
 import CvUploadDialog from '@/components/admin/cv-upload-dialog';
 import {
     AnalysisPending,
@@ -19,10 +26,12 @@ import {
     StageDot,
     StepScore,
     VerdictBadge,
+    postJson,
     seniorityLabels,
     useAnalysisDriver,
 } from '@/components/admin/recruitment';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -34,7 +43,7 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes/admin';
-import { index, show, update } from '@/routes/admin/applications';
+import { contacts, index, show, update } from '@/routes/admin/applications';
 import { index as candidates } from '@/routes/admin/candidates';
 import { show as sourcing } from '@/routes/admin/job-offers/sourcing';
 import { missing } from '@/routes/admin/recruitment/analyses';
@@ -73,9 +82,28 @@ type Props = {
 
 const ALL = 'all';
 
+// Cartes cochées une à une, ou tout le résultat du filtre (cartes non
+// chargées comprises).
+type Selection = { all: true } | { all: false; ids: number[] };
+
+const none: Selection = { all: false, ids: [] };
+
+const plural = (count: number, word: string) =>
+    `${count} ${word}${count > 1 ? 's' : ''}`;
+
 const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' });
 
-function Card({ card }: { card: PipelineCard }) {
+function Card({
+    card,
+    selecting,
+    checked,
+    onToggle,
+}: {
+    card: PipelineCard;
+    selecting: boolean;
+    checked: boolean;
+    onToggle: () => void;
+}) {
     const { candidate } = card;
     const details = [
         candidate.job_family,
@@ -84,17 +112,17 @@ function Card({ card }: { card: PipelineCard }) {
             `${candidate.years_experience} an${candidate.years_experience > 1 ? 's' : ''}`,
     ].filter(Boolean);
 
-    return (
-        <Link
-            href={show(card.id)}
-            draggable
-            onDragStart={(event: DragEvent) => {
-                event.dataTransfer.setData('text/plain', String(card.id));
-                event.dataTransfer.effectAllowed = 'move';
-            }}
-            className="block cursor-grab space-y-2 rounded-lg border bg-background p-3 shadow-xs transition-colors hover:border-foreground/30 active:cursor-grabbing"
-        >
+    const content = (
+        <>
             <div className="flex items-start gap-2">
+                {selecting && (
+                    <Checkbox
+                        checked={checked}
+                        onCheckedChange={onToggle}
+                        aria-label={`Sélectionner ${candidate.name}`}
+                        className="mt-0.5"
+                    />
+                )}
                 <div className="min-w-0 flex-1">
                     <p
                         className={cn(
@@ -144,6 +172,34 @@ function Card({ card }: { card: PipelineCard }) {
                     </span>
                 )}
             </div>
+        </>
+    );
+
+    // En sélection, un clic coche la carte au lieu d'ouvrir la fiche.
+    if (selecting) {
+        return (
+            <label
+                className={cn(
+                    'block cursor-pointer space-y-2 rounded-lg border bg-background p-3 shadow-xs transition-colors hover:border-foreground/30',
+                    checked && 'border-primary ring-2 ring-primary/30',
+                )}
+            >
+                {content}
+            </label>
+        );
+    }
+
+    return (
+        <Link
+            href={show(card.id)}
+            draggable
+            onDragStart={(event: DragEvent) => {
+                event.dataTransfer.setData('text/plain', String(card.id));
+                event.dataTransfer.effectAllowed = 'move';
+            }}
+            className="block cursor-grab space-y-2 rounded-lg border bg-background p-3 shadow-xs transition-colors hover:border-foreground/30 active:cursor-grabbing"
+        >
+            {content}
         </Link>
     );
 }
@@ -193,7 +249,114 @@ export default function Pipeline({
         stageId: number;
     } | null>(null);
 
+    const [selecting, setSelecting] = useState(false);
+    const [selection, setSelection] = useState<Selection>(none);
+    const [exporting, setExporting] = useState<'export' | 'copy' | null>(null);
+    const loadedIds = stages.flatMap((s) => s.applications.map((a) => a.id));
+    const total = stages.reduce((sum, s) => sum + s.total, 0);
+    const count = selection.all ? total : selection.ids.length;
+    const isSelected = (id: number) =>
+        selection.all || selection.ids.includes(id);
+
+    // Décocher une carte quand tout le filtre est sélectionné repart des
+    // cartes affichées.
+    const toggle = (id: number) =>
+        setSelection((current) => {
+            const ids = current.all ? loadedIds : current.ids;
+
+            return {
+                all: false,
+                ids: ids.includes(id)
+                    ? ids.filter((other) => other !== id)
+                    : [...ids, id],
+            };
+        });
+
+    const toggleStage = (stage: PipelineStage, on: boolean) =>
+        setSelection((current) => {
+            const ids = current.all ? loadedIds : current.ids;
+            const stageIds = stage.applications.map((a) => a.id);
+
+            return {
+                all: false,
+                ids: on
+                    ? [...new Set([...ids, ...stageIds])]
+                    : ids.filter((id) => !stageIds.includes(id)),
+            };
+        });
+
+    const stageChecked = (stage: PipelineStage) => {
+        const checked = stage.applications.filter((a) =>
+            isSelected(a.id),
+        ).length;
+
+        if (checked === 0) {
+            return false;
+        }
+
+        return checked === stage.applications.length ? true : 'indeterminate';
+    };
+
+    const stopSelecting = () => {
+        setSelecting(false);
+        setSelection(none);
+    };
+
+    const exportContacts = async (action: 'export' | 'copy') => {
+        const body = new FormData();
+        body.append('action', action);
+
+        if (selection.all) {
+            body.append('all', '1');
+            (['offer', 'search', 'recommendation'] as const).forEach(
+                (key) => filters[key] && body.append(key, filters[key]),
+            );
+        } else {
+            selection.ids.forEach((id) => body.append('ids[]', String(id)));
+        }
+
+        setExporting(action);
+
+        try {
+            const { rows } = await postJson<{ rows: ContactRow[] }>(
+                contacts.url(),
+                body,
+            );
+
+            if (action === 'export') {
+                downloadCsv(rows);
+                toast.success(
+                    `${plural(rows.length, 'candidature')} exportée${rows.length > 1 ? 's' : ''}.`,
+                );
+
+                return;
+            }
+
+            try {
+                await copyRows(rows);
+                toast.success(
+                    `Coordonnées copiées (${plural(rows.length, 'candidature')}).`,
+                );
+            } catch {
+                toast.error(
+                    'Le navigateur a refusé la copie : utilisez « Exporter ».',
+                );
+            }
+        } catch (error) {
+            toast.error(
+                error instanceof Error ? error.message : 'Export impossible.',
+            );
+        } finally {
+            setExporting(null);
+        }
+    };
+
     const filter = (patch: Partial<Filters>) => {
+        // Un autre filtre change les candidatures concernées ; le tri, non.
+        if (Object.keys(patch).some((key) => key !== 'sort')) {
+            setSelection(none);
+        }
+
         router.get(
             index.url(),
             { ...filters, ...patch },
@@ -393,6 +556,16 @@ export default function Pipeline({
                     </Button>
                 )}
 
+                <Button
+                    variant={selecting ? 'secondary' : 'outline'}
+                    onClick={() =>
+                        selecting ? stopSelecting() : setSelecting(true)
+                    }
+                >
+                    <ListChecks />
+                    {selecting ? 'Terminer la sélection' : 'Sélectionner'}
+                </Button>
+
                 {activeAnalyses > 0 && !aiBlockedReason && (
                     <span className="self-center text-sm text-muted-foreground">
                         {activeAnalyses} analyse
@@ -418,6 +591,16 @@ export default function Pipeline({
                         )}
                     >
                         <header className="flex items-center gap-2 px-2 py-2">
+                            {selecting && (
+                                <Checkbox
+                                    checked={stageChecked(stage)}
+                                    disabled={stage.applications.length === 0}
+                                    onCheckedChange={(value) =>
+                                        toggleStage(stage, value === true)
+                                    }
+                                    aria-label={`Tout cocher : ${stage.name}`}
+                                />
+                            )}
                             <StageDot color={stage.color} />
                             <h2 className="flex-1 truncate text-sm font-semibold">
                                 {stage.name}
@@ -428,7 +611,13 @@ export default function Pipeline({
                         </header>
                         <div className="flex min-h-24 flex-col gap-2">
                             {stage.applications.map((card) => (
-                                <Card key={card.id} card={card} />
+                                <Card
+                                    key={card.id}
+                                    card={card}
+                                    selecting={selecting}
+                                    checked={isSelected(card.id)}
+                                    onToggle={() => toggle(card.id)}
+                                />
                             ))}
                             {stage.total > stage.applications.length && (
                                 <Button
@@ -454,6 +643,61 @@ export default function Pipeline({
                     </section>
                 ))}
             </div>
+
+            {selecting && (
+                <div className="sticky bottom-4 z-10 flex max-w-full flex-wrap items-center gap-2 self-center rounded-xl border bg-background p-2 pl-4 shadow-lg">
+                    <span className="text-sm">
+                        {selection.all
+                            ? `Les ${plural(total, 'candidature')} du filtre sont sélectionnées`
+                            : count === 0
+                              ? 'Cochez des candidatures'
+                              : `${plural(count, 'candidature')} sélectionnée${count > 1 ? 's' : ''}`}
+                    </span>
+                    {!selection.all && count < total && (
+                        <Button
+                            variant="link"
+                            size="sm"
+                            onClick={() => setSelection({ all: true })}
+                        >
+                            Tout sélectionner ({total})
+                        </Button>
+                    )}
+                    {count > 0 && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelection(none)}
+                        >
+                            Effacer
+                        </Button>
+                    )}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={count === 0 || exporting !== null}
+                        onClick={() => exportContacts('copy')}
+                    >
+                        {exporting === 'copy' ? <Spinner /> : <Copy />}
+                        Copier
+                    </Button>
+                    <Button
+                        size="sm"
+                        disabled={count === 0 || exporting !== null}
+                        onClick={() => exportContacts('export')}
+                    >
+                        {exporting === 'export' ? <Spinner /> : <Download />}
+                        Exporter (CSV)
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={stopSelecting}
+                        aria-label="Fermer la sélection"
+                    >
+                        <X />
+                    </Button>
+                </div>
+            )}
 
             {email && (
                 <CandidateEmailDialog

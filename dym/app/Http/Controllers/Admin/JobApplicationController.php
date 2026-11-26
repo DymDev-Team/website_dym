@@ -25,6 +25,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -246,6 +247,43 @@ class JobApplicationController extends Controller
         }
 
         return back();
+    }
+
+    /**
+     * Contact details of the selected applications (one line each), for the
+     * CSV export or the clipboard. Each export is noted in their history.
+     */
+    public function contacts(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'action' => ['required', Rule::in(['export', 'copy'])],
+            // Tout le résultat du filtre, cartes non chargées comprises.
+            'all' => ['boolean'],
+            'ids' => ['nullable', 'array', 'max:5000'],
+            'ids.*' => ['integer'],
+            'offer' => ['nullable', 'string'],
+            'search' => ['nullable', 'string', 'max:100'],
+            'recommendation' => ['nullable', Rule::enum(Recommendation::class)],
+        ]);
+
+        $applications = ($request->boolean('all') ? $this->filtered($validated) : JobApplication::query()->whereKey($validated['ids'] ?? []))
+            ->with(['candidate:id,name,email,phone', 'jobOffer:id,title'])
+            ->latest()
+            ->latest('id')
+            ->get();
+
+        DB::transaction(fn () => $applications->each(
+            fn (JobApplication $application) => $application->record(ApplicationEventType::ContactsExported, ['action' => $validated['action']], $request->user()),
+        ));
+
+        return response()->json([
+            'rows' => $applications->map(fn (JobApplication $application) => [
+                'name' => $application->candidate->name,
+                'phone' => $application->candidate->phone,
+                'email' => $application->candidate->email,
+                'offer' => $application->jobOffer?->title ?? 'Candidature spontanée',
+            ]),
+        ]);
     }
 
     /**

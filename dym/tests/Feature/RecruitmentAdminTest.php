@@ -43,6 +43,7 @@ test('the recruitment pages are reserved to admins', function (string $method, s
     ['get', 'admin.recruitment.settings.edit'],
     ['post', 'admin.recruitment.analyses.next'],
     ['post', 'admin.applications.store'],
+    ['post', 'admin.applications.contacts'],
 ]);
 
 test('CVs added in bulk wait for the page to analyse them one by one', function () {

@@ -194,6 +194,10 @@ function eventLabel(event: ApplicationEvent): ReactNode {
             return `Analyse IA en échec : ${data.error}`;
         case 'candidate_merged':
             return 'Rattaché à la fiche existante du candidat (même e-mail)';
+        case 'contacts_exported':
+            return data.action === 'copy'
+                ? 'Coordonnées copiées (sélection du pipeline)'
+                : 'Coordonnées exportées en CSV (sélection du pipeline)';
     }
 }
 

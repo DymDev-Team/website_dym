@@ -18,4 +18,5 @@ enum ApplicationEventType: string
     case AnalysisCompleted = 'analysis_completed';
     case AnalysisFailed = 'analysis_failed';
     case CandidateMerged = 'candidate_merged';
+    case ContactsExported = 'contacts_exported';
 }

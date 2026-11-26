@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\ApplicationEventType;
+use App\Models\Candidate;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
 use App\Models\RecruitmentSetting;
@@ -261,6 +263,44 @@ test('the pipeline can show the latest applications first', function () {
             ->where('filters.sort', 'recent')
             ->where('stages.0.applications.0.id', $latest->id)
             ->where('stages.0.applications.1.id', $best->id));
+});
+
+test('the contacts of selected applications are exported and the export is noted', function () {
+    $admin = User::factory()->admin()->create();
+    $chosen = JobApplication::factory()
+        ->for(JobOffer::factory()->state(['title' => 'Soudeur']))
+        ->for(Candidate::factory()->state(['name' => 'Awa Koné', 'email' => 'awa@example.com', 'phone' => '0707070707']))
+        ->create();
+    $spontaneous = JobApplication::factory()->create();
+    $other = JobApplication::factory()->create();
+
+    $this->actingAs($admin)
+        ->postJson(route('admin.applications.contacts'), ['action' => 'export', 'ids' => [$chosen->id, $spontaneous->id]])
+        ->assertOk()
+        ->assertJsonCount(2, 'rows')
+        ->assertJsonFragment(['name' => 'Awa Koné', 'phone' => '0707070707', 'email' => 'awa@example.com', 'offer' => 'Soudeur'])
+        ->assertJsonFragment(['offer' => 'Candidature spontanée']);
+
+    $event = $chosen->events()->where('type', ApplicationEventType::ContactsExported)->sole();
+    expect($event->data)->toBe(['action' => 'export'])
+        ->and($event->user_id)->toBe($admin->id)
+        ->and($other->events()->where('type', ApplicationEventType::ContactsExported)->exists())->toBeFalse();
+});
+
+test('the whole filter result can be exported, cards not loaded included', function () {
+    $admin = User::factory()->admin()->create();
+    $offer = JobOffer::factory()->create();
+    JobApplication::factory()->count(3)->for($offer)->create();
+    JobApplication::factory()->create();
+
+    $this->actingAs($admin)
+        ->postJson(route('admin.applications.contacts'), ['action' => 'copy', 'all' => true, 'offer' => (string) $offer->id])
+        ->assertOk()
+        ->assertJsonCount(3, 'rows');
+
+    $this->actingAs($admin)
+        ->postJson(route('admin.applications.contacts'), ['action' => 'print', 'ids' => [1]])
+        ->assertUnprocessable();
 });
 
 test('the admin overview lists the latest applications', function () {

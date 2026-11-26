@@ -51,6 +51,7 @@ Route::prefix('admin')
         Route::post('job-offers/{job_offer}/sourcing/next', [SourcingController::class, 'next'])->name('job-offers.sourcing.next');
         Route::post('job-offers/{job_offer}/sourcing/{candidate}', [SourcingController::class, 'add'])->name('job-offers.sourcing.add');
         Route::resource('job-offers', JobOfferController::class)->except('show');
+        Route::post('applications/contacts', [JobApplicationController::class, 'contacts'])->name('applications.contacts');
         Route::get('applications/{application}/cv', [JobApplicationController::class, 'cv'])->name('applications.cv');
         Route::get('applications/{application}/report', [JobApplicationController::class, 'report'])->name('applications.report');
         Route::post('applications/{application}/analyze', [JobApplicationController::class, 'analyze'])->name('applications.analyze');
