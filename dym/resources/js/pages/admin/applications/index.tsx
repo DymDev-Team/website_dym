@@ -8,6 +8,7 @@ import {
     Search,
     Settings2,
     Sparkles,
+    MessageCircle,
     UserSearch,
     X,
 } from 'lucide-react';
@@ -19,6 +20,7 @@ import CandidateEmailDialog from '@/components/admin/candidate-email-dialog';
 import { copyRows, downloadCsv } from '@/components/admin/contacts-export';
 import type { ContactRow } from '@/components/admin/contacts-export';
 import CvUploadDialog from '@/components/admin/cv-upload-dialog';
+import WhatsappShareDialog from '@/components/admin/whatsapp-share-dialog';
 import {
     AnalysisPending,
     RecommendationBadge,
@@ -252,6 +254,7 @@ export default function Pipeline({
     const [selecting, setSelecting] = useState(false);
     const [selection, setSelection] = useState<Selection>(none);
     const [exporting, setExporting] = useState<'export' | 'copy' | null>(null);
+    const [sharing, setSharing] = useState(false);
     const loadedIds = stages.flatMap((s) => s.applications.map((a) => a.id));
     const total = stages.reduce((sum, s) => sum + s.total, 0);
     const count = selection.all ? total : selection.ids.length;
@@ -302,7 +305,8 @@ export default function Pipeline({
         setSelection(none);
     };
 
-    const exportContacts = async (action: 'export' | 'copy') => {
+    // Requête des infos de la sélection, pour l'action demandée.
+    const selectionBody = (action: string) => {
         const body = new FormData();
         body.append('action', action);
 
@@ -314,6 +318,12 @@ export default function Pipeline({
         } else {
             selection.ids.forEach((id) => body.append('ids[]', String(id)));
         }
+
+        return body;
+    };
+
+    const exportContacts = async (action: 'export' | 'copy') => {
+        const body = selectionBody(action);
 
         setExporting(action);
 
@@ -681,6 +691,15 @@ export default function Pipeline({
                         Copier
                     </Button>
                     <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={count === 0}
+                        onClick={() => setSharing(true)}
+                    >
+                        <MessageCircle />
+                        WhatsApp
+                    </Button>
+                    <Button
                         size="sm"
                         disabled={count === 0 || exporting !== null}
                         onClick={() => exportContacts('export')}
@@ -697,6 +716,15 @@ export default function Pipeline({
                         <X />
                     </Button>
                 </div>
+            )}
+
+            {sharing && (
+                <WhatsappShareDialog
+                    count={count}
+                    body={selectionBody}
+                    open
+                    onOpenChange={(open) => !open && setSharing(false)}
+                />
             )}
 
             {email && (

@@ -195,6 +195,10 @@ function eventLabel(event: ApplicationEvent): ReactNode {
         case 'candidate_merged':
             return 'Rattaché à la fiche existante du candidat (même e-mail)';
         case 'contacts_exported':
+            if (data.action === 'whatsapp') {
+                return `Infos envoyées par WhatsApp${data.recipient ? ` au ${data.recipient}` : ''} (sélection du pipeline)`;
+            }
+
             return data.action === 'copy'
                 ? 'Coordonnées copiées (sélection du pipeline)'
                 : 'Coordonnées exportées en CSV (sélection du pipeline)';

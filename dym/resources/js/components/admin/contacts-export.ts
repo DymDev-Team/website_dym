@@ -6,6 +6,17 @@ export type ContactRow = {
     phone: string | null;
     email: string | null;
     offer: string;
+    stage: string;
+    score: number | null;
+    recommendation: string | null;
+    test_score: number | null;
+    dg_score: number | null;
+    global_score: number | null;
+    years_experience: number | null;
+    seniority: string | null;
+    location: string | null;
+    summary: string | null;
+    url: string;
 };
 
 const headers = ['Nom', 'Téléphone', 'E-mail', 'Poste visé'];

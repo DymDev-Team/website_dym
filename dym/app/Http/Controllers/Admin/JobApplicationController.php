@@ -250,13 +250,16 @@ class JobApplicationController extends Controller
     }
 
     /**
-     * Contact details of the selected applications (one line each), for the
-     * CSV export or the clipboard. Each export is noted in their history.
+     * Details of the selected applications (one line each), for the CSV
+     * export, the clipboard or a WhatsApp message to a third person. Each
+     * sharing is noted in their history; a preview is not.
      */
     public function contacts(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'action' => ['required', Rule::in(['export', 'copy'])],
+            'action' => ['required', Rule::in(['export', 'copy', 'whatsapp', 'preview'])],
+            // Numéro de la personne à qui les infos sont envoyées par WhatsApp.
+            'recipient' => ['nullable', 'string', 'max:30'],
             // Tout le résultat du filtre, cartes non chargées comprises.
             'all' => ['boolean'],
             'ids' => ['nullable', 'array', 'max:5000'],
@@ -267,14 +270,23 @@ class JobApplicationController extends Controller
         ]);
 
         $applications = ($request->boolean('all') ? $this->filtered($validated) : JobApplication::query()->whereKey($validated['ids'] ?? []))
-            ->with(['candidate:id,name,email,phone', 'jobOffer:id,title'])
+            ->with(['candidate:id,name,email,phone,location,seniority,years_experience,summary', 'jobOffer:id,title', 'stage:id,name'])
             ->latest()
             ->latest('id')
             ->get();
 
-        DB::transaction(fn () => $applications->each(
-            fn (JobApplication $application) => $application->record(ApplicationEventType::ContactsExported, ['action' => $validated['action']], $request->user()),
-        ));
+        if ($validated['action'] !== 'preview') {
+            $data = array_filter([
+                'action' => $validated['action'],
+                'recipient' => $validated['action'] === 'whatsapp' ? ($validated['recipient'] ?? null) : null,
+            ]);
+
+            DB::transaction(fn () => $applications->each(
+                fn (JobApplication $application) => $application->record(ApplicationEventType::ContactsExported, $data, $request->user()),
+            ));
+        }
+
+        $weights = RecruitmentSetting::weights();
 
         return response()->json([
             'rows' => $applications->map(fn (JobApplication $application) => [
@@ -282,6 +294,17 @@ class JobApplicationController extends Controller
                 'phone' => $application->candidate->phone,
                 'email' => $application->candidate->email,
                 'offer' => $application->jobOffer?->title ?? 'Candidature spontanée',
+                'stage' => $application->stage->name,
+                'score' => $application->score,
+                'recommendation' => $application->recommendation?->label(),
+                'test_score' => $application->test_score,
+                'dg_score' => $application->dg_score,
+                'global_score' => $application->dg_score === null ? null : $application->globalScore($weights),
+                'years_experience' => $application->candidate->years_experience,
+                'seniority' => $application->candidate->seniority?->label(),
+                'location' => $application->candidate->location,
+                'summary' => $application->candidate->summary,
+                'url' => route('admin.applications.show', $application),
             ]),
         ]);
     }

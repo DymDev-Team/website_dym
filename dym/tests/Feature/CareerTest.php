@@ -303,6 +303,27 @@ test('the whole filter result can be exported, cards not loaded included', funct
         ->assertUnprocessable();
 });
 
+test('the details sent by WhatsApp to a third person are previewed, then noted', function () {
+    $admin = User::factory()->admin()->create();
+    $application = JobApplication::factory()->create(['score' => 82, 'recommendation' => 'priority']);
+
+    $this->actingAs($admin)
+        ->postJson(route('admin.applications.contacts'), ['action' => 'preview', 'ids' => [$application->id]])
+        ->assertOk()
+        ->assertJsonPath('rows.0.score', 82)
+        ->assertJsonPath('rows.0.stage', $application->stage->name)
+        ->assertJsonPath('rows.0.url', route('admin.applications.show', $application));
+
+    expect($application->events()->where('type', ApplicationEventType::ContactsExported)->exists())->toBeFalse();
+
+    $this->actingAs($admin)
+        ->postJson(route('admin.applications.contacts'), ['action' => 'whatsapp', 'recipient' => '+2250707070707', 'ids' => [$application->id]])
+        ->assertOk();
+
+    expect($application->events()->where('type', ApplicationEventType::ContactsExported)->sole()->data)
+        ->toBe(['action' => 'whatsapp', 'recipient' => '+2250707070707']);
+});
+
 test('the admin overview lists the latest applications', function () {
     $admin = User::factory()->admin()->create();
     $older = JobApplication::factory()->create(['created_at' => now()->subDay()]);
