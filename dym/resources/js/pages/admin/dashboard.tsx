@@ -44,6 +44,12 @@ import type { Post } from '@/types/admin';
 type Count = { total: number; published: number };
 
 type Props = {
+    traffic: {
+        today: number;
+        week: number;
+        month: number;
+        topSections: { section: string; views: number }[];
+    };
     stats: {
         activities: Count;
         projects: Count;
@@ -72,6 +78,68 @@ const receivedAt = new Intl.DateTimeFormat('fr-FR', {
     dateStyle: 'medium',
     timeStyle: 'short',
 });
+
+const viewsFormat = new Intl.NumberFormat('fr-FR');
+
+const trafficSections: Record<string, string> = {
+    home: 'Accueil',
+    about: 'À propos',
+    activities: 'Activités',
+    realisations: 'Réalisations',
+    brands: 'Marques',
+    'posts.index': 'Actualités',
+    'quotes.create': 'Demande de devis',
+    'careers.index': 'Carrière',
+    'legal.show': 'Pages légales',
+};
+
+function TrafficOverview({ traffic }: { traffic: Props['traffic'] }) {
+    const periods = [
+        { label: 'Aujourd’hui', views: traffic.today },
+        { label: '7 derniers jours', views: traffic.week },
+        { label: '30 derniers jours', views: traffic.month },
+    ];
+
+    return (
+        <section className="space-y-4 rounded-xl border p-4">
+            <h2 className="font-medium">Affluence du site</h2>
+            <dl className="grid gap-3 sm:grid-cols-3">
+                {periods.map(({ label, views }) => (
+                    <div key={label} className="rounded-lg bg-muted/50 p-4">
+                        <dt className="text-sm text-muted-foreground">
+                            Pages vues · {label}
+                        </dt>
+                        <dd className="mt-1 text-2xl font-semibold tabular-nums">
+                            {viewsFormat.format(views)}
+                        </dd>
+                    </div>
+                ))}
+            </dl>
+            <h3 className="text-sm font-medium">
+                Rubriques les plus consultées sur 30 jours
+            </h3>
+            {traffic.topSections.length ? (
+                <ol className="divide-y text-sm">
+                    {traffic.topSections.map(({ section, views }) => (
+                        <li
+                            key={section}
+                            className="flex justify-between gap-4 py-2"
+                        >
+                            <span>{trafficSections[section] ?? section}</span>
+                            <span className="tabular-nums">
+                                {viewsFormat.format(views)}
+                            </span>
+                        </li>
+                    ))}
+                </ol>
+            ) : (
+                <p className="text-sm text-muted-foreground">
+                    Aucune page vue enregistrée sur cette période.
+                </p>
+            )}
+        </section>
+    );
+}
 
 function StatCard({
     title,
@@ -107,6 +175,7 @@ const visible = (c: Count) =>
         : `${c.published} visibles sur le site`;
 
 export default function AdminDashboard({
+    traffic,
     stats,
     latestPosts,
     latestApplications,
@@ -124,6 +193,8 @@ export default function AdminDashboard({
                 </Button>
             }
         >
+            <TrafficOverview traffic={traffic} />
+
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <StatCard
                     title="Demandes de devis"

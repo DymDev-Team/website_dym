@@ -16,6 +16,7 @@ use App\Models\QuoteRequest;
 use App\Models\Testimonial;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -27,6 +28,7 @@ class DashboardController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('admin/dashboard', [
+            'traffic' => $this->traffic(),
             'stats' => [
                 'activities' => $this->count(Activity::class),
                 'projects' => $this->count(Project::class),
@@ -69,6 +71,29 @@ class DashboardController extends Controller
                     'created_at' => $application->created_at,
                 ]),
         ]);
+    }
+
+    /**
+     * @return array{today: int, week: int, month: int, topSections: list<array{section: string, views: int}>}
+     */
+    private function traffic(): array
+    {
+        $today = today()->toImmutable();
+        $rows = DB::table('site_page_views')
+            ->whereBetween('viewed_on', [$today->subDays(29)->toDateString(), $today->toDateString()])
+            ->get();
+
+        return [
+            'today' => $rows->where('viewed_on', $today->toDateString())->sum('views'),
+            'week' => $rows->where('viewed_on', '>=', $today->subDays(6)->toDateString())->sum('views'),
+            'month' => $rows->sum('views'),
+            'topSections' => $rows->groupBy('section')
+                ->map(fn ($views, string $section) => ['section' => $section, 'views' => $views->sum('views')])
+                ->sortBy([['views', 'desc'], ['section', 'asc']])
+                ->take(5)
+                ->values()
+                ->all(),
+        ];
     }
 
     /**
