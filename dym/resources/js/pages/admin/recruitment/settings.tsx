@@ -85,6 +85,9 @@ type Props = {
         auto_advance_threshold: number;
         psychotest_question_seconds: number;
         psychotest_validity_days: number;
+        psychotest_mix_aptitude: number;
+        psychotest_mix_behaviour: number;
+        psychotest_mix_trade: number;
         dg_criteria: string[];
         ai_knowledge: string;
         weight_ai: number;
@@ -795,6 +798,55 @@ function ProcessSettings({
                                     required
                                 />
                             </Field>
+                        </div>
+
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium">
+                                Contenu du test psychotechnique (en %, total
+                                100)
+                            </p>
+                            <div className="grid gap-4 sm:grid-cols-3">
+                                {(
+                                    [
+                                        [
+                                            'psychotest_mix_aptitude',
+                                            'Aptitudes (logique, attention, calcul)',
+                                        ],
+                                        [
+                                            'psychotest_mix_behaviour',
+                                            'Comportement au travail',
+                                        ],
+                                        [
+                                            'psychotest_mix_trade',
+                                            'Métier et sécurité',
+                                        ],
+                                    ] as const
+                                ).map(([name, label]) => (
+                                    <Field
+                                        key={name}
+                                        id={name}
+                                        label={label}
+                                        error={errors[name]}
+                                    >
+                                        <Input
+                                            id={name}
+                                            name={name}
+                                            type="number"
+                                            min={0}
+                                            max={100}
+                                            defaultValue={settings[name]}
+                                            required
+                                        />
+                                    </Field>
+                                ))}
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                Part de chaque volet dans la réserve de
+                                questions d’un poste. Une réserve déjà créée
+                                garde ses questions : régénérez-la depuis la
+                                fiche d’un candidat pour appliquer un
+                                changement.
+                            </p>
                         </div>
 
                         <div className="space-y-2">

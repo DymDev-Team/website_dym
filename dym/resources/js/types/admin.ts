@@ -224,6 +224,7 @@ export type PipelineCard = {
     dg_score: number | null;
     global_score: number | null;
     verdict: Verdict | null;
+    test_status: 'draft' | 'sent' | 'started' | 'expired' | 'completed' | null;
     viewed: boolean;
     created_at: string;
     analysis_status: AnalysisStatus | null;

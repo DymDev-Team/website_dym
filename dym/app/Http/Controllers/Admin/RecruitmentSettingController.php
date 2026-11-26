@@ -131,6 +131,13 @@ class RecruitmentSettingController extends Controller
             'auto_advance_threshold' => ['required', 'integer', 'between:1,100'],
             'psychotest_question_seconds' => ['required', 'integer', 'between:15,300'],
             'psychotest_validity_days' => ['required', 'integer', 'between:1,60'],
+            'psychotest_mix_aptitude' => ['required', 'integer', 'between:0,100'],
+            'psychotest_mix_behaviour' => ['required', 'integer', 'between:0,100'],
+            'psychotest_mix_trade' => ['required', 'integer', 'between:0,100', function (string $attribute, mixed $value, \Closure $fail) use ($request) {
+                if ($request->integer('psychotest_mix_aptitude') + $request->integer('psychotest_mix_behaviour') + (int) $value !== 100) {
+                    $fail('Les trois volets du test doivent totaliser 100 %.');
+                }
+            }],
             'ai_knowledge' => ['nullable', 'string', 'max:5000'],
             'weight_ai' => ['required', 'integer', 'between:0,10'],
             'weight_test' => ['required', 'integer', 'between:0,10'],
@@ -151,6 +158,9 @@ class RecruitmentSettingController extends Controller
             'auto_advance_threshold' => (string) $validated['auto_advance_threshold'],
             'psychotest_question_seconds' => (string) $validated['psychotest_question_seconds'],
             'psychotest_validity_days' => (string) $validated['psychotest_validity_days'],
+            'psychotest_mix_aptitude' => (string) $validated['psychotest_mix_aptitude'],
+            'psychotest_mix_behaviour' => (string) $validated['psychotest_mix_behaviour'],
+            'psychotest_mix_trade' => (string) $validated['psychotest_mix_trade'],
             'dg_criteria' => implode("\n", RecruitmentSetting::lines($validated['dg_criteria'])),
             'ai_knowledge' => trim((string) ($validated['ai_knowledge'] ?? '')),
             'weight_ai' => (string) $validated['weight_ai'],

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ApplicationEventType;
+use App\Recruitment\AutoAdvance;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Model;
@@ -215,6 +216,7 @@ class Psychotest extends Model
                 'exits' => $this->exits,
                 'stopped' => $reason,
             ]);
+            AutoAdvance::afterPsychotest($this->application);
         });
     }
 

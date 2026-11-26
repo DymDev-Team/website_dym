@@ -12,6 +12,7 @@ use App\Models\RecruitmentStage;
 use App\Models\User;
 use App\Notifications\CandidateMessage;
 use App\Recruitment\Ai\ModelGateway;
+use App\Recruitment\PsychotestDesigner;
 use App\Recruitment\PsychotestInvitation;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
@@ -110,6 +111,9 @@ test('the process settings are saved', function () {
             'auto_advance_threshold' => '60',
             'psychotest_question_seconds' => '45',
             'psychotest_validity_days' => '3',
+            'psychotest_mix_aptitude' => '30',
+            'psychotest_mix_behaviour' => '50',
+            'psychotest_mix_trade' => '20',
             'dg_criteria' => "Motivation\n\n  Rigueur \nMotivation",
             'ai_knowledge' => '  Montants en FCFA.  ',
             'weight_ai' => '1',
@@ -123,6 +127,9 @@ test('the process settings are saved', function () {
         'auto_advance_threshold' => 60,
         'psychotest_question_seconds' => 45,
         'psychotest_validity_days' => 3,
+        'psychotest_mix_aptitude' => 30,
+        'psychotest_mix_behaviour' => 50,
+        'psychotest_mix_trade' => 20,
         'dg_criteria' => ['Motivation', 'Rigueur'],
         'ai_knowledge' => 'Montants en FCFA.',
     ])->and(RecruitmentSetting::weights())->toBe(['ai' => 1, 'test' => 1, 'dg' => 2]);
@@ -132,9 +139,12 @@ test('the process settings are saved', function () {
             'auto_advance_threshold' => '101',
             'psychotest_question_seconds' => '45',
             'psychotest_validity_days' => '3',
+            'psychotest_mix_aptitude' => '50',
+            'psychotest_mix_behaviour' => '60',
+            'psychotest_mix_trade' => '0',
             'dg_criteria' => '',
         ])
-        ->assertSessionHasErrors(['auto_advance_threshold', 'dg_criteria']);
+        ->assertSessionHasErrors(['auto_advance_threshold', 'dg_criteria', 'psychotest_mix_trade']);
 });
 
 test('the team moves at once the waiting applications that reach the threshold', function () {
@@ -244,7 +254,7 @@ test('the team edits the questions until the candidate starts', function () {
         ->assertSessionHasErrors('psychotest');
 });
 
-test('the test is sent by WhatsApp and the candidate joins the test column', function () {
+test('the test is sent by WhatsApp and the candidate stays in review while taking it', function () {
     $test = sentTest(['sent_at' => null, 'expires_at' => null], ['phone' => '07 00 00 00 00']);
     $application = $test->application;
 
@@ -263,8 +273,37 @@ test('the test is sent by WhatsApp and the candidate joins the test column', fun
     $test->refresh();
     expect($test->sent_at)->not->toBeNull()
         ->and($test->expires_at->isSameDay(now()->addDays(7)))->toBeTrue()
-        ->and($application->refresh()->stage->role)->toBe(StageRole::Psychotest)
+        ->and($application->refresh()->stage->is(RecruitmentStage::initial()))->toBeTrue()
         ->and($application->events()->where('type', 'psychotest_sent')->sole()->data)->toBe(['channel' => 'whatsapp']);
+});
+
+test('a candidate who finishes the test joins the test column, never moved back', function () {
+    $test = sentTest(['started_at' => now()]);
+    $application = $test->application;
+    $application->update(['stage_id' => RecruitmentStage::withRole(StageRole::Review)->id]);
+
+    $test->refresh()->finish();
+
+    expect($application->refresh()->stage->role)->toBe(StageRole::Psychotest)
+        ->and($application->test_score)->not->toBeNull()
+        ->and($application->events()->where('type', 'stage_changed')->latest('id')->first()->data)
+        ->toMatchArray(['auto' => true, 'reason' => 'psychotest']);
+
+    // Déjà plus loin dans le pipeline : la fin du test ne le fait pas reculer.
+    $later = sentTest(['started_at' => now()], ['email' => 'kofi@example.com']);
+    $later->application->update(['stage_id' => RecruitmentStage::withRole(StageRole::DgReview)->id]);
+
+    $later->refresh()->finish();
+
+    expect($later->application->refresh()->stage->role)->toBe(StageRole::DgReview);
+});
+
+test('the shares set in the admin split the base of the test', function () {
+    RecruitmentSetting::store(['psychotest_mix_aptitude' => '40', 'psychotest_mix_behaviour' => '60', 'psychotest_mix_trade' => '0']);
+    expect(PsychotestDesigner::mix())->toBe(['aptitude' => 10, 'behaviour' => 15, 'trade' => 0]);
+
+    RecruitmentSetting::store(['psychotest_mix_aptitude' => '33', 'psychotest_mix_behaviour' => '33', 'psychotest_mix_trade' => '34']);
+    expect(array_sum(PsychotestDesigner::mix()))->toBe(PsychotestDesigner::OFFER_QUESTIONS);
 });
 
 test('the test link can be e-mailed', function () {

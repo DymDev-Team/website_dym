@@ -64,6 +64,10 @@ class RecruitmentSetting extends Model
         // Test psychotechnique : temps par question, validité du lien.
         'psychotest_question_seconds' => '60',
         'psychotest_validity_days' => '7',
+        // Part de chaque volet dans la réserve de questions d'un poste (en %).
+        'psychotest_mix_aptitude' => '40',
+        'psychotest_mix_behaviour' => '60',
+        'psychotest_mix_trade' => '0',
         // Grille de l'appréciation DG, un critère par ligne, chacun noté sur 5.
         'dg_criteria' => "Présentation et communication\nMotivation\nCompétences techniques\nPotentiel d’évolution\nAdéquation avec l’équipe",
         // Poids des notes IA, test et DG dans la note globale.
@@ -92,7 +96,7 @@ class RecruitmentSetting extends Model
     /**
      * Every setting, defaults included, secrets decrypted.
      *
-     * @return array{ai_enabled: bool, auto_analyze: bool, api_key: string|null, model: string, effort: string, monthly_budget: float, custom_instructions: string|null, priority_threshold: int, consider_threshold: int, web_research: bool, acknowledgment_enabled: bool, acknowledgment_subject: string, acknowledgment_body: string, acknowledgment_reply_to: string|null, auto_advance: bool, auto_advance_threshold: int, psychotest_question_seconds: int, psychotest_validity_days: int, dg_criteria: list<string>, ai_knowledge: string, weight_ai: int, weight_test: int, weight_dg: int}
+     * @return array{ai_enabled: bool, auto_analyze: bool, api_key: string|null, model: string, effort: string, monthly_budget: float, custom_instructions: string|null, priority_threshold: int, consider_threshold: int, web_research: bool, acknowledgment_enabled: bool, acknowledgment_subject: string, acknowledgment_body: string, acknowledgment_reply_to: string|null, auto_advance: bool, auto_advance_threshold: int, psychotest_question_seconds: int, psychotest_validity_days: int, psychotest_mix_aptitude: int, psychotest_mix_behaviour: int, psychotest_mix_trade: int, dg_criteria: list<string>, ai_knowledge: string, weight_ai: int, weight_test: int, weight_dg: int}
      */
     public static function values(): array
     {
@@ -123,6 +127,9 @@ class RecruitmentSetting extends Model
             'auto_advance_threshold' => (int) $values['auto_advance_threshold'],
             'psychotest_question_seconds' => max(15, (int) $values['psychotest_question_seconds']),
             'psychotest_validity_days' => max(1, (int) $values['psychotest_validity_days']),
+            'psychotest_mix_aptitude' => max(0, (int) $values['psychotest_mix_aptitude']),
+            'psychotest_mix_behaviour' => max(0, (int) $values['psychotest_mix_behaviour']),
+            'psychotest_mix_trade' => max(0, (int) $values['psychotest_mix_trade']),
             'dg_criteria' => self::lines((string) ($values['dg_criteria'] ?: self::DEFAULTS['dg_criteria'])),
             'ai_knowledge' => trim((string) $values['ai_knowledge']),
             'weight_ai' => max(0, (int) $values['weight_ai']),

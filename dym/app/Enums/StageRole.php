@@ -10,7 +10,7 @@ enum StageRole: string
     /** Receives the applications whose AI score reaches the threshold. */
     case Review = 'review';
 
-    /** Candidates who received the psychotechnical test. */
+    /** Candidates who finished the psychotechnical test (moved there on completion). */
     case Psychotest = 'psychotest';
 
     /** Candidates waiting for the managing director's appraisal. */

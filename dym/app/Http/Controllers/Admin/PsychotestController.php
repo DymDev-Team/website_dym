@@ -3,13 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\ApplicationEventType;
-use App\Enums\StageKind;
-use App\Enums\StageRole;
 use App\Http\Controllers\Controller;
 use App\Models\JobApplication;
 use App\Models\Psychotest;
 use App\Models\RecruitmentSetting;
-use App\Models\RecruitmentStage;
 use App\Notifications\CandidateMessage;
 use App\Recruitment\Exceptions\PermanentAnalysisError;
 use App\Recruitment\Exceptions\TransientAnalysisError;
@@ -156,8 +153,9 @@ class PsychotestController extends Controller
             }
         }
 
+        // Le candidat reste à l'étude pendant le test : il change de colonne
+        // en le terminant (AutoAdvance::afterPsychotest).
         $application->record(ApplicationEventType::PsychotestSent, ['channel' => $channel], $request->user());
-        $this->moveToTestStage($application, $request);
 
         return $this->toast('success', match ($channel) {
             'whatsapp' => 'Test ouvert au candidat : envoyez le message préparé dans WhatsApp.',
@@ -190,22 +188,6 @@ class PsychotestController extends Controller
         }
 
         return $test;
-    }
-
-    /**
-     * A candidate still in an earlier open stage joins the test column.
-     */
-    private function moveToTestStage(JobApplication $application, Request $request): void
-    {
-        $stage = RecruitmentStage::withRole(StageRole::Psychotest);
-        $current = $application->stage;
-
-        if ($stage === null || $current->is($stage) || $current->kind !== StageKind::Open || $current->position > $stage->position) {
-            return;
-        }
-
-        $application->update(['stage_id' => $stage->id]);
-        $application->record(ApplicationEventType::StageChanged, ['from' => $current->name, 'to' => $stage->name], $request->user());
     }
 
     private function toast(string $type, string $message): RedirectResponse

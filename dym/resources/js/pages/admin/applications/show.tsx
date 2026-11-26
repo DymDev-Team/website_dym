@@ -149,6 +149,10 @@ function eventLabel(event: ApplicationEvent): ReactNode {
                 ? 'Ajouté depuis la base de CV'
                 : `Ajouté depuis la base de CV (correspondance ${data.score} / 100)`;
         case 'stage_changed':
+            if (data.reason === 'psychotest') {
+                return `Étape : ${data.from} → ${data.to} (automatique, test terminé)`;
+            }
+
             return data.auto
                 ? `Étape : ${data.from} → ${data.to} (automatique, note IA ${data.score})`
                 : `Étape : ${data.from} → ${data.to}`;

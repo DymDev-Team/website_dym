@@ -12,6 +12,7 @@ use App\Http\Requests\Admin\UpdateJobApplicationRequest;
 use App\Models\ApplicationEvent;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
+use App\Models\Psychotest;
 use App\Models\RecruitmentOption;
 use App\Models\RecruitmentSetting;
 use App\Models\RecruitmentStage;
@@ -60,6 +61,11 @@ class JobApplicationController extends Controller
 
         $this->runner->resumeStale();
 
+        // Tests abandonnés en cours de route : le temps écoulé les termine,
+        // et le candidat rejoint la colonne du test (pas de tâche planifiée).
+        Psychotest::query()->whereNotNull('started_at')->whereNull('completed_at')
+            ->with('application.stage')->get()->each->catchUp();
+
         $stages = RecruitmentStage::query()->ordered()->get();
         $query = fn () => $this->filtered($filters);
         $shown = fn (RecruitmentStage $stage) => min(max((int) ($filters['shown'][$stage->id] ?? 0), self::PER_STAGE), self::MAX_PER_STAGE);
@@ -74,7 +80,7 @@ class JobApplicationController extends Controller
                 'total' => $query()->where('stage_id', $stage->id)->count(),
                 'applications' => $query()
                     ->where('stage_id', $stage->id)
-                    ->with(['candidate.jobFamily:id,label', 'jobOffer:id,title,slug', 'latestAnalysis:id,job_application_id,status'])
+                    ->with(['candidate.jobFamily:id,label', 'jobOffer:id,title,slug', 'latestAnalysis:id,job_application_id,status', 'psychotest:id,job_application_id,sent_at,expires_at,started_at,completed_at'])
                     ->unless($recent, fn (Builder $q) => $q->orderByRaw('score IS NULL')->orderByDesc('score'))
                     ->latest()
                     ->latest('id')
@@ -458,6 +464,8 @@ class JobApplicationController extends Controller
             // Note globale montrée une fois le DG passé : avant, elle répète la note IA.
             'global_score' => $application->dg_score === null ? null : $application->globalScore($weights),
             'verdict' => $application->verdict?->value,
+            // Avancement du test, suivi depuis la colonne « En cours d'étude ».
+            'test_status' => $application->psychotest?->status(),
             'viewed' => $application->viewed_at !== null,
             'created_at' => $application->created_at,
             'analysis_status' => $application->latestAnalysis?->status->value,

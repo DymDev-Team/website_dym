@@ -19,7 +19,27 @@ export type ContactRow = {
     url: string;
 };
 
-const headers = ['Nom', 'Téléphone', 'E-mail', 'Poste visé'];
+// Toutes les infos du partage WhatsApp, une colonne chacune ; le téléphone
+// reste en deuxième position (traité à part pour Excel).
+const headers = [
+    'Nom',
+    'Téléphone',
+    'E-mail',
+    'Poste visé',
+    'Étape',
+    'Note IA (/100)',
+    'Avis de l’IA',
+    'Note test (/100)',
+    'Note DG (/100)',
+    'Note globale (/100)',
+    'Années d’expérience',
+    'Niveau',
+    'Ville',
+    'Résumé de l’IA',
+    'Lien vers la fiche',
+];
+
+const score = (value: number | null) => (value === null ? '' : String(value));
 
 // Seuls les caractères d'un numéro sont gardés.
 const phone = (value: string | null) =>
@@ -36,23 +56,36 @@ const safe = (value: string | null) => {
 const csvCell = (value: string) =>
     /[";]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value;
 
+// Une ligne, dans l'ordre des en-têtes.
+const cells = (row: ContactRow): string[] => [
+    safe(row.name),
+    phone(row.phone),
+    safe(row.email),
+    safe(row.offer),
+    safe(row.stage),
+    score(row.score),
+    safe(row.recommendation),
+    score(row.test_score),
+    score(row.dg_score),
+    score(row.global_score),
+    score(row.years_experience),
+    safe(row.seniority),
+    safe(row.location),
+    safe(row.summary),
+    row.url,
+];
+
 /**
  * CSV lu tel quel par Excel en français : point-virgule, UTF-8 avec BOM.
  */
 export function toCsv(rows: ContactRow[]): string {
-    const lines = rows.map((row) => {
-        const number = phone(row.phone);
-
-        return [
-            safe(row.name),
+    const lines = rows.map((row) =>
+        cells(row)
             // Formule texte : sinon Excel efface le 0 de tête du numéro.
-            number ? `="${number}"` : '',
-            safe(row.email),
-            safe(row.offer),
-        ]
+            .map((cell, i) => (i === 1 && cell ? `="${cell}"` : cell))
             .map(csvCell)
-            .join(';');
-    });
+            .join(';'),
+    );
 
     return '\uFEFF' + [headers.join(';'), ...lines].join('\r\n');
 }
@@ -80,13 +113,8 @@ const escapeHtml = (value: string) =>
  * colonne et le téléphone reste du texte ; ailleurs, une ligne par candidat.
  */
 export async function copyRows(rows: ContactRow[]): Promise<void> {
-    const cells = rows.map((row) => [
-        safe(row.name),
-        phone(row.phone),
-        safe(row.email),
-        safe(row.offer),
-    ]);
-    const text = [headers, ...cells].map((line) => line.join('\t')).join('\n');
+    const lines = rows.map(cells);
+    const text = [headers, ...lines].map((line) => line.join('\t')).join('\n');
 
     if (typeof ClipboardItem === 'undefined') {
         await navigator.clipboard.writeText(text);
@@ -94,7 +122,7 @@ export async function copyRows(rows: ContactRow[]): Promise<void> {
         return;
     }
 
-    const html = `<table><tr>${headers.map((h) => `<th>${h}</th>`).join('')}</tr>${cells
+    const html = `<table><tr>${headers.map((h) => `<th>${h}</th>`).join('')}</tr>${lines
         .map(
             (line) =>
                 `<tr>${line

@@ -3,6 +3,7 @@
 namespace App\Recruitment;
 
 use App\Enums\ApplicationEventType;
+use App\Enums\StageKind;
 use App\Enums\StageRole;
 use App\Models\JobApplication;
 use App\Models\RecruitmentSetting;
@@ -10,12 +11,37 @@ use App\Models\RecruitmentStage;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Moves the new applications whose AI score reaches the threshold set in the
- * admin to the review stage. Only from the first stage: a candidate the
- * team already moved is never moved back.
+ * Automatic moves in the pipeline: the new applications whose AI score
+ * reaches the threshold set in the admin go to the review stage, and a
+ * candidate who finishes the psychotechnical test goes to the test stage.
+ * A candidate the team already moved further is never moved back.
  */
 class AutoAdvance
 {
+    /**
+     * The test is taken during the review: once finished, the candidate
+     * joins the test column, unless already in a later or closed stage.
+     */
+    public static function afterPsychotest(JobApplication $application): bool
+    {
+        $target = RecruitmentStage::withRole(StageRole::Psychotest);
+        $current = $application->stage;
+
+        if ($target === null || $current->is($target) || $current->kind !== StageKind::Open || $current->position > $target->position) {
+            return false;
+        }
+
+        $application->update(['stage_id' => $target->id]);
+        $application->record(ApplicationEventType::StageChanged, [
+            'from' => $current->name,
+            'to' => $target->name,
+            'auto' => true,
+            'reason' => 'psychotest',
+        ]);
+
+        return true;
+    }
+
     /**
      * Move one application after its analysis, if it qualifies.
      */

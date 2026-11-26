@@ -93,6 +93,14 @@ const none: Selection = { all: false, ids: [] };
 const plural = (count: number, word: string) =>
     `${count} ${word}${count > 1 ? 's' : ''}`;
 
+// Avancement du test pendant l'étude ; une fois fini, la note s'affiche.
+const testLabels: Record<string, string> = {
+    draft: 'Test préparé',
+    sent: 'Test envoyé',
+    started: 'Test en cours',
+    expired: 'Test expiré',
+};
+
 const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' });
 
 function Card({
@@ -167,6 +175,18 @@ function Card({
                     <StepScore label="Global" score={card.global_score} />
                 )}
                 <VerdictBadge verdict={card.verdict} />
+                {card.test_status && card.test_status in testLabels && (
+                    <span
+                        className={cn(
+                            'rounded-md border px-1.5 py-0.5 text-xs',
+                            card.test_status === 'expired'
+                                ? 'border-amber-500/40 text-amber-700 dark:text-amber-300'
+                                : 'text-muted-foreground',
+                        )}
+                    >
+                        {testLabels[card.test_status]}
+                    </span>
+                )}
                 <AnalysisPending status={card.analysis_status} />
                 {card.analysis_status === 'failed' && (
                     <span className="text-xs text-destructive">

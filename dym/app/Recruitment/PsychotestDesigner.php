@@ -17,7 +17,8 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Writes the multiple-choice questions of the psychotechnical tests: a base
- * common to an offer, plus questions drawn from a candidate's analysis.
+ * common to an offer (aptitudes and behaviour at work, in the shares set in
+ * the admin), plus behaviour questions drawn from a candidate's analysis.
  * Suggestions only: the team reviews them before sending the test.
  */
 class PsychotestDesigner
@@ -32,16 +33,23 @@ class PsychotestDesigner
     private const RULES = <<<'TXT'
         Tu prépares les tests psychotechniques de DYM Manufacture, entreprise de conception, d'usinage et de fabrication métallique sur mesure basée à Abidjan (Côte d'Ivoire).
 
+        Le test est d'abord psychotechnique : il mesure les aptitudes et le comportement au travail, pas les connaissances techniques, vérifiées en entretien.
+
         Chaque question est un QCM :
         - « text » : l'énoncé, en français clair, compréhensible sans document ni calculatrice, auquel on répond en une minute et demie au plus ;
         - « options » : exactement 4 réponses courtes et plausibles ;
         - « answer » : l'indice (de 0 à 3) de la seule bonne réponse ;
-        - « category » : Logique, Calcul, Compréhension, Mise en situation, ou Rigueur et sécurité.
+        - « category » : l'une des catégories ci-dessous, écrite telle quelle.
+
+        Catégories :
+        - Aptitudes : « Logique » (suites de nombres ou de lettres, analogies, intrus, déductions), « Attention » (repérer une différence, une erreur ou un élément manquant dans une courte liste écrite dans l'énoncé), « Raisonnement chiffré » (petits problèmes résolus de tête), « Compréhension » (sens d'une consigne ou d'un court texte).
+        - « Comportement » : une mise en situation de la vie au travail (atelier, chantier ou bureau) qui révèle la façon d'agir : gestion du stress et de l'urgence, conflit avec un collègue ou un chef, réaction à sa propre erreur, respect des consignes et de la hiérarchie, honnêteté et intégrité, esprit d'équipe et entraide, autonomie et initiative, relation avec un client.
+        - « Métier et sécurité » : un cas concret du poste visé où la bonne réponse est le bon réflexe de qualité ou de sécurité.
 
         Règles impératives :
-        1. Aucune question sur la vie privée, l'âge, le sexe, la situation familiale, l'origine, la religion, la santé ou les opinions.
+        1. Aucune question sur la vie privée, l'âge, le sexe, la situation familiale, l'origine, la religion, la santé (physique ou mentale) ou les opinions.
         2. Ni piège ni ambiguïté : une personne compétente trouve la bonne réponse sans hésiter entre deux options.
-        3. Une mise en situation décrit un cas concret du poste ; sa bonne réponse est la conduite professionnelle attendue (sécurité, qualité, respect des consignes, communication).
+        3. En « Comportement », les 4 réponses sont des réactions qu'on observe réellement au travail, sans caricature ; la bonne est la conduite professionnelle la plus adaptée (calme, honnêteté, respect des consignes et de la sécurité, communication, entraide). Varie les situations et la position de la bonne conduite.
         4. Ne cite jamais le nom du candidat ni aucune information qui permettrait de l'identifier.
         TXT;
 
@@ -67,10 +75,48 @@ class PsychotestDesigner
             ])->filter(fn (?string $value) => filled($value))->map(fn (string $value, string $label) => "{$label} : ".trim($value))->implode("\n")."\n</offre>";
 
         return $this->ask(
-            $context."\n\nPrépare ".self::OFFER_QUESTIONS.' questions communes aux candidats de ce poste : environ 6 de logique, 5 de calcul, 4 de compréhension et 10 mises en situation ou questions de rigueur et de sécurité propres au métier.',
+            $context."\n\nPrépare ".self::OFFER_QUESTIONS.' questions communes aux candidats de ce poste : '.self::mixInstructions().'.',
             'offer',
             $offer?->id,
         );
+    }
+
+    /**
+     * Number of questions of each part of the base, from the shares set in
+     * the admin (the rounding goes to the largest part).
+     *
+     * @return array{aptitude: int, behaviour: int, trade: int}
+     */
+    public static function mix(): array
+    {
+        $values = RecruitmentSetting::values();
+        $shares = [
+            'aptitude' => $values['psychotest_mix_aptitude'],
+            'behaviour' => $values['psychotest_mix_behaviour'],
+            'trade' => $values['psychotest_mix_trade'],
+        ];
+
+        if (array_sum($shares) === 0) {
+            $shares = ['aptitude' => 40, 'behaviour' => 60, 'trade' => 0];
+        }
+
+        $total = array_sum($shares);
+        $counts = array_map(fn (int $share) => (int) round(self::OFFER_QUESTIONS * $share / $total), $shares);
+        $largest = array_search(max($shares), $shares, true);
+        $counts[$largest] += self::OFFER_QUESTIONS - array_sum($counts);
+
+        return $counts;
+    }
+
+    private static function mixInstructions(): string
+    {
+        $mix = self::mix();
+
+        return collect([
+            $mix['aptitude'] > 0 ? "{$mix['aptitude']} d’aptitudes, réparties entre Logique, Attention, Raisonnement chiffré et Compréhension" : null,
+            $mix['behaviour'] > 0 ? "{$mix['behaviour']} de Comportement, chacune sur une situation différente" : null,
+            $mix['trade'] > 0 ? "{$mix['trade']} de Métier et sécurité propres au poste" : null,
+        ])->filter()->implode(', ');
     }
 
     /**
@@ -102,7 +148,7 @@ class PsychotestDesigner
         ])->filter()->implode("\n\n");
 
         return $this->ask(
-            "<analyse>\n{$context}\n</analyse>\n\nPrépare ".self::CANDIDATE_QUESTIONS.' questions qui vérifient les compétences annoncées par ce candidat et ses points d’attention : surtout des mises en situation tirées de son parcours et du poste visé.',
+            "<analyse>\n{$context}\n</analyse>\n\nPrépare ".self::CANDIDATE_QUESTIONS.' questions de Comportement qui éclairent les points d’attention de ce candidat (stabilité, travail en équipe, autonomie, rigueur, gestion de la pression…) : des mises en situation proches de son parcours et du poste visé, sans jamais mentionner son parcours dans l’énoncé.',
             'candidate',
             $application->job_offer_id,
         );
